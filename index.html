@@ -84,6 +84,9 @@
     <div class="pack-container" onclick="startPackAnimation('exotics')" id="exotics-pack">
       <div class="pack-title">🌍 Exotics Pack</div>
     </div>
+    <div class="pack-container" onclick="startPackAnimation('sports')" id="sports-pack">
+      <div class="pack-title">⚽ Sports Pack</div>
+    </div>
 
     <div id="item"></div>
     <div id="rarity"></div>
@@ -133,17 +136,32 @@
         { name: "🗽", rarity: "Epic", chance: 8 },
         { name: "🌋", rarity: "Legendary", chance: 1.79 },
         { name: "📀", rarity: "Exotic", chance: 0.006 },
-        { name: "💿", rarity: "Exotic", chance: 0.004 }
+        { name: "💿", rarity: "Exotic", chance: 0.004 },
+      ],
+      sports: [
+        { name: "⚽", rarity: "Uncommon", chance: 18 },
+        { name: "🏀", rarity: "Uncommon", chance: 18 },
+        { name: "🏈", rarity: "Uncommon", chance: 18 },
+        { name: "⚾", rarity: "Uncommon", chance: 18 },
+        { name: "🥊", rarity: "Rare", chance: 6.25 },
+        { name: "🎾", rarity: "Rare", chance: 6.25 },
+        { name: "🏒", rarity: "Rare", chance: 6.25 },
+        { name: "🏆", rarity: "Epic", chance: 3.125 },
+        { name: "🧢", rarity: "Epic", chance: 3.125 },
+        { name: "🥇", rarity: "Legendary", chance: 1.799963 },
+        { name: "🥏", rarity: "Chroma", chance: 0.2 },
+        { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
       ]
     };
 
     const rarityColors = {
-      Uncommon: ['#2ecc71'],
-      Rare: ['#3498db'],
-      Epic: ['#e74c3c'],
-      Legendary: ['#f1c40f'],
-      Chroma: ['#00bfff', '#ff69b4'],
-      Exotic: ['#8000ff', '#00ffe5']
+      Uncommon: '#2ecc71',
+      Rare: '#3498db',
+      Epic: '#e74c3c',
+      Legendary: '#f1c40f',
+      Chroma: '#00bfff',
+      Exotic: '#8000ff',
+      Elusive: 'salmon'
     };
 
     let locker = {};
@@ -189,14 +207,7 @@
     }
 
     function getColor(rarity) {
-      switch (rarity) {
-        case "Uncommon": return "#2c9e2c";
-        case "Rare": return "#007bff";
-        case "Epic": return "#e60000";
-        case "Legendary": return "#FFD700";
-        case "Chroma": return "#00bfff";
-        case "Exotic": return "purple";
-      }
+      return rarityColors[rarity] || '#ffffff';
     }
 
     function updateLocker() {
@@ -252,7 +263,7 @@
         particleCount: 150,
         spread: 90,
         origin: { y: 0.6 },
-        colors: rarityColors[selected.rarity] || ['#ffffff']
+        colors: [getColor(selected.rarity)]
       });
     }
   </script>
