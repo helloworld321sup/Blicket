@@ -94,6 +94,15 @@
       border-radius: 5px;
       cursor: pointer;
     }
+    <div class="locker">
+  <div class="locker-title">Trade With a Friend</div>
+  <input type="text" id="tradeUser" placeholder="Friend's Username" style="padding: 10px; font-size: 16px; margin: 5px;">
+  <input type="text" id="giveItem" placeholder="Emoji to Give" style="padding: 10px; font-size: 16px; margin: 5px;">
+  <input type="text" id="getItem" placeholder="Emoji to Receive" style="padding: 10px; font-size: 16px; margin: 5px;">
+  <br>
+  <button onclick="tradeBlook()">Trade</button>
+</div>
+
   </style>
 </head>
 <body>
@@ -216,28 +225,33 @@
       login(localStorage.getItem("username"));
     }
 
-    function login(existingUser = null) {
-      const usernameInput = document.getElementById("username");
-      const username = existingUser || usernameInput.value.trim();
-      if (!username) return alert("Please enter a username!");
+function login(existingUser = null) {
+  let username = existingUser;
+  if (!existingUser) {
+    const usernameInput = document.getElementById("username");
+    username = usernameInput.value.trim();
+  }
 
-      currentUser = username;
-      localStorage.setItem("username", username);
+  if (!username) return alert("Please enter a username!");
 
-      const storedLocker = localStorage.getItem("locker_" + username);
-      locker = storedLocker ? JSON.parse(storedLocker) : {};
+  currentUser = username;
+  localStorage.setItem("username", username);
 
-      for (let pack in packs) {
-        packs[pack].forEach(b => {
-          if (!(b.name in locker)) locker[b.name] = 0;
-        });
-      }
+  const storedLocker = localStorage.getItem("locker_" + username);
+  locker = storedLocker ? JSON.parse(storedLocker) : {};
 
-      document.getElementById("userNameDisplay").textContent = username;
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("gameScreen").style.display = "block";
-      updateLocker();
-    }
+  // Fill missing blooks in locker
+  for (let pack in packs) {
+    packs[pack].forEach(b => {
+      if (!(b.name in locker)) locker[b.name] = 0;
+    });
+  }
+
+  document.getElementById("userNameDisplay").textContent = username;
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+  updateLocker();
+}
 
     function logout() {
       document.getElementById("loginScreen").style.display = "block";
@@ -264,4 +278,36 @@
         div.onclick = () => selectForTrade(emoji); // Allow selecting blooks
         lockerContent.appendChild(div);
       }
+      function tradeBlook() {
+  const friend = document.getElementById("tradeUser").value.trim();
+  const give = document.getElementById("giveItem").value.trim();
+  const get = document.getElementById("getItem").value.trim();
+
+  if (!friend || !give || !get) return alert("Fill all fields!");
+
+  if (friend === currentUser) return alert("You can't trade with yourself.");
+
+  if (!locker[give] || locker[give] <= 0) return alert("You don't own the emoji you're trying to give.");
+
+  let friendLocker = localStorage.getItem("locker_" + friend);
+  if (!friendLocker) return alert("User not found.");
+  friendLocker = JSON.parse(friendLocker);
+
+  if (!friendLocker[get] || friendLocker[get] <= 0) return alert(`${friend} doesn't have the emoji you're trying to receive.`);
+
+  // Trade logic
+  locker[give]--;
+  locker[get] = (locker[get] || 0) + 1;
+
+  friendLocker[get]--;
+  friendLocker[give] = (friendLocker[give] || 0) + 1;
+
+  // Save both lockers
+  localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
+  localStorage.setItem("locker_" + friend, JSON.stringify(friendLocker));
+
+  updateLocker();
+  alert("Trade successful!");
+}
+
       saveLocker();
