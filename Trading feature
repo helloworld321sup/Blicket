@@ -1,0 +1,59 @@
+<h2>Trade Center</h2>
+
+<div>
+  <label for="tradeCodeInput">Paste a trade code:</label><br>
+  <textarea id="tradeCodeInput" rows="5" cols="50"></textarea><br>
+  <button onclick="checkTrade()">Check Trade</button>
+</div>
+
+<div id="tradeResult" style="margin-top: 20px;"></div>
+
+<script>
+  function checkTrade() {
+    const codeText = document.getElementById("tradeCodeInput").value;
+    const resultDiv = document.getElementById("tradeResult");
+    resultDiv.innerHTML = "";
+
+    let trade;
+    try {
+      trade = JSON.parse(codeText);
+    } catch (e) {
+      resultDiv.textContent = "❌ Invalid trade code.";
+      return;
+    }
+
+    const locker = JSON.parse(localStorage.getItem("locker") || "[]");
+
+    if (!locker.includes(trade.want)) {
+      resultDiv.innerHTML = `
+        <p>👤 <b>${trade.from}</b> wants to trade <b>${trade.give}</b> for <b>${trade.want}</b></p>
+        <p>❌ You don’t have <b>${trade.want}</b> in your locker. You can’t accept this trade.</p>
+      `;
+      return;
+    }
+
+    resultDiv.innerHTML = `
+      <p>👤 <b>${trade.from}</b> wants to trade <b>${trade.give}</b> for <b>${trade.want}</b></p>
+      <p>✅ You DO have <b>${trade.want}</b>. Accept trade?</p>
+      <button onclick='acceptTrade(${JSON.stringify(JSON.stringify(trade))})'>Accept</button>
+    `;
+  }
+
+  function acceptTrade(tradeString) {
+    const trade = JSON.parse(tradeString);
+    let locker = JSON.parse(localStorage.getItem("locker") || "[]");
+
+    // Remove 'want', add 'give'
+    const wantIndex = locker.indexOf(trade.want);
+    if (wantIndex === -1) {
+      alert("Trade failed. You no longer have the required blook.");
+      return;
+    }
+    locker.splice(wantIndex, 1); // remove wanted item
+    locker.push(trade.give);     // add given item
+    localStorage.setItem("locker", JSON.stringify(locker));
+
+    alert(`✅ Trade complete! You gave ${trade.want} and received ${trade.give}.`);
+    location.reload();
+  }
+</script>
