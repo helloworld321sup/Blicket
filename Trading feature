@@ -1,158 +1,209 @@
-<h2>Trade System</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blicket Trade System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
 
-<!-- Trade Button -->
-<div>
-  <button onclick="startTrade()">Start Trade</button>
-</div>
+        #tradeWindow {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 60%;
+        }
 
-<!-- Player Chat and Trade Interface -->
-<div id="tradeWindow" style="display: none;">
-  <h3>Trade with <span id="tradePlayer"></span></h3>
+        #chatBox {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
 
-  <!-- Chatbox -->
-  <div id="chatBox" style="border: 1px solid #ccc; padding: 10px; max-height: 150px; overflow-y: auto; margin-bottom: 20px;">
-    <!-- Messages will appear here -->
-  </div>
-  
-  <!-- Chat Input -->
-  <textarea id="chatInput" placeholder="Talk about the trade..." rows="3" style="width: 100%;"></textarea><br>
-  <button onclick="sendMessage()">Send</button>
-  
-  <h4>Your Locker:</h4>
-  <div id="yourLocker"></div>
+        #yourLocker, #theirLocker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-  <h4>Trade Offer:</h4>
-  <div id="theirLocker"></div>
+        .lockerItem {
+            padding: 10px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-  <!-- Buttons for offering and confirming the deal -->
-  <button id="offerButton" style="display:none;" onclick="offerBlook()">Offer Blook</button>
-  <button id="dealButton" style="display:none;" onclick="confirmDeal()">Confirm Deal</button>
-</div>
+        button {
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
 
-<script>
-  // Simulate online users
-  const onlinePlayers = JSON.parse(localStorage.getItem('onlinePlayers') || '[]');
+        button:disabled {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
 
-  function startTrade() {
-    const playerName = prompt("Enter the username of the player you want to trade with:");
+    <h2>Blicket Trade System</h2>
 
-    // Check if the player is online
-    if (!onlinePlayers.includes(playerName)) {
-      alert(`${playerName} is not online.`);
-      return;
-    }
+    <!-- Trade Button -->
+    <div>
+        <button onclick="startTrade()">Start Trade</button>
+    </div>
 
-    // Initialize trade window
-    document.getElementById('tradeWindow').style.display = 'block';
-    document.getElementById('tradePlayer').textContent = playerName;
+    <!-- Trade Window -->
+    <div id="tradeWindow">
+        <h3>Trade with <span id="tradePlayer"></span></h3>
 
-    // Display lockers (player's own and the other player's)
-    loadLocker(playerName);
-    loadYourLocker();
+        <!-- Chatbox -->
+        <div id="chatBox"></div>
 
-    // Show the trade button
-    document.getElementById('offerButton').style.display = 'block';
-  }
+        <!-- Chat Input -->
+        <textarea id="chatInput" placeholder="Talk about the trade..." rows="3" style="width: 100%;"></textarea><br>
+        <button onclick="sendMessage()">Send</button>
 
-  function loadLocker(playerName) {
-    // Load the locker of the other player (from localStorage or simulate)
-    const locker = JSON.parse(localStorage.getItem(playerName + 'Locker') || '[]');
-    const lockerDiv = document.getElementById('theirLocker');
-    lockerDiv.innerHTML = '';
-    
-    locker.forEach(blook => {
-      const blookDiv = document.createElement('div');
-      blookDiv.textContent = blook;
-      lockerDiv.appendChild(blookDiv);
-    });
-  }
+        <h4>Your Locker:</h4>
+        <div id="yourLocker"></div>
 
-  function loadYourLocker() {
-    const locker = JSON.parse(localStorage.getItem('locker') || '[]');
-    const lockerDiv = document.getElementById('yourLocker');
-    lockerDiv.innerHTML = '';
+        <h4>Trade Offer:</h4>
+        <div id="theirLocker"></div>
 
-    locker.forEach(blook => {
-      const blookDiv = document.createElement('div');
-      const offerButton = document.createElement('button');
-      offerButton.textContent = `Offer ${blook}`;
-      offerButton.onclick = () => selectBlook(blook);
-      blookDiv.appendChild(offerButton);
-      lockerDiv.appendChild(blookDiv);
-    });
-  }
+        <!-- Offer and Deal Buttons -->
+        <button id="offerButton" onclick="offerBlook()">Offer Blook</button>
+        <button id="dealButton" style="display: none;" onclick="confirmDeal()">Confirm Deal</button>
+    </div>
 
-  let selectedBlook = null;
+    <script>
+        // Simulated online players and lockers
+        const onlinePlayers = ['jack', 'sara', 'john']; // Example online players
+        const playerLocker = ['🌋', '🥇', '⚽', '🎾']; // Example player locker (this should be stored in localStorage)
+        localStorage.setItem('locker', JSON.stringify(playerLocker));
 
-  function selectBlook(blook) {
-    selectedBlook = blook;
-    alert(`You selected ${blook} to offer.`);
-  }
+        function startTrade() {
+            const playerName = prompt("Enter the username of the player you want to trade with:");
 
-  function offerBlook() {
-    if (!selectedBlook) {
-      alert('Please select a blook to offer first.');
-      return;
-    }
+            // Check if player is online
+            if (!onlinePlayers.includes(playerName)) {
+                alert(`${playerName} is not online.`);
+                return;
+            }
 
-    // Add blook to chat (or message history)
-    const chatBox = document.getElementById('chatBox');
-    const message = document.createElement('div');
-    message.textContent = `You offered: ${selectedBlook}`;
-    chatBox.appendChild(message);
-    
-    // Simulate the other player offering their blook
-    setTimeout(() => {
-      const otherMessage = document.createElement('div');
-      otherMessage.textContent = `The other player offered: 🌋`; // Simulated offer
-      chatBox.appendChild(otherMessage);
-      chatBox.scrollTop = chatBox.scrollHeight; // Scroll chat to the bottom
-      document.getElementById('dealButton').style.display = 'block'; // Show deal button
-    }, 1500);
-  }
+            // Set up the trade window
+            document.getElementById('tradeWindow').style.display = 'block';
+            document.getElementById('tradePlayer').textContent = playerName;
 
-  function confirmDeal() {
-    const confirm = window.confirm("Do you want to proceed with the trade?");
-    if (confirm) {
-      processTrade();
-    } else {
-      alert("Trade canceled.");
-    }
-  }
+            // Load player's locker and other player’s locker
+            loadYourLocker();
+            loadTheirLocker(playerName);
 
-  function processTrade() {
-    // Simulate the trade (swap blooks between players)
-    const playerName = document.getElementById('tradePlayer').textContent;
+            // Show offer button
+            document.getElementById('offerButton').style.display = 'block';
+        }
 
-    let myLocker = JSON.parse(localStorage.getItem('locker') || '[]');
-    let theirLocker = JSON.parse(localStorage.getItem(playerName + 'Locker') || '[]');
+        function loadYourLocker() {
+            const locker = JSON.parse(localStorage.getItem('locker'));
+            const lockerDiv = document.getElementById('yourLocker');
+            lockerDiv.innerHTML = '';
 
-    // Remove offered blook and add it to the other player’s locker
-    myLocker = myLocker.filter(blook => blook !== selectedBlook);
-    theirLocker.push(selectedBlook);
+            locker.forEach(blook => {
+                const blookDiv = document.createElement('div');
+                blookDiv.className = 'lockerItem';
+                blookDiv.textContent = blook;
+                blookDiv.onclick = () => selectBlook(blook);
+                lockerDiv.appendChild(blookDiv);
+            });
+        }
 
-    // Simulate the other player’s offer (e.g., they offered 🌋)
-    const theirOffer = '🌋';
-    theirLocker = theirLocker.filter(blook => blook !== theirOffer);
-    myLocker.push(theirOffer);
+        function loadTheirLocker(playerName) {
+            // Simulate the other player's locker
+            const locker = ['🌋', '🥇', '⚾']; // Example of the other player’s locker
+            const lockerDiv = document.getElementById('theirLocker');
+            lockerDiv.innerHTML = '';
 
-    // Save lockers back to localStorage
-    localStorage.setItem('locker', JSON.stringify(myLocker));
-    localStorage.setItem(playerName + 'Locker', JSON.stringify(theirLocker));
+            locker.forEach(blook => {
+                const blookDiv = document.createElement('div');
+                blookDiv.className = 'lockerItem';
+                blookDiv.textContent = blook;
+                lockerDiv.appendChild(blookDiv);
+            });
+        }
 
-    alert("✅ Trade completed successfully!");
-    location.reload();
-  }
+        let selectedBlook = null;
 
-  function sendMessage() {
-    const chatInput = document.getElementById('chatInput').value;
-    const chatBox = document.getElementById('chatBox');
-    
-    const message = document.createElement('div');
-    message.textContent = `You: ${chatInput}`;
-    chatBox.appendChild(message);
-    
-    chatInput.value = ''; // Clear chat input box
-    chatBox.scrollTop = chatBox.scrollHeight; // Scroll chat to the bottom
-  }
-</script>
+        function selectBlook(blook) {
+            selectedBlook = blook;
+            alert(`You selected ${blook} to offer.`);
+        }
+
+        function offerBlook() {
+            if (!selectedBlook) {
+                alert('Please select a blook to offer first.');
+                return;
+            }
+
+            // Add your offer to chat
+            const chatBox = document.getElementById('chatBox');
+            const message = document.createElement('div');
+            message.textContent = `You offered: ${selectedBlook}`;
+            chatBox.appendChild(message);
+
+            // Simulate the other player offering something
+            setTimeout(() => {
+                const otherMessage = document.createElement('div');
+                otherMessage.textContent = `The other player offered: 🌋`;
+                chatBox.appendChild(otherMessage);
+                document.getElementById('dealButton').style.display = 'block'; // Show deal button
+            }, 1500);
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput').value;
+            const chatBox = document.getElementById('chatBox');
+            const message = document.createElement('div');
+            message.textContent = `You: ${chatInput}`;
+            chatBox.appendChild(message);
+
+            chatInput.value = ''; // Clear input
+            chatBox.scrollTop = chatBox.scrollHeight; // Scroll chat to the bottom
+        }
+
+        function confirmDeal() {
+            const confirm = window.confirm("Do you want to proceed with the trade?");
+            if (confirm) {
+                processTrade();
+            } else {
+                alert("Trade canceled.");
+            }
+        }
+
+        function processTrade() {
+            // Simulate the trade (swap blooks)
+            const myLocker = JSON.parse(localStorage.getItem('locker'));
+            const theirLocker = ['🌋', '🥇', '⚾']; // Simulate their locker
+
+            // Swap blooks between players (e.g., remove offered and add the other player’s offer)
+            const updatedMyLocker = myLocker.filter(blook => blook !== selectedBlook).concat('🌋');
+            const updatedTheirLocker = theirLocker.filter(blook => blook !== '🌋').concat(selectedBlook);
+
+            // Save updated lockers
+            localStorage.setItem('locker', JSON.stringify(updatedMyLocker));
+
+            alert("✅ Trade completed successfully!");
+            location.reload(); // Reload to reset trade state
+        }
+    </script>
+
+</body>
+</html>
