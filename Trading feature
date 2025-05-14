@@ -1,59 +1,158 @@
-<h2>Trade Center</h2>
+<h2>Trade System</h2>
 
+<!-- Trade Button -->
 <div>
-  <label for="tradeCodeInput">Paste a trade code:</label><br>
-  <textarea id="tradeCodeInput" rows="5" cols="50"></textarea><br>
-  <button onclick="checkTrade()">Check Trade</button>
+  <button onclick="startTrade()">Start Trade</button>
 </div>
 
-<div id="tradeResult" style="margin-top: 20px;"></div>
+<!-- Player Chat and Trade Interface -->
+<div id="tradeWindow" style="display: none;">
+  <h3>Trade with <span id="tradePlayer"></span></h3>
+
+  <!-- Chatbox -->
+  <div id="chatBox" style="border: 1px solid #ccc; padding: 10px; max-height: 150px; overflow-y: auto; margin-bottom: 20px;">
+    <!-- Messages will appear here -->
+  </div>
+  
+  <!-- Chat Input -->
+  <textarea id="chatInput" placeholder="Talk about the trade..." rows="3" style="width: 100%;"></textarea><br>
+  <button onclick="sendMessage()">Send</button>
+  
+  <h4>Your Locker:</h4>
+  <div id="yourLocker"></div>
+
+  <h4>Trade Offer:</h4>
+  <div id="theirLocker"></div>
+
+  <!-- Buttons for offering and confirming the deal -->
+  <button id="offerButton" style="display:none;" onclick="offerBlook()">Offer Blook</button>
+  <button id="dealButton" style="display:none;" onclick="confirmDeal()">Confirm Deal</button>
+</div>
 
 <script>
-  function checkTrade() {
-    const codeText = document.getElementById("tradeCodeInput").value;
-    const resultDiv = document.getElementById("tradeResult");
-    resultDiv.innerHTML = "";
+  // Simulate online users
+  const onlinePlayers = JSON.parse(localStorage.getItem('onlinePlayers') || '[]');
 
-    let trade;
-    try {
-      trade = JSON.parse(codeText);
-    } catch (e) {
-      resultDiv.textContent = "❌ Invalid trade code.";
+  function startTrade() {
+    const playerName = prompt("Enter the username of the player you want to trade with:");
+
+    // Check if the player is online
+    if (!onlinePlayers.includes(playerName)) {
+      alert(`${playerName} is not online.`);
       return;
     }
 
-    const locker = JSON.parse(localStorage.getItem("locker") || "[]");
+    // Initialize trade window
+    document.getElementById('tradeWindow').style.display = 'block';
+    document.getElementById('tradePlayer').textContent = playerName;
 
-    if (!locker.includes(trade.want)) {
-      resultDiv.innerHTML = `
-        <p>👤 <b>${trade.from}</b> wants to trade <b>${trade.give}</b> for <b>${trade.want}</b></p>
-        <p>❌ You don’t have <b>${trade.want}</b> in your locker. You can’t accept this trade.</p>
-      `;
-      return;
-    }
+    // Display lockers (player's own and the other player's)
+    loadLocker(playerName);
+    loadYourLocker();
 
-    resultDiv.innerHTML = `
-      <p>👤 <b>${trade.from}</b> wants to trade <b>${trade.give}</b> for <b>${trade.want}</b></p>
-      <p>✅ You DO have <b>${trade.want}</b>. Accept trade?</p>
-      <button onclick='acceptTrade(${JSON.stringify(JSON.stringify(trade))})'>Accept</button>
-    `;
+    // Show the trade button
+    document.getElementById('offerButton').style.display = 'block';
   }
 
-  function acceptTrade(tradeString) {
-    const trade = JSON.parse(tradeString);
-    let locker = JSON.parse(localStorage.getItem("locker") || "[]");
+  function loadLocker(playerName) {
+    // Load the locker of the other player (from localStorage or simulate)
+    const locker = JSON.parse(localStorage.getItem(playerName + 'Locker') || '[]');
+    const lockerDiv = document.getElementById('theirLocker');
+    lockerDiv.innerHTML = '';
+    
+    locker.forEach(blook => {
+      const blookDiv = document.createElement('div');
+      blookDiv.textContent = blook;
+      lockerDiv.appendChild(blookDiv);
+    });
+  }
 
-    // Remove 'want', add 'give'
-    const wantIndex = locker.indexOf(trade.want);
-    if (wantIndex === -1) {
-      alert("Trade failed. You no longer have the required blook.");
+  function loadYourLocker() {
+    const locker = JSON.parse(localStorage.getItem('locker') || '[]');
+    const lockerDiv = document.getElementById('yourLocker');
+    lockerDiv.innerHTML = '';
+
+    locker.forEach(blook => {
+      const blookDiv = document.createElement('div');
+      const offerButton = document.createElement('button');
+      offerButton.textContent = `Offer ${blook}`;
+      offerButton.onclick = () => selectBlook(blook);
+      blookDiv.appendChild(offerButton);
+      lockerDiv.appendChild(blookDiv);
+    });
+  }
+
+  let selectedBlook = null;
+
+  function selectBlook(blook) {
+    selectedBlook = blook;
+    alert(`You selected ${blook} to offer.`);
+  }
+
+  function offerBlook() {
+    if (!selectedBlook) {
+      alert('Please select a blook to offer first.');
       return;
     }
-    locker.splice(wantIndex, 1); // remove wanted item
-    locker.push(trade.give);     // add given item
-    localStorage.setItem("locker", JSON.stringify(locker));
 
-    alert(`✅ Trade complete! You gave ${trade.want} and received ${trade.give}.`);
+    // Add blook to chat (or message history)
+    const chatBox = document.getElementById('chatBox');
+    const message = document.createElement('div');
+    message.textContent = `You offered: ${selectedBlook}`;
+    chatBox.appendChild(message);
+    
+    // Simulate the other player offering their blook
+    setTimeout(() => {
+      const otherMessage = document.createElement('div');
+      otherMessage.textContent = `The other player offered: 🌋`; // Simulated offer
+      chatBox.appendChild(otherMessage);
+      chatBox.scrollTop = chatBox.scrollHeight; // Scroll chat to the bottom
+      document.getElementById('dealButton').style.display = 'block'; // Show deal button
+    }, 1500);
+  }
+
+  function confirmDeal() {
+    const confirm = window.confirm("Do you want to proceed with the trade?");
+    if (confirm) {
+      processTrade();
+    } else {
+      alert("Trade canceled.");
+    }
+  }
+
+  function processTrade() {
+    // Simulate the trade (swap blooks between players)
+    const playerName = document.getElementById('tradePlayer').textContent;
+
+    let myLocker = JSON.parse(localStorage.getItem('locker') || '[]');
+    let theirLocker = JSON.parse(localStorage.getItem(playerName + 'Locker') || '[]');
+
+    // Remove offered blook and add it to the other player’s locker
+    myLocker = myLocker.filter(blook => blook !== selectedBlook);
+    theirLocker.push(selectedBlook);
+
+    // Simulate the other player’s offer (e.g., they offered 🌋)
+    const theirOffer = '🌋';
+    theirLocker = theirLocker.filter(blook => blook !== theirOffer);
+    myLocker.push(theirOffer);
+
+    // Save lockers back to localStorage
+    localStorage.setItem('locker', JSON.stringify(myLocker));
+    localStorage.setItem(playerName + 'Locker', JSON.stringify(theirLocker));
+
+    alert("✅ Trade completed successfully!");
     location.reload();
+  }
+
+  function sendMessage() {
+    const chatInput = document.getElementById('chatInput').value;
+    const chatBox = document.getElementById('chatBox');
+    
+    const message = document.createElement('div');
+    message.textContent = `You: ${chatInput}`;
+    chatBox.appendChild(message);
+    
+    chatInput.value = ''; // Clear chat input box
+    chatBox.scrollTop = chatBox.scrollHeight; // Scroll chat to the bottom
   }
 </script>
