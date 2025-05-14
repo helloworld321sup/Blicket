@@ -84,8 +84,11 @@
     <div class="pack-container" onclick="startPackAnimation('exotics')" id="exotics-pack">
       <div class="pack-title">🌍 Exotics Pack</div>
     </div>
+    <div class="pack-container" onclick="startPackAnimation('food')" id="food-pack">
+      <div class="pack-title">🍔 Food Pack</div>
+    </div>
     <div class="pack-container" onclick="startPackAnimation('sports')" id="sports-pack">
-      <div class="pack-title">⚽ Sports Pack</div>
+      <div class="pack-title">🏅 Sports Pack</div>
     </div>
 
     <div id="item"></div>
@@ -136,8 +139,22 @@
         { name: "🗽", rarity: "Epic", chance: 8 },
         { name: "🌋", rarity: "Legendary", chance: 1.79 },
         { name: "📀", rarity: "Exotic", chance: 0.006 },
-        { name: "💿", rarity: "Exotic", chance: 0.004 },
-        { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
+        { name: "💿", rarity: "Exotic", chance: 0.004 }
+      ],
+      food: [
+        { name: "🍕", rarity: "Uncommon", chance: 18 },
+        { name: "🍔", rarity: "Uncommon", chance: 18 },
+        { name: "🌮", rarity: "Uncommon", chance: 18 },
+        { name: "🍟", rarity: "Uncommon", chance: 18 },
+        { name: "🍦", rarity: "Rare", chance: 6.25 },
+        { name: "🍩", rarity: "Rare", chance: 6.25 },
+        { name: "🍉", rarity: "Rare", chance: 6.25 },
+        { name: "🍰", rarity: "Epic", chance: 3.125 },
+        { name: "🍪", rarity: "Epic", chance: 3.125 },
+        { name: "🍣", rarity: "Legendary", chance: 1.799063 },
+        { name: "🥑", rarity: "Chroma", chance: 0.2 },
+        { name: "🥞", rarity: "Exotic", chance: 0.0009 },
+        { name: "🍑", rarity: "Elusive", chance: 0.000037 },
       ],
       sports: [
         { name: "⚽", rarity: "Uncommon", chance: 18 },
@@ -151,18 +168,18 @@
         { name: "🧢", rarity: "Epic", chance: 3.125 },
         { name: "🥇", rarity: "Legendary", chance: 1.799963 },
         { name: "🥏", rarity: "Chroma", chance: 0.2 },
-        { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
+        { name: "🏄", rarity: "Elusive", chance: 0.000037 }
       ]
     };
 
     const rarityColors = {
-      Uncommon: '#2ecc71',
-      Rare: '#3498db',
-      Epic: '#e74c3c',
-      Legendary: '#f1c40f',
-      Chroma: '#00bfff',
-      Exotic: '#8000ff',
-      Elusive: 'salmon'
+      Uncommon: ['#2ecc71'],
+      Rare: ['#3498db'],
+      Epic: ['#e74c3c'],
+      Legendary: ['#f1c40f'],
+      Chroma: ['#00bfff', '#ff69b4'],
+      Exotic: ['#8000ff', '#00ffe5'],
+      Elusive: ['#ff6347'] // Salmon color
     };
 
     let locker = {};
@@ -185,24 +202,64 @@
       locker = storedLocker ? JSON.parse(storedLocker) : {};
 
       for (let pack in packs) {
-        packs[pack].forEach(b => {
-          if (!(b.name in locker)) locker[b.name] = 0;
+        packs[pack].forEach(blook => {
+          if (!locker[pack]) locker[pack] = [];
+          if (Math.random() < blook.chance / 100) locker[pack].push(blook.name);
         });
       }
-
-      document.getElementById("userNameDisplay").textContent = username;
+      updateLockerDisplay();
+      document.getElementById("userNameDisplay").textContent = currentUser;
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("gameScreen").style.display = "block";
-      updateLocker();
+    }
+
+    function startPackAnimation(pack) {
+      if (isOpening) return;
+      isOpening = true;
+      const selectedPack = packs[pack];
+      const item = selectedPack[Math.floor(Math.random() * selectedPack.length)];
+      const rarity = item.rarity;
+      const color = rarityColors[rarity];
+      document.getElementById("item").textContent = item.name;
+      document.getElementById("rarity").textContent = rarity;
+      document.getElementById("item").style.color = color[0];
+      addConfetti();
+      locker[pack].push(item.name);
+      updateLockerDisplay();
+      isOpening = false;
+    }
+
+    function addConfetti() {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#ff8c00", "#ff0000", "#2ecc71"]
+      });
+    }
+
+    function updateLockerDisplay() {
+      const lockerContent = document.getElementById("locker-content");
+      lockerContent.innerHTML = "";
+      for (let pack in locker) {
+        locker[pack].forEach(item => {
+         
+          const itemElement = document.createElement("div");
+          itemElement.classList.add("locker-item");
+          itemElement.textContent = item;
+          lockerContent.appendChild(itemElement);
+        });
+      }
+      localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
     }
 
     function logout() {
+      localStorage.removeItem("username");
+      localStorage.removeItem("locker_" + currentUser);
       document.getElementById("loginScreen").style.display = "block";
       document.getElementById("gameScreen").style.display = "none";
     }
+  </script>
 
-    function saveLocker() {
-      if (currentUser) {
-        localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
-      }
-        
+</body>
+</html>
