@@ -84,8 +84,11 @@
     <div class="pack-container" onclick="startPackAnimation('exotics')" id="exotics-pack">
       <div class="pack-title">🌍 Exotics Pack</div>
     </div>
+    <div class="pack-container" onclick="startPackAnimation('food')" id="food-pack">
+      <div class="pack-title">🍔 Food Pack</div>
+    </div>
     <div class="pack-container" onclick="startPackAnimation('sports')" id="sports-pack">
-      <div class="pack-title">⚽ Sports Pack</div>
+      <div class="pack-title">🏅 Sports Pack</div>
     </div>
 
     <div id="item"></div>
@@ -136,7 +139,22 @@
         { name: "🗽", rarity: "Epic", chance: 8 },
         { name: "🌋", rarity: "Legendary", chance: 1.79 },
         { name: "📀", rarity: "Exotic", chance: 0.006 },
-        { name: "💿", rarity: "Exotic", chance: 0.004 },
+        { name: "💿", rarity: "Exotic", chance: 0.004 }
+      ],
+      food: [
+        { name: "🍕", rarity: "Uncommon", chance: 18 },
+        { name: "🍔", rarity: "Uncommon", chance: 18 },
+        { name: "🌮", rarity: "Uncommon", chance: 18 },
+        { name: "🍟", rarity: "Uncommon", chance: 18 },
+        { name: "🍦", rarity: "Rare", chance: 6.25 },
+        { name: "🍩", rarity: "Rare", chance: 6.25 },
+        { name: "🍉", rarity: "Rare", chance: 6.25 },
+        { name: "🍰", rarity: "Epic", chance: 3.125 },
+        { name: "🍪", rarity: "Epic", chance: 3.125 },
+        { name: "🍣", rarity: "Legendary", chance: 1.799063 },
+        { name: "🥑", rarity: "Chroma", chance: 0.2 },
+        { name: "🍑", rarity: "Elusive", chance: 0.000037 },
+        { name: "🥞", rarity: "Exotic", chance: 0.0009 }
       ],
       sports: [
         { name: "⚽", rarity: "Uncommon", chance: 18 },
@@ -150,18 +168,18 @@
         { name: "🧢", rarity: "Epic", chance: 3.125 },
         { name: "🥇", rarity: "Legendary", chance: 1.799963 },
         { name: "🥏", rarity: "Chroma", chance: 0.2 },
-        { name: "🏄", rarity: "Elusive", chance: 0.000037 },
+        { name: "🏄", rarity: "Elusive", chance: 0.000037 }
       ]
     };
 
     const rarityColors = {
-      Uncommon: '#2ecc71',
-      Rare: '#3498db',
-      Epic: '#e74c3c',
-      Legendary: '#f1c40f',
-      Chroma: '#00bfff',
-      Exotic: '#8000ff',
-      Elusive: 'salmon'
+      Uncommon: ['#2ecc71'],
+      Rare: ['#3498db'],
+      Epic: ['#e74c3c'],
+      Legendary: ['#f1c40f'],
+      Chroma: ['#00bfff', '#ff69b4'],
+      Exotic: ['#8000ff', '#00ffe5'],
+      Elusive: ['#ff6347'] // Salmon color
     };
 
     let locker = {};
@@ -184,88 +202,61 @@
       locker = storedLocker ? JSON.parse(storedLocker) : {};
 
       for (let pack in packs) {
-        packs[pack].forEach(b => {
-          if (!(b.name in locker)) locker[b.name] = 0;
+        packs[pack].forEach(blook => {
+          if (!locker[pack]) locker[pack] = [];
+          if (Math.random() < blook.chance / 100) locker[pack].push(blook.name);
         });
       }
-
-      document.getElementById("userNameDisplay").textContent = username;
+      updateLockerDisplay();
+      document.getElementById("userNameDisplay").textContent = currentUser;
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("gameScreen").style.display = "block";
-      updateLocker();
+    }
+
+    function startPackAnimation(pack) {
+      if (isOpening) return;
+      isOpening = true;
+      const selectedPack = packs[pack];
+      const item = selectedPack[Math.floor(Math.random() * selectedPack.length)];
+      const rarity = item.rarity;
+      const color = rarityColors[rarity];
+      document.getElementById("item").textContent = item.name;
+      document.getElementById("rarity").textContent = rarity;
+      document.getElementById("item").style.color = color[0];
+      addConfetti();
+      locker[pack].push(item.name);
+      updateLockerDisplay();
+      isOpening = false;
+    }
+
+    function addConfetti() {
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#ff8c00", "#ff0000", "#2ecc71"]
+      });
+    }
+
+    function updateLockerDisplay() {
+      const lockerContent = document.getElementById("locker-content");
+      lockerContent.innerHTML = "";
+      for (let pack in locker) {
+        locker[pack].forEach(item => {
+          const div = document.createElement("div");
+          div.classList.add("locker-item");
+          div.textContent = item;
+          lockerContent.appendChild(div);
+        });
+      }
     }
 
     function logout() {
-      document.getElementById("loginScreen").style.display = "block";
-      document.getElementById("gameScreen").style.display = "none";
-    }
-
-    function saveLocker() {
-      if (currentUser) {
-        localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
-      }
-    }
-
-    function getColor(rarity) {
-      return rarityColors[rarity] || '#ffffff';
-    }
-
-    function updateLocker() {
-      const lockerContent = document.getElementById("locker-content");
-      lockerContent.innerHTML = '';
-      for (let emoji in locker) {
-        const div = document.createElement("div");
-        div.className = "locker-item";
-        div.textContent = `${emoji} - ${locker[emoji]}`;
-        lockerContent.appendChild(div);
-      }
-      saveLocker();
-    }
-
-    function startPackAnimation(packName) {
-      if (isOpening) return;
-      isOpening = true;
-      const packDiv = document.getElementById(`${packName}-pack`);
-      packDiv.classList.add("pulse");
-      setTimeout(() => {
-        packDiv.classList.remove("pulse");
-        openPack(packName);
-        isOpening = false;
-      }, 500);
-    }
-
-    function openPack(packName) {
-      const pack = packs[packName];
-      const totalChance = pack.reduce((sum, item) => sum + item.chance, 0);
-      const rand = Math.random() * totalChance;
-      let cumulative = 0;
-      let selected;
-
-      for (let item of pack) {
-        cumulative += item.chance;
-        if (rand < cumulative) {
-          selected = item;
-          break;
-        }
-      }
-
-      locker[selected.name]++;
-      updateLocker();
-
-      const itemDisplay = document.getElementById("item");
-      const rarityDisplay = document.getElementById("rarity");
-      itemDisplay.textContent = selected.name;
-      rarityDisplay.textContent = selected.rarity;
-      rarityDisplay.style.color = getColor(selected.rarity);
-
-      // Confetti launch
-      confetti({
-        particleCount: 150,
-        spread: 90,
-        origin: { y: 0.6 },
-        colors: [getColor(selected.rarity)]
-      });
+      localStorage.removeItem("username");
+      localStorage.removeItem("locker_" + currentUser);
+      window.location.reload();
     }
   </script>
+
 </body>
 </html>
