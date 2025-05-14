@@ -5,7 +5,6 @@
   <title>Blooket-Style Pack Game</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* Your existing styles remain unchanged */
     body {
       font-family: sans-serif;
       background: #f0f0f0;
@@ -54,12 +53,18 @@
     .locker-item {
       font-size: 18px; margin: 5px;
     }
-    canvas {
-      position: fixed;
-      pointer-events: none;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 9999;
+    .trade-container {
+      margin-top: 30px;
+    }
+    .trade-title {
+      font-size: 22px; font-weight: bold;
+    }
+    .trade-item {
+      font-size: 18px; margin: 5px;
+      cursor: pointer; padding: 5px; border-radius: 5px; background-color: #f1f1f1;
+    }
+    .trade-item:hover {
+      background-color: #dcdcdc;
     }
   </style>
 </head>
@@ -94,6 +99,12 @@
     <div class="locker">
       <div class="locker-title">Your Locker</div>
       <div id="locker-content"></div>
+    </div>
+
+    <div class="trade-container">
+      <div class="trade-title">Trade with Another User</div>
+      <div id="trade-offer" class="trade-item" onclick="tradeItem('offer')">Offer Item</div>
+      <div id="trade-request" class="trade-item" onclick="tradeItem('request')">Request Item</div>
     </div>
 
     <button onclick="logout()">Logout</button>
@@ -257,16 +268,40 @@
       const rarityDisplay = document.getElementById("rarity");
       itemDisplay.textContent = selected.name;
       rarityDisplay.textContent = selected.rarity;
-      rarityDisplay.style.color = getColor(selected.rarity);
+      rarityDisplay
 
-      // Confetti launch
-      confetti({
-        particleCount: 150,
-        spread: 90,
-        origin: { y: 0.6 },
-        colors: [getColor(selected.rarity)]
-      });
+
+
+
+
+ChatGPT said:
+.style.color = getColor(selected.rarity);
+
+typescript
+Copy
+Edit
+  showConfetti();
+}
+
+function showConfetti() {
+  confetti.create(document.getElementById("confetti-canvas"), {
+    resize: true,
+    useWorker: true
+  })();
+}
+
+function tradeItem(type) {
+  if (type === 'offer') {
+    const tradeItems = Object.keys(locker).filter(item => locker[item] > 0);
+    if (tradeItems.length === 0) return alert("You don't have any items to offer!");
+    const selectedItem = prompt(`Select an item to offer: ${tradeItems.join(", ")}`);
+    if (selectedItem && locker[selectedItem] > 0) {
+      locker[selectedItem]--;
+      alert(`You offered ${selectedItem} for trade.`);
     }
-  </script>
-</body>
-</html>
+  } else if (type === 'request') {
+    alert("Select an item from another user to request.");
+  }
+  updateLocker();
+}
+</script> </body> </html> 
