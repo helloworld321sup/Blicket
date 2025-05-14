@@ -1,313 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Blooket-Style Pack Game</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blicket Game</title>
   <style>
     body {
       font-family: sans-serif;
+      text-align: center;
       background: #f0f0f0;
-      text-align: center;
-      margin: 0;
-      padding: 20px;
     }
-    #loginScreen { display: block; }
-    #gameScreen { display: none; }
-    input[type="text"] {
-      padding: 15px; font-size: 18px; width: 250px; margin-bottom: 10px;
-    }
-    button {
-      padding: 12px 25px; font-size: 18px; cursor: pointer;
-    }
-    .pack-container {
-      display: inline-block; background: #ccc; border: 4px solid #999;
-      border-radius: 16px; padding: 30px 50px; margin: 20px;
-      cursor: pointer; transition: transform 0.2s;
-    }
-    .pack-title {
-      font-size: 24px; font-weight: bold;
-    }
-    .pulse {
-      animation: pulse-click 0.5s ease-in-out 2;
-    }
-    @keyframes pulse-click {
-      0%, 100% { transform: scale(1); }
-      25% { transform: scale(1.1); }
-      50% { transform: scale(0.95); }
-      75% { transform: scale(1.05); }
-    }
-    #item {
-      font-size: 60px; margin-top: 30px;
-    }
-    #rarity {
-      font-size: 24px; margin-top: 10px;
-    }
-    .locker {
-      margin-top: 40px; background: #e0e0e0; padding: 20px;
-      border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-    .locker-title {
-      font-size: 22px; font-weight: bold; margin-bottom: 10px;
-    }
-    .locker-item {
-      font-size: 18px; margin: 5px;
-      cursor: pointer;
-    }
-    canvas {
-      position: fixed;
-      pointer-events: none;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 9999;
-    }
-    .trade-modal {
+    .hidden {
       display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      color: white;
-      padding: 20px;
-      text-align: center;
-      z-index: 1000;
     }
-    .trade-modal .content {
-      background: #444;
-      padding: 20px;
-      border-radius: 10px;
+    .confetti {
+      animation: pop 0.6s ease-out;
+      font-size: 2em;
     }
-    .trade-modal .content .trade-item {
-      font-size: 18px;
-      margin: 10px;
-      cursor: pointer;
-      padding: 10px;
-      background: #666;
-      border-radius: 5px;
+    @keyframes pop {
+      0% { transform: scale(2); opacity: 0; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .trade-modal button {
+    .tabs button {
+      margin: 5px;
       padding: 10px 20px;
-      margin-top: 20px;
-      background: #28a745;
-      border: none;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
+      font-size: 1em;
     }
-    <div class="locker">
-  <div class="locker-title">Trade With a Friend</div>
-  <input type="text" id="tradeUser" placeholder="Friend's Username" style="padding: 10px; font-size: 16px; margin: 5px;">
-  <input type="text" id="giveItem" placeholder="Emoji to Give" style="padding: 10px; font-size: 16px; margin: 5px;">
-  <input type="text" id="getItem" placeholder="Emoji to Receive" style="padding: 10px; font-size: 16px; margin: 5px;">
-  <br>
-  <button onclick="tradeBlook()">Trade</button>
-</div>
-
   </style>
 </head>
 <body>
 
+  <!-- Login UI -->
   <div id="loginScreen">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter your username">
-    <br>
-    <button onclick="login()">Start</button>
+    <h1>Welcome to Blicket</h1>
+    <input id="usernameInput" placeholder="Enter username">
+    <button onclick="login()">Login</button>
   </div>
 
-  <div id="gameScreen">
-    <h2>Hello, <span id="userNameDisplay"></span>!</h2>
-
-    <div class="pack-container" onclick="startPackAnimation('business')" id="business-pack">
-      <div class="pack-title">📦 Business Pack</div>
-    </div>
-    <div class="pack-container" onclick="startPackAnimation('emojis')" id="emojis-pack">
-      <div class="pack-title">😊 Emojis Pack</div>
-    </div>
-    <div class="pack-container" onclick="startPackAnimation('exotics')" id="exotics-pack">
-      <div class="pack-title">🌍 Exotics Pack</div>
-    </div>
-    <div class="pack-container" onclick="startPackAnimation('sports')" id="sports-pack">
-      <div class="pack-title">⚽ Sports Pack</div>
+  <!-- Main Game UI -->
+  <div id="mainGame" class="hidden">
+    <h2 id="welcomeMsg"></h2>
+    <div class="tabs">
+      <button onclick="showTab('packOpener')">Open Packs</button>
+      <button onclick="showTab('locker')">Locker</button>
+      <button onclick="showTab('trade')">Trade</button>
+      <button onclick="logout()">Logout</button>
     </div>
 
-    <div id="item"></div>
-    <div id="rarity"></div>
-
-    <div class="locker">
-      <div class="locker-title">Your Locker</div>
-      <div id="locker-content"></div>
+    <!-- Pack Opener -->
+    <div id="packOpener">
+      <h3>Choose a Pack:</h3>
+      <select id="packSelect">
+        <option value="Emojis">Emojis Pack</option>
+        <option value="Business">Business Pack</option>
+        <option value="Exotics">Exotics Pack</option>
+        <option value="Sports">Sports Pack</option>
+      </select>
+      <button onclick="openPack()">Open Pack</button>
+      <h3 id="packResult"></h3>
     </div>
 
-    <button onclick="logout()">Logout</button>
-    <button onclick="openTradeModal()">Trade</button>
+    <!-- Locker -->
+    <div id="locker" class="hidden">
+      <h3>Your Locker</h3>
+      <div id="lockerDisplay"></div>
+    </div>
+
+    <!-- Trading -->
+    <div id="trade" class="hidden">
+      <h3>Trade Blooks</h3>
+      <input id="targetUser" placeholder="Recipient Username"><br><br>
+      <input id="blookToSend" placeholder="Blook Emoji to Send"><br><br>
+      <button onclick="tradeBlook()">Send Trade</button>
+      <p id="tradeMsg"></p>
+    </div>
   </div>
-
-  <div id="trade-modal" class="trade-modal">
-    <div class="content">
-      <h3>Select items to trade</h3>
-      <div id="trade-content"></div>
-      <button onclick="confirmTrade()">Confirm Trade</button>
-      <button onclick="closeTradeModal()">Cancel</button>
-    </div>
-  </div>
-
-  <canvas id="confetti-canvas"></canvas>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
     const packs = {
-      business: [
-        { name: "🏷️", rarity: "Uncommon", chance: 18.75 },
-        { name: "📅", rarity: "Uncommon", chance: 18.75 },
-        { name: "📊", rarity: "Uncommon", chance: 18.75 },
-        { name: "💼", rarity: "Uncommon", chance: 18.75 },
-        { name: "💳", rarity: "Rare", chance: 8.5 },
-        { name: "🗑️", rarity: "Rare", chance: 8.5 },
-        { name: "💻", rarity: "Epic", chance: 6 },
-        { name: "👨🏻‍💼", rarity: "Legendary", chance: 0.95 },
-        { name: "🛒", rarity: "Chroma", chance: 0.05 }
+      Emojis: [
+        { blook: "😩", chance: 18.75 }, { blook: "😕", chance: 18.75 },
+        { blook: "🤨", chance: 18.75 }, { blook: "😗", chance: 18.75 },
+        { blook: "🤓", chance: 8.5 }, { blook: "😍", chance: 8.5 },
+        { blook: "😎", chance: 6 }, { blook: "🤯", chance: 0.9 },
+        { blook: "🤬", chance: 0.1 }
       ],
-      emojis: [
-        { name: "😩", rarity: "Uncommon", chance: 18.75 },
-        { name: "😕", rarity: "Uncommon", chance: 18.75 },
-        { name: "🤨", rarity: "Uncommon", chance: 18.75 },
-        { name: "😗", rarity: "Uncommon", chance: 18.75 },
-        { name: "🤓", rarity: "Rare", chance: 8.5 },
-        { name: "😍", rarity: "Rare", chance: 8.5 },
-        { name: "😎", rarity: "Epic", chance: 6 },
-        { name: "🤯", rarity: "Legendary", chance: 0.9 },
-        { name: "🤬", rarity: "Chroma", chance: 0.1 }
+      Business: [
+        { blook: "🏷️", chance: 18.75 }, { blook: "📅", chance: 18.75 },
+        { blook: "📊", chance: 18.75 }, { blook: "💼", chance: 18.75 },
+        { blook: "💳", chance: 8.5 }, { blook: "🗑️", chance: 8.5 },
+        { blook: "💻", chance: 6 }, { blook: "👨🏻‍💼", chance: 0.95 },
+        { blook: "🛒", chance: 0.05 }
       ],
-      exotics: [
-        { name: "🩵", rarity: "Uncommon", chance: 16.25 },
-        { name: "🤹‍♀️", rarity: "Uncommon", chance: 16.25 },
-        { name: "🎬", rarity: "Uncommon", chance: 16.25 },
-        { name: "🚛", rarity: "Uncommon", chance: 16.25 },
-        { name: "🚀", rarity: "Rare", chance: 12.5 },
-        { name: "🛳️", rarity: "Rare", chance: 12.5 },
-        { name: "🗽", rarity: "Epic", chance: 8 },
-        { name: "🌋", rarity: "Legendary", chance: 1.79 },
-        { name: "📀", rarity: "Exotic", chance: 0.006 },
-        { name: "💿", rarity: "Exotic", chance: 0.004 },
-        { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
+      Exotics: [
+        { blook: "🩵", chance: 16.25 }, { blook: "🤹‍♀️", chance: 16.25 },
+        { blook: "🎬", chance: 16.25 }, { blook: "🚛", chance: 16.25 },
+        { blook: "🚀", chance: 12.5 }, { blook: "🛳️", chance: 12.5 },
+        { blook: "🗽", chance: 8 }, { blook: "🌋", chance: 1.79 },
+        { blook: "📀", chance: 0.006 }, { blook: "💿", chance: 0.004 }
       ],
-      sports: [
-        { name: "⚽", rarity: "Uncommon", chance: 18 },
-        { name: "🏀", rarity: "Uncommon", chance: 18 },
-        { name: "🏈", rarity: "Uncommon", chance: 18 },
-        { name: "⚾", rarity: "Uncommon", chance: 18 },
-        { name: "🥊", rarity: "Rare", chance: 6.25 },
-        { name: "🎾", rarity: "Rare", chance: 6.25 },
-        { name: "🏒", rarity: "Rare", chance: 6.25 },
-        { name: "🏆", rarity: "Epic", chance: 3.125 },
-        { name: "🧢", rarity: "Epic", chance: 3.125 },
-        { name: "🥇", rarity: "Legendary", chance: 1.799963 },
-        { name: "🥏", rarity: "Chroma", chance: 0.2 },
-        { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
+      Sports: [
+        { blook: "⚽", chance: 18 }, { blook: "🏀", chance: 18 },
+        { blook: "🏈", chance: 18 }, { blook: "⚾", chance: 18 },
+        { blook: "🥊", chance: 6.25 }, { blook: "🎾", chance: 6.25 },
+        { blook: "🏒", chance: 6.25 }, { blook: "🏆", chance: 3.125 },
+        { blook: "🧢", chance: 3.125 }, { blook: "🥇", chance: 1.799963 },
+        { blook: "🥏", chance: 0.2 }, { blook: "🏄", chance: 0.000037 }
       ]
     };
 
-    const rarityColors = {
-      Uncommon: '#2ecc71',
-      Rare: '#3498db',
-      Epic: '#e74c3c',
-      Legendary: '#f1c40f',
-      Chroma: '#00bfff',
-      Exotic: '#8000ff',
-      Elusive: 'salmon'
-    };
-
-    let locker = {};
-    let currentUser = "";
-    let isOpening = false;
-
-    if (localStorage.getItem("username")) {
-      login(localStorage.getItem("username"));
+    function login() {
+      const username = document.getElementById('usernameInput').value.trim();
+      if (!username) return alert("Enter a username.");
+      localStorage.setItem("blicketUser", username);
+      showMain(username);
     }
-
-function login(existingUser = null) {
-  let username = existingUser;
-  if (!existingUser) {
-    const usernameInput = document.getElementById("username");
-    username = usernameInput.value.trim();
-  }
-
-  if (!username) return alert("Please enter a username!");
-
-  currentUser = username;
-  localStorage.setItem("username", username);
-
-  const storedLocker = localStorage.getItem("locker_" + username);
-  locker = storedLocker ? JSON.parse(storedLocker) : {};
-
-  // Fill missing blooks in locker
-  for (let pack in packs) {
-    packs[pack].forEach(b => {
-      if (!(b.name in locker)) locker[b.name] = 0;
-    });
-  }
-
-  document.getElementById("userNameDisplay").textContent = username;
-  document.getElementById("loginScreen").style.display = "none";
-  document.getElementById("gameScreen").style.display = "block";
-  updateLocker();
-}
 
     function logout() {
-      document.getElementById("loginScreen").style.display = "block";
-      document.getElementById("gameScreen").style.display = "none";
+      document.getElementById('mainGame').classList.add('hidden');
+      document.getElementById('loginScreen').classList.remove('hidden');
     }
 
-    function saveLocker() {
-      if (currentUser) {
-        localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
+    function showMain(username) {
+      document.getElementById('welcomeMsg').textContent = `Hello, ${username}!`;
+      document.getElementById('loginScreen').classList.add('hidden');
+      document.getElementById('mainGame').classList.remove('hidden');
+      showTab('packOpener');
+      updateLocker();
+    }
+
+    function showTab(tabId) {
+      ['packOpener', 'locker', 'trade'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+      if (tabId === 'locker') updateLocker();
+    }
+
+    function openPack() {
+      const username = localStorage.getItem("blicketUser");
+      const packName = document.getElementById('packSelect').value;
+      const blook = getRandomBlook(packs[packName]);
+      document.getElementById('packResult').innerHTML = `<span class='confetti'>🎉 ${blook} 🎉</span>`;
+      let userData = JSON.parse(localStorage.getItem("blicket_" + username)) || {};
+      userData[blook] = (userData[blook] || 0) + 1;
+      localStorage.setItem("blicket_" + username, JSON.stringify(userData));
+      updateLocker();
+    }
+
+    function getRandomBlook(blookArray) {
+      const roll = Math.random() * 100;
+      let total = 0;
+      for (let b of blookArray) {
+        total += b.chance;
+        if (roll <= total) return b.blook;
       }
-    }
-
-    function getColor(rarity) {
-      return rarityColors[rarity] || '#ffffff';
+      return blookArray[blookArray.length - 1].blook;
     }
 
     function updateLocker() {
-      const lockerContent = document.getElementById("locker-content");
-      lockerContent.innerHTML = '';
-      for (let emoji in locker) {
-        const div = document.createElement("div");
-        div.className = "locker-item";
-        div.textContent = `${emoji} - ${locker[emoji]}`;
-        div.onclick = () => selectForTrade(emoji); // Allow selecting blooks
-        lockerContent.appendChild(div);
+      const username = localStorage.getItem("blicketUser");
+      const data = JSON.parse(localStorage.getItem("blicket_" + username)) || {};
+      let output = '';
+      for (let blook in data) {
+        output += `${blook} x${data[blook]}<br>`;
       }
-      function tradeBlook() {
-  const friend = document.getElementById("tradeUser").value.trim();
-  const give = document.getElementById("giveItem").value.trim();
-  const get = document.getElementById("getItem").value.trim();
+      document.getElementById('lockerDisplay').innerHTML = output || "No blooks yet.";
+    }
 
-  if (!friend || !give || !get) return alert("Fill all fields!");
+    function tradeBlook() {
+      const from = localStorage.getItem("blicketUser");
+      const to = document.getElementById('targetUser').value.trim();
+      const blook = document.getElementById('blookToSend').value.trim();
+      if (!to || !blook) return alert("Fill all fields.");
 
-  if (friend === currentUser) return alert("You can't trade with yourself.");
+      let fromData = JSON.parse(localStorage.getItem("blicket_" + from)) || {};
+      let toData = JSON.parse(localStorage.getItem("blicket_" + to)) || {};
 
-  if (!locker[give] || locker[give] <= 0) return alert("You don't own the emoji you're trying to give.");
+      if (!fromData[blook] || fromData[blook] <= 0) {
+        return alert("You don't own that blook.");
+      }
 
-  let friendLocker = localStorage.getItem("locker_" + friend);
-  if (!friendLocker) return alert("User not found.");
-  friendLocker = JSON.parse(friendLocker);
+      fromData[blook]--;
+      if (fromData[blook] === 0) delete fromData[blook];
+      toData[blook] = (toData[blook] || 0) + 1;
 
-  if (!friendLocker[get] || friendLocker[get] <= 0) return alert(`${friend} doesn't have the emoji you're trying to receive.`);
+      localStorage.setItem("blicket_" + from, JSON.stringify(fromData));
+      localStorage.setItem("blicket_" + to, JSON.stringify(toData));
+      updateLocker();
 
-  // Trade logic
-  locker[give]--;
-  locker[get] = (locker[get] || 0) + 1;
+      document.getElementById('tradeMsg').textContent = `Sent ${blook} to ${to}!`;
+    }
 
-  friendLocker[get]--;
-  friendLocker[give] = (friendLocker[give] || 0) + 1;
+    // Auto-login if username saved
+    window.onload = () => {
+      const savedUser = localStorage.getItem("blicketUser");
+      if (savedUser) showMain(savedUser);
+    };
+  </script>
 
-  // Save both lockers
-  localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
-  localStorage.setItem("locker_" + friend, JSON.stringify(friendLocker));
-
-  updateLocker();
-  alert("Trade successful!");
-}
-
-      saveLocker();
+</body>
+</html>
