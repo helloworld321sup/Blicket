@@ -87,6 +87,9 @@
     <div class="pack-container" onclick="startPackAnimation('sports')" id="sports-pack">
       <div class="pack-title">⚽ Sports Pack</div>
     </div>
+    <div class="pack-container" onclick="startPackAnimation('food')" id="food-pack">
+      <div class="pack-title">🍎 Food Pack</div>
+    </div>
 
     <div id="item"></div>
     <div id="rarity"></div>
@@ -152,9 +155,24 @@
         { name: "🥇", rarity: "Legendary", chance: 1.799963 },
         { name: "🥏", rarity: "Chroma", chance: 0.2 },
         { name: "🏄", rarity: "Elusive", chance: 0.000037, color: "salmon" }
+     ],
+       food: [
+        { name: "🍎", rarity: "Uncommon", chance: 18 },
+        { name: "🍕", rarity: "Uncommon", chance: 18 },
+        { name: "🍩", rarity: "Uncommon", chance: 18 },
+        { name: "🍪", rarity: "Uncommon", chance: 18 },
+        { name: "🍣", rarity: "Rare", chance: 6.25 },
+        { name: "🍔", rarity: "Rare", chance: 6.25 },
+        { name: "🌮", rarity: "Rare", chance: 6.25 },
+        { name: "🥗", rarity: "Epic", chance: 3.125 },
+        { name: "🍜", rarity: "Epic", chance: 3.125 },
+        { name: "🍑", rarity: "Legendary", chance: 1.4 },
+        { name: "👨‍🍳", rarity: "Legendary", chance: 1.4 },
+        { name: "🍰", rarity: "Chroma", chance: 0.19996 },
+        { name: "🥩", rarity: "Elusive", chance: 0.00004, color: "metallicred" }
       ]
     };
-
+    
     const rarityColors = {
       Uncommon: '#2ecc71',
       Rare: '#3498db',
