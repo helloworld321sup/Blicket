@@ -377,8 +377,31 @@
       updateLocker();
     }
 
-    function capitalize(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
+    function logout() {
+      document.getElementById("loginScreen").style.display = "block";
+      document.getElementById("gameScreen").style.display = "none";
+    }
+
+    function saveLocker() {
+      if (currentUser) {
+        localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
+      }
+    }
+
+    function getColor(rarity) {
+      return rarityColors[rarity] || '#ffffff';
+    }
+
+    function updateLocker() {
+      const lockerContent = document.getElementById("locker-content");
+      lockerContent.innerHTML = '';
+      for (let emoji in locker) {
+        const div = document.createElement("div");
+        div.className = "locker-item";
+        div.textContent = `${emoji} - ${locker[emoji]}`;
+        lockerContent.appendChild(div);
+      }
+      saveLocker();
     }
 
     function startPackAnimation(packName) {
