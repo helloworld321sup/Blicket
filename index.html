@@ -377,49 +377,6 @@
       updateLocker();
     }
 
-    function logout() {
-      document.getElementById("loginScreen").style.display = "block";
-      document.getElementById("gameScreen").style.display = "none";
-    }
-
-    function saveLocker() {
-      if (currentUser) {
-        localStorage.setItem("locker_" + currentUser, JSON.stringify(locker));
-      }
-    }
-
-    function getColor(rarity) {
-      return rarityColors[rarity] || '#ffffff';
-    }
-
-    function updateLocker() {
-  const lockerContent = document.getElementById("locker-content");
-  const savedItems = JSON.parse(localStorage.getItem("locker") || "{}");
-
-  lockerContent.innerHTML = ""; // Clear it before rebuilding
-
-  for (const pack in savedItems) {
-    if (savedItems[pack].length === 0) continue;
-
-    // Create a pack section
-    const packTitle = document.createElement("div");
-    packTitle.className = "locker-title";
-    packTitle.textContent = `📦 ${capitalize(pack)} Pack`;
-    lockerContent.appendChild(packTitle);
-
-    // List items
-    savedItems[pack].forEach((entry) => {
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "locker-item";
-      itemDiv.textContent = `${entry.name} (${entry.rarity})`;
-      lockerContent.appendChild(itemDiv);
-    });
-
-    // Space between packs
-    lockerContent.appendChild(document.createElement("hr"));
-  }
-}
-
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
