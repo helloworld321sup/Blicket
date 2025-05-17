@@ -469,3 +469,87 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<!-- TRADING UI INSERTION START -->
+<!-- We'll add this at the bottom of your game screen before </body> -->
+
+<div id="tradeSection" style="margin-top: 40px; display:none;">
+  <h2>Trading Center</h2>
+  <input type="text" id="tradeWith" placeholder="Enter username to trade with"><br><br>
+
+  <label>Your Offer:</label>
+  <input type="text" id="yourOffer" placeholder="e.g., 😎"><br><br>
+
+  <label>Your Request:</label>
+  <input type="text" id="yourRequest" placeholder="e.g., 🤬"><br><br>
+
+  <button onclick="sendTradeRequest()">Send Trade</button>
+  <div id="tradeStatus" style="margin-top: 10px; color: green;"></div>
+</div>
+
+<script>
+  let tradeRequests = {};
+
+  function sendTradeRequest() {
+    const target = document.getElementById("tradeWith").value.trim();
+    const offer = document.getElementById("yourOffer").value.trim();
+    const request = document.getElementById("yourRequest").value.trim();
+
+    if (!target || !offer || !request) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    // Save trade for target in localStorage
+    const existingTrades = JSON.parse(localStorage.getItem("trades") || '{}');
+    if (!existingTrades[target]) existingTrades[target] = [];
+
+    existingTrades[target].push({ from: username, offer, request });
+    localStorage.setItem("trades", JSON.stringify(existingTrades));
+    document.getElementById("tradeStatus").innerText = `Trade sent to ${target}.`;
+  }
+
+  function checkIncomingTrades() {
+    const trades = JSON.parse(localStorage.getItem("trades") || '{}');
+    const incoming = trades[username] || [];
+    if (incoming.length === 0) return;
+
+    let message = "You have new trade offers:\n";
+    incoming.forEach((trade, i) => {
+      message += `From ${trade.from}: ${trade.offer} for your ${trade.request}\n`;
+    });
+
+    const response = confirm(message + "\nDo you want to accept the first offer?");
+    if (response) {
+      const trade = incoming[0];
+      const locker = JSON.parse(localStorage.getItem("locker-" + username) || '{}');
+      const otherLocker = JSON.parse(localStorage.getItem("locker-" + trade.from) || '{}');
+
+      // Do the trade
+      if ((locker[trade.request] || 0) > 0) {
+        locker[trade.request]--;
+        locker[trade.offer] = (locker[trade.offer] || 0) + 1;
+
+        otherLocker[trade.offer]--;
+        otherLocker[trade.request] = (otherLocker[trade.request] || 0) + 1;
+
+        localStorage.setItem("locker-" + username, JSON.stringify(locker));
+        localStorage.setItem("locker-" + trade.from, JSON.stringify(otherLocker));
+        alert("Trade completed!");
+      } else {
+        alert("You don't own the requested item anymore. Trade canceled.");
+      }
+
+      incoming.shift();
+      trades[username] = incoming;
+      localStorage.setItem("trades", JSON.stringify(trades));
+      updateLocker();
+    }
+  }
+
+  setInterval(checkIncomingTrades, 3000); // Check every 3 seconds
+</script>
+
+<!-- Trigger Button for Trade UI -->
+<button onclick="document.getElementById('tradeSection').style.display='block'">Open Trading Center</button>
+<!-- TRADING UI INSERTION END -->
