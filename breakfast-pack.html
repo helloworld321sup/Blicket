@@ -17,7 +17,7 @@
 
     .pack-wrapper {
       position: relative;
-      width: 300px; /* 1.5 times bigger */
+      width: 300px;  /* 1.5 times bigger */
       height: 300px; /* 1.5 times bigger */
       cursor: pointer;
       z-index: 10;
@@ -57,55 +57,28 @@
       position: absolute;
       top: 60%;
       left: 50%;
-      font-size: 3rem;
+      transform: translate(-50%, -50%) scale(0.1);
+      font-size: 4.5rem; /* 1.5 times bigger */
       color: white;
       z-index: 15;
-      transform: translateX(-50%);
+      transition: transform 0.3s ease;
+      will-change: transform;
     }
 
     #result img {
       width: 150px; /* 1.5 times bigger */
       height: auto;
-      transform-origin: center center;
-      animation: scaleUp 0.5s ease forwards;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%) scale(0);
     }
 
-    @keyframes scaleUp {
-      0% {
-        transform: translateX(-50%) scale(0);
-      }
-      100% {
-        transform: translateX(-50%) scale(1.5);
-      }
-    }
-
-    /* Confetti styles */
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
+    .confetti-piece {
+      position: fixed;
+      width: 12px;  /* bigger confetti */
+      height: 12px; /* bigger confetti */
       background-color: green;
-      opacity: 0.9;
+      opacity: 0.8;
       pointer-events: none;
+      z-index: 20;
       border-radius: 2px;
-      animation-name: confettiFall;
-      animation-timing-function: ease-out;
-      animation-iteration-count: 1;
-      animation-fill-mode: forwards;
-    }
-
-    @keyframes confettiFall {
-      0% {
-        transform: translateY(0) translateX(0);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(150px) translateX(var(--confetti-x, 0));
-        opacity: 0;
-      }
     }
   </style>
 </head>
@@ -120,18 +93,18 @@
   <script>
     const breakfastPack = {
       blooks: [
-        { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.37, rarity: "uncommon" },
-        { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 8.9, rarity: "rare" },
-        { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 8.9, rarity: "rare" },
-        { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 4.95, rarity: "epic" },
-        { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 1.98, rarity: "legendary" },
-        { name: "https://ac.blooket.com/marketassets/blooks/sandwitch.svg", chance: 0.99, rarity: "chroma" },
-        { name: "https://ac.blooket.com/marketassets/blooks/chocolatemilk.svg", chance: 0.099, rarity: "chroma" }
+        { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 8.9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 8.9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 4.95, rarity: 'epic' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 1.98, rarity: 'legendary' },
+        { name: "https://ac.blooket.com/marketassets/blooks/sandwitch.svg", chance: 0.99, rarity: 'chroma' },
+        { name: "https://ac.blooket.com/marketassets/blooks/chocolatemilk.svg", chance: 0.099, rarity: 'chroma' }
       ]
     };
 
@@ -147,44 +120,81 @@
 
     const pack = document.getElementById('pack');
     const result = document.getElementById('result');
-
-    function createConfetti(color, x) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti');
-      confetti.style.backgroundColor = color;
-      confetti.style.left = x + 'px';
-      confetti.style.top = '0px';
-      confetti.style.setProperty('--confetti-x', (Math.random() * 100 - 50) + 'px');
-      confetti.style.animationDuration = (Math.random() * 1 + 3) + 's'; // 3-4 seconds
-      document.body.appendChild(confetti);
-      confetti.addEventListener('animationend', () => confetti.remove());
-    }
+    let openedOnce = false;
 
     function spawnConfettiForRarity(rarity) {
-      if (rarity === "uncommon") {
-        // Green confetti, shoot from top of blook and fall down with gravity
-        const blookRect = result.getBoundingClientRect();
-        for (let i = 0; i < 30; i++) {
-          const x = blookRect.left + Math.random() * blookRect.width;
-          createConfetti('green', x);
+      if (rarity === 'uncommon') {
+        // green confetti, shoot up from top of blook, gravity pulls down
+        for (let i = 0; i < 40; i++) {
+          createConfetti();
         }
       }
-      // Add other rarities if needed
+    }
+
+    function createConfetti() {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.backgroundColor = 'green';
+      confetti.style.left = (window.innerWidth / 2 + (Math.random() * 200 - 100)) + 'px';
+      confetti.style.top = (window.innerHeight / 2) + 'px';
+      document.body.appendChild(confetti);
+
+      let velocityY = - (Math.random() * 10 + 10);
+      let velocityX = Math.random() * 4 - 2;
+      let gravity = 0.5;
+      let posX = parseFloat(confetti.style.left);
+      let posY = parseFloat(confetti.style.top);
+
+      function update() {
+        velocityY += gravity;
+        posX += velocityX;
+        posY += velocityY;
+
+        confetti.style.left = posX + 'px';
+        confetti.style.top = posY + 'px';
+
+        if (posY > window.innerHeight) {
+          confetti.remove();
+        } else {
+          requestAnimationFrame(update);
+        }
+      }
+      requestAnimationFrame(update);
+
+      // fade out and remove after 4 seconds max
+      setTimeout(() => {
+        confetti.style.transition = 'opacity 1s';
+        confetti.style.opacity = '0';
+        setTimeout(() => confetti.remove(), 1000);
+      }, 3000);
     }
 
     pack.addEventListener('click', () => {
-      if (pack.classList.contains('torn')) return;
-      pack.classList.add('torn');
-      const blook = getRandomBlook();
-      if (blook) {
-        result.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = blook.name;
-        img.alt = "Blook";
-        result.appendChild(img);
-        spawnConfettiForRarity(blook.rarity);
+      if (!openedOnce) {
+        if (pack.classList.contains('torn')) return; // prevent double click during animation
+        pack.classList.add('torn');
+        const blook = getRandomBlook();
+        if (blook) {
+          result.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = blook.name;
+          img.alt = "Blook";
+          result.appendChild(img);
+
+          // Animate from small to normal
+          result.style.transform = 'translate(-50%, -50%) scale(0.1)';
+          setTimeout(() => {
+            result.style.transition = 'transform 0.4s ease-out';
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+          }, 50);
+
+          spawnConfettiForRarity(blook.rarity);
+        } else {
+          result.textContent = "❓";
+        }
+        openedOnce = true;
       } else {
-        result.textContent = "❓";
+        window.location.href = "index.html";
       }
     });
   </script>
