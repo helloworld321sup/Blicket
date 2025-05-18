@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Breakfast Pack Open</title>
   <style>
     body {
       background-color: rgb(198, 101, 57);
@@ -10,6 +11,7 @@
       align-items: center;
       height: 100vh;
       overflow: hidden;
+      position: relative;
     }
 
     .pack-wrapper {
@@ -17,6 +19,7 @@
       width: 200px;
       height: 200px;
       cursor: pointer;
+      z-index: 10;
     }
 
     .half {
@@ -48,6 +51,31 @@
       transform: translateY(150%) rotate(15deg);
       opacity: 0;
     }
+
+    /* Confetti styles */
+    .confetti {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background-color: red;
+      opacity: 0.9;
+      pointer-events: none;
+      will-change: transform;
+      border-radius: 2px;
+      z-index: 20;
+      animation: confetti-fall 3s forwards ease-out;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(300px) rotate(360deg);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 <body>
@@ -57,8 +85,40 @@
   </div>
 
   <script>
-    document.getElementById('pack').addEventListener('click', function () {
-      this.classList.add('torn');
+    const pack = document.getElementById('pack');
+
+    function randomRange(min, max) {
+      return Math.random() * (max - min) + min;
+    }
+
+    function createConfettiPiece(x, y, color) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.left = x + 'px';
+      confetti.style.top = y + 'px';
+      confetti.style.backgroundColor = color;
+      confetti.style.animationDuration = (randomRange(2, 4)) + 's';
+      document.body.appendChild(confetti);
+
+      // Remove after animation
+      confetti.addEventListener('animationend', () => confetti.remove());
+    }
+
+    function generateConfetti() {
+      const colors = ['#f44336', '#ffeb3b', '#4caf50', '#2196f3', '#ff9800', '#9c27b0'];
+      const count = 30;
+
+      for (let i = 0; i < count; i++) {
+        const x = window.innerWidth / 2 + randomRange(-100, 100);
+        const y = window.innerHeight / 2 + randomRange(-50, 50);
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        createConfettiPiece(x, y, color);
+      }
+    }
+
+    pack.addEventListener('click', () => {
+      pack.classList.add('torn');
+      generateConfetti();
     });
   </script>
 </body>
