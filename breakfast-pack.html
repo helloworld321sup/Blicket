@@ -17,8 +17,8 @@
 
     .pack-wrapper {
       position: relative;
-      width: 300px; /* 1.5x bigger */
-      height: 300px; /* 1.5x bigger */
+      width: 300px; /* 1.5 times bigger */
+      height: 300px; /* 1.5 times bigger */
       cursor: pointer;
       z-index: 10;
     }
@@ -56,20 +56,21 @@
     #result {
       position: absolute;
       top: 60%;
+      left: 50%;
       font-size: 3rem;
       color: white;
       z-index: 15;
-      left: 50%;
       transform: translateX(-50%);
-      /* animation for blook scaling */
-      animation: scaleUp 0.5s ease forwards;
     }
 
     #result img {
-      width: 150px; /* 1.5x bigger */
+      width: 150px; /* 1.5 times bigger */
       height: auto;
       transform-origin: center center;
       animation: scaleUp 0.5s ease forwards;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
     }
 
     @keyframes scaleUp {
@@ -77,31 +78,32 @@
         transform: translateX(-50%) scale(0);
       }
       100% {
-        transform: translateX(-50%) scale(1);
+        transform: translateX(-50%) scale(1.5);
       }
     }
 
-    /* Confetti styling */
+    /* Confetti styles */
     .confetti {
       position: absolute;
       width: 10px;
       height: 10px;
-      background-color: #00FF00; /* green for uncommon */
+      background-color: green;
       opacity: 0.9;
-      border-radius: 50%;
       pointer-events: none;
-      animation-name: confetti-fall;
-      animation-timing-function: ease-in;
+      border-radius: 2px;
+      animation-name: confettiFall;
+      animation-timing-function: ease-out;
+      animation-iteration-count: 1;
       animation-fill-mode: forwards;
     }
 
-    @keyframes confetti-fall {
+    @keyframes confettiFall {
       0% {
-        transform: translateY(0);
+        transform: translateY(0) translateX(0);
         opacity: 1;
       }
       100% {
-        transform: translateY(300px);
+        transform: translateY(150px) translateX(var(--confetti-x, 0));
         opacity: 0;
       }
     }
@@ -128,7 +130,7 @@
         { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 8.9, rarity: "rare" },
         { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 4.95, rarity: "epic" },
         { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 1.98, rarity: "legendary" },
-        { name: "https://ac.blooket.com/marketassets/blooks/sandwitch.svg", chance: 0.99, rarity: "legendary" },
+        { name: "https://ac.blooket.com/marketassets/blooks/sandwitch.svg", chance: 0.99, rarity: "chroma" },
         { name: "https://ac.blooket.com/marketassets/blooks/chocolatemilk.svg", chance: 0.099, rarity: "chroma" }
       ]
     };
@@ -143,33 +145,32 @@
       return null;
     }
 
-    function createConfetti(rarity, container) {
-      const confettiCount = 30; // more confetti
-      for (let i = 0; i < confettiCount; i++) {
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti');
-        // Adjust color based on rarity
-        if (rarity === 'uncommon') {
-          confetti.style.backgroundColor = '#00FF00'; // green
-        }
-        // spread confetti horizontally
-        confetti.style.left = (50 + (Math.random() - 0.5) * 200) + 'px'; // spread wider
-        confetti.style.top = '0px';
-        confetti.style.width = '14px'; // bigger confetti
-        confetti.style.height = '14px';
-        confetti.style.animationDuration = (3 + Math.random()) + 's'; // ~4s
-        confetti.style.animationDelay = (Math.random() * 0.5) + 's';
-        container.appendChild(confetti);
-
-        // remove confetti after animation
-        confetti.addEventListener('animationend', () => {
-          confetti.remove();
-        });
-      }
-    }
-
     const pack = document.getElementById('pack');
     const result = document.getElementById('result');
+
+    function createConfetti(color, x) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti');
+      confetti.style.backgroundColor = color;
+      confetti.style.left = x + 'px';
+      confetti.style.top = '0px';
+      confetti.style.setProperty('--confetti-x', (Math.random() * 100 - 50) + 'px');
+      confetti.style.animationDuration = (Math.random() * 1 + 3) + 's'; // 3-4 seconds
+      document.body.appendChild(confetti);
+      confetti.addEventListener('animationend', () => confetti.remove());
+    }
+
+    function spawnConfettiForRarity(rarity) {
+      if (rarity === "uncommon") {
+        // Green confetti, shoot from top of blook and fall down with gravity
+        const blookRect = result.getBoundingClientRect();
+        for (let i = 0; i < 30; i++) {
+          const x = blookRect.left + Math.random() * blookRect.width;
+          createConfetti('green', x);
+        }
+      }
+      // Add other rarities if needed
+    }
 
     pack.addEventListener('click', () => {
       if (pack.classList.contains('torn')) return;
@@ -181,7 +182,7 @@
         img.src = blook.name;
         img.alt = "Blook";
         result.appendChild(img);
-        createConfetti(blook.rarity, document.body);
+        spawnConfettiForRarity(blook.rarity);
       } else {
         result.textContent = "❓";
       }
