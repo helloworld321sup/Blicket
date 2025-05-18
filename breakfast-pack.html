@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Breakfast Pack Open</title>
   <style>
     body {
       background-color: rgb(198, 101, 57);
@@ -10,14 +9,57 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      overflow: hidden;
     }
-    img {
+
+    .pack-wrapper {
+      position: relative;
       width: 200px;
-      height: auto;
+      height: 200px;
+      cursor: pointer;
+    }
+
+    .half {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      background-image: url('https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+
+    .top-half {
+      background-position: top;
+      top: 0;
+    }
+
+    .bottom-half {
+      background-position: bottom;
+      bottom: 0;
+    }
+
+    .torn .top-half {
+      transform: translateY(-150%) rotate(-15deg);
+      opacity: 0;
+    }
+
+    .torn .bottom-half {
+      transform: translateY(150%) rotate(15deg);
+      opacity: 0;
     }
   </style>
 </head>
 <body>
-  <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast">
+  <div class="pack-wrapper" id="pack">
+    <div class="half top-half"></div>
+    <div class="half bottom-half"></div>
+  </div>
+
+  <script>
+    document.getElementById('pack').addEventListener('click', function () {
+      this.classList.add('torn');
+    });
+  </script>
 </body>
 </html>
