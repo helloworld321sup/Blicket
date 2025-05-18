@@ -1,105 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Blicket Market</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Arial', sans-serif;
-      background-color: #f0f0f0;
-    }
+<div class="pack-container">
+  <a href="breakfast-pack.html" class="pack-card breakfast-pack">
+    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
+    <h3>Breakfast Pack</h3>
+    <p>Crack it open for a chance at tasty blooks!</p>
+  </a>
+</div>
 
-    .sidebar {
-      width: 180px;
-      background-color: #8e44ad;
-      color: white;
-      position: fixed;
-      height: 100%;
-      padding-top: 20px;
-    }
+<style>
+.pack-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
 
-    .sidebar h1 {
-      text-align: center;
-      font-size: 24px;
-      margin-bottom: 30px;
-    }
-
-    .sidebar button {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      background: none;
-      border: none;
-      color: white;
-      text-align: left;
-      padding-left: 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .sidebar button:hover,
-    .sidebar .active {
-      background-color: #732d91;
-    }
-
-    .main {
-      margin-left: 180px;
-      padding: 25px;
-    }
-
-    .market-title {
-      font-size: 30px;
-      font-weight: bold;
-      margin-bottom: 20px;
-    }
-
-    .pack-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-      gap: 20px;
-    }
-
-    .pack {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      text-align: center;
-      padding: 12px;
-      transition: transform 0.2s;
-    }
-
-    .pack:hover {
-      transform: scale(1.05);
-    }
-
-    .pack img {
-      width: 100px;
-      height: 100px;
-    }
-
-    .pack-name {
-      font-weight: bold;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-  <div class="sidebar">
-    <h1>Blicket</h1>
-    <button class="active">Market</button>
-    <button>Blooks</button>
-    <button>Trading</button>
-  </div>
-
-  <div class="main">
-    <div class="market-title">Market</div>
-    <div class="pack-grid">
-      <div class="pack">
-        <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-        <div class="pack-name">Breakfast Pack</div>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+.pack-card {
+  background: linear-gradient(to bottom right, #fff3cd, #f9e79f);
+  border: 3px solid #f7c948;
+  border-radius: 20px;
+  width: 220px;
+  text-align: center;
+  padding: 20px 15px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s, box-shadow 0.25s;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.pack-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+}
+.pack-card img {
+  width: 120px;
+  height: auto;
+  margin-bottom: 15px;
+}
+.pack-card h3 {
+  margin: 10px 0 5px;
+  font-size: 20px;
+  color: #6c4a00;
+}
+.pack-card p {
+  font-size: 14px;
+  color: #6c757d;
+}
+</style>
