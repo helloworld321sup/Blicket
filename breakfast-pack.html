@@ -12,6 +12,7 @@
       height: 100vh;
       overflow: hidden;
       position: relative;
+      font-family: sans-serif;
     }
 
     .pack-wrapper {
@@ -52,7 +53,6 @@
       opacity: 0;
     }
 
-    /* Confetti styles */
     .confetti {
       position: absolute;
       width: 8px;
@@ -76,6 +76,14 @@
         opacity: 0;
       }
     }
+
+    #result {
+      position: absolute;
+      top: 60%;
+      font-size: 3rem;
+      color: white;
+      z-index: 15;
+    }
   </style>
 </head>
 <body>
@@ -84,8 +92,35 @@
     <div class="half bottom-half"></div>
   </div>
 
+  <div id="result"></div>
+
   <script>
-    const pack = document.getElementById('pack');
+    const breakfastPack = {
+      blooks: [
+        { name: "🍞 Toast", chance: 12.5 },
+        { name: "🥣 Cereal", chance: 12.5 },
+        { name: "🍦 Yogurt", chance: 12.5 },
+        { name: "🥓🍳 Breakfast Combo", chance: 12.5 },
+        { name: "🍊 Orange Juice", chance: 12.5 },
+        { name: "🥛 Milk", chance: 12.5 },
+        { name: "🧇 Waffle", chance: 9 },
+        { name: "🥞 Pancakes", chance: 9 },
+        { name: "🍞🍯 French Toast", chance: 5 },
+        { name: "🍕 Pizza", chance: 2 },
+        { name: "🥪 Sandwich", chance: 1 },
+        { name: "☕️ Chocolate Milk", chance: 0.1 }
+      ]
+    };
+
+    function getRandomBlook() {
+      const rand = Math.random() * 100;
+      let total = 0;
+      for (const blook of breakfastPack.blooks) {
+        total += blook.chance;
+        if (rand <= total) return blook.name;
+      }
+      return "❓"; // fallback
+    }
 
     function randomRange(min, max) {
       return Math.random() * (max - min) + min;
@@ -99,15 +134,12 @@
       confetti.style.backgroundColor = color;
       confetti.style.animationDuration = (randomRange(2, 4)) + 's';
       document.body.appendChild(confetti);
-
-      // Remove after animation
       confetti.addEventListener('animationend', () => confetti.remove());
     }
 
     function generateConfetti() {
       const colors = ['#f44336', '#ffeb3b', '#4caf50', '#2196f3', '#ff9800', '#9c27b0'];
       const count = 30;
-
       for (let i = 0; i < count; i++) {
         const x = window.innerWidth / 2 + randomRange(-100, 100);
         const y = window.innerHeight / 2 + randomRange(-50, 50);
@@ -116,9 +148,16 @@
       }
     }
 
+    const pack = document.getElementById('pack');
+    const result = document.getElementById('result');
+
     pack.addEventListener('click', () => {
+      if (pack.classList.contains('torn')) return;
+
       pack.classList.add('torn');
       generateConfetti();
+      const blook = getRandomBlook();
+      result.textContent = blook;
     });
   </script>
 </body>
