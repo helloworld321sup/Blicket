@@ -1,3 +1,5 @@
+Here's the complete, single HTML file with all confetti effects:
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -74,7 +76,6 @@
       position: fixed;
       width: 12px;
       height: 12px;
-      background-color: green;
       opacity: 0.8;
       pointer-events: none;
       z-index: 20;
@@ -93,18 +94,18 @@
   <script>
     const breakfastPack = {
       blooks: [
-        { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.3168, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.3168, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.3168, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.3168, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.316, rarity: 'uncommon' },
-        { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 9, rarity: 'rare' },
-        { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 9, rarity: 'rare' },
-        { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 5, rarity: 'epic' },
-        { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 2, rarity: 'legendary' },
-        { name: "https://ac.blooket.com/marketassets/blooks/sandwich.svg", chance: 1, rarity: 'legendary' },
-        { name: "https://ac.blooket.com/marketassets/blooks/chocolatemilk.svg", chance: 0.1, rarity: 'chroma' }
+        { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.37, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 8.9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 8.9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 4.95, rarity: 'epic' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 1.98, rarity: 'legendary' },
+        { name: "https://ac.blooket.com/marketassets/blooks/sandwitch.svg", chance: 0.99, rarity: 'chroma' },
+        { name: "https://ac.blooket.com/marketassets/blooks/chocolatemilk.svg", chance: 0.099, rarity: 'chroma' }
       ]
     };
 
@@ -127,7 +128,6 @@
       confetti.classList.add('confetti-piece');
       confetti.style.backgroundColor = '#0281e8'; // Blue color for rare
 
-      // Set starting position at bottom corners
       confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
       confetti.style.top = window.innerHeight + 'px';
       document.body.appendChild(confetti);
@@ -158,7 +158,45 @@
         confetti.style.transition = 'opacity 1s';
         confetti.style.opacity = '0';
         setTimeout(() => confetti.remove(), 1000);
-      }, 10000); // 10 seconds
+      }, 10000);
+    }
+
+    function createEpicConfetti(isLeftSide) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.backgroundColor = '#ff0000'; // Red color for epic
+
+      confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
+      confetti.style.top = (Math.random() * window.innerHeight) + 'px';
+      document.body.appendChild(confetti);
+
+      let velocityY = -(Math.random() * 5 + 5);
+      let velocityX = isLeftSide ? (Math.random() * 4 + 2) : -(Math.random() * 4 + 2);
+      let gravity = 0.5;
+      let posX = parseFloat(confetti.style.left);
+      let posY = parseFloat(confetti.style.top);
+
+      function update() {
+        velocityY += gravity;
+        posX += velocityX;
+        posY += velocityY;
+
+        confetti.style.left = posX + 'px';
+        confetti.style.top = posY + 'px';
+
+        if (posY > window.innerHeight) {
+          confetti.remove();
+        } else {
+          requestAnimationFrame(update);
+        }
+      }
+      requestAnimationFrame(update);
+
+      setTimeout(() => {
+        confetti.style.transition = 'opacity 1s';
+        confetti.style.opacity = '0';
+        setTimeout(() => confetti.remove(), 1000);
+      }, 20000);
     }
 
     function spawnConfettiForRarity(rarity) {
@@ -200,10 +238,14 @@
           }, 3000);
         }
       } else if (rarity === 'rare') {
-        // Spawn 75 confetti from each bottom corner
         for (let i = 0; i < 75; i++) {
-          createConfetti(true);  // Left side
-          createConfetti(false); // Right side
+          createConfetti(true);
+          createConfetti(false);
+        }
+      } else if (rarity === 'epic') {
+        for (let i = 0; i < 75; i++) {
+          createEpicConfetti(true);
+          createEpicConfetti(false);
         }
       }
     }
