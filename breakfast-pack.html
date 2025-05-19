@@ -117,14 +117,46 @@
       return null;
     }
 
-    const pack = document.getElementById('pack');
-    const result = document.getElementById('result');
-    let openedOnce = false;
+    function createLegendaryConfetti() {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.backgroundColor = '#FFD700';  // Gold color
+
+      confetti.style.left = (Math.random() * window.innerWidth) + 'px';
+      confetti.style.top = '0px';
+      document.body.appendChild(confetti);
+
+      let velocityY = Math.random() * 3 + 2;
+      let velocityX = Math.random() * 4 - 2;
+      let posX = parseFloat(confetti.style.left);
+      let posY = parseFloat(confetti.style.top);
+
+      function update() {
+        posX += velocityX;
+        posY += velocityY;
+
+        confetti.style.left = posX + 'px';
+        confetti.style.top = posY + 'px';
+
+        if (posY < window.innerHeight) {
+          requestAnimationFrame(update);
+        } else {
+          confetti.remove();
+        }
+      }
+      requestAnimationFrame(update);
+
+      setTimeout(() => {
+        confetti.style.transition = 'opacity 1s';
+        confetti.style.opacity = '0';
+        setTimeout(() => confetti.remove(), 1000);
+      }, 50000);
+    }
 
     function createConfetti(isLeftSide) {
       const confetti = document.createElement('div');
       confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = '#0281e8'; // Blue color for rare
+      confetti.style.backgroundColor = '#0281e8';
 
       confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
       confetti.style.top = window.innerHeight + 'px';
@@ -162,7 +194,7 @@
     function createEpicConfetti(isLeftSide) {
       const confetti = document.createElement('div');
       confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = '#ff0000'; // Red color for epic
+      confetti.style.backgroundColor = '#ff0000';
 
       confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
       confetti.style.top = (Math.random() * window.innerHeight) + 'px';
@@ -245,8 +277,18 @@
           createEpicConfetti(true);
           createEpicConfetti(false);
         }
+      } else if (rarity === 'legendary') {
+        for (let i = 0; i < 100; i++) {
+          setTimeout(() => {
+            createLegendaryConfetti();
+          }, Math.random() * 50000);
+        }
       }
     }
+
+    const pack = document.getElementById('pack');
+    const result = document.getElementById('result');
+    let openedOnce = false;
 
     pack.addEventListener('click', () => {
       if (!openedOnce) {
