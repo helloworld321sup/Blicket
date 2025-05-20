@@ -116,101 +116,101 @@ function getRandomBlook() {
   return null;
 }
 
-function spawnConfetti(rarity, originX, originY) {
+function spawnConfetti(rarity, blookElement) {
   const colors = {
-    uncommon: ['#a0e060', '#88c040'],
-    rare: ['#60b0e0', '#4080c0'],
-    epic: ['#c060e0', '#a040c0'],
-    legendary: ['#f7c338', '#d4a217'],
-    chroma: ['#ff3cac', '#784ba0']
+    uncommon: '#00cc66',
+    rare: '#3399ff',
+    epic: '#9933ff',
+    legendary: '#ffaa00',
+    chroma: '#ff66cc'
   };
 
-  const countMap = {
-    uncommon: 40,
-    rare: 60,
-    epic: 80,
-    legendary: 100,
+  const amount = {
+    uncommon: 25,
+    rare: 40,
+    epic: 60,
+    legendary: 80,
     chroma: 120
   };
 
-  const count = countMap[rarity] || 30;
-  const colorSet = colors[rarity] || ['#ffffff'];
-
-  for (let i = 0; i < count; i++) {
+  for (let i = 0; i < amount[rarity]; i++) {
     const confetti = document.createElement('div');
-    confetti.classList.add('confetti-piece');
-    confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+    confetti.className = 'confetti';
+    confetti.style.backgroundColor = colors[rarity];
+    confetti.style.position = 'fixed';
+    confetti.style.width = '8px';
+    confetti.style.height = '8px';
+    confetti.style.borderRadius = '2px';
+    confetti.style.zIndex = 9999;
 
-    let startX = originX || window.innerWidth / 2;
-    let startY = originY || window.innerHeight / 2;
-    let velocityX = 0, velocityY = 0;
-    let gravity = true;
+    let startX, startY, velocityX, velocityY, gravity = true;
 
     if (rarity === 'uncommon') {
-      startX += (Math.random() - 0.5) * 160; // wider spread
-      startY -= 120; // higher start
-      velocityX = (Math.random() - 0.5) * 240; // more spread
-      velocityY = -Math.random() * 500 - 300; // stronger upward
+      const rect = blookElement.getBoundingClientRect();
+      startX = rect.left + rect.width / 2 + (Math.random() - 0.5) * 60;
+      startY = rect.top + 10;
+      velocityX = (Math.random() - 0.5) * 2;
+      velocityY = -Math.random() * 4 - 3;
     } else if (rarity === 'rare') {
       const fromLeft = i % 2 === 0;
       startX = fromLeft ? 30 : window.innerWidth - 30;
       startY = window.innerHeight - 30;
-      velocityX = fromLeft ? Math.random() * 900 + 200 : -Math.random() * 900 - 200;
-      velocityY = -Math.random() * 900 - 400; // 🔥 big upward push
-      gravity = true;
+      velocityX = fromLeft ? Math.random() * 9 + 2 : -Math.random() * 9 - 2;
+      velocityY = -Math.random() * 9 - 4;
+      gravity = false; // delay gravity
     } else if (rarity === 'epic') {
-      startX = i % 2 === 0 ? 0 : window.innerWidth;
+      const fromLeft = i % 2 === 0;
+      startX = fromLeft ? 0 : window.innerWidth;
       startY = Math.random() * window.innerHeight;
-      velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-      velocityY = (Math.random() - 0.5) * 100;
+      velocityX = fromLeft ? Math.random() * 20 + 10 : -Math.random() * 20 - 10;
+      velocityY = (Math.random() - 0.5) * 6;
       gravity = false;
     } else if (rarity === 'legendary') {
       startX = Math.random() * window.innerWidth;
-      startY = -10;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = Math.random() * 100 + 100;
+      startY = -20;
+      velocityX = (Math.random() - 0.5) * 2;
+      velocityY = Math.random() * 4 + 2;
     } else if (rarity === 'chroma') {
-      const corners = [
-        [0, 0], [window.innerWidth, 0],
-        [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-      ];
-      const [x, y] = corners[i % 4];
-      startX = x;
-      startY = y;
-      velocityX = (Math.random() - 0.5) * 600;
-      velocityY = (Math.random() - 0.5) * 600;
+      const fromX = i % 2 === 0 ? 0 : window.innerWidth;
+      const fromY = i % 4 < 2 ? 0 : window.innerHeight;
+      startX = fromX;
+      startY = fromY;
+      velocityX = (Math.random() - 0.5) * 25;
+      velocityY = (Math.random() - 0.5) * 25;
       gravity = false;
     }
 
-    confetti.style.left = startX + 'px';
-    confetti.style.top = startY + 'px';
+    confetti.style.left = `${startX}px`;
+    confetti.style.top = `${startY}px`;
     document.body.appendChild(confetti);
 
-    const duration = Math.random() * 2 + 2;
+    let currentX = startX;
+    let currentY = startY;
 
-    confetti.animate([
-      { transform: `translate(0px, 0px)` },
-      { transform: `translate(${velocityX}px, ${velocityY}px)` }
-    ], {
-      duration: duration * 1000,
-      iterations: 1,
-      easing: 'ease-out'
-    });
+    const animation = setInterval(() => {
+      currentX += velocityX;
+      currentY += velocityY;
+      velocityY += gravity ? 0.2 : 0; // simple gravity
 
-    if (gravity) {
-      confetti.animate([
-        { transform: 'translateY(0)' },
-        { transform: `translateY(${window.innerHeight}px)` }
-      ], {
-        duration: duration * 1000,
-        iterations: 1,
-        easing: 'ease-in'
-      });
+      confetti.style.left = `${currentX}px`;
+      confetti.style.top = `${currentY}px`;
+
+      if (
+        currentX < -50 || currentX > window.innerWidth + 50 ||
+        currentY > window.innerHeight + 50
+      ) {
+        clearInterval(animation);
+        confetti.remove();
+      }
+    }, 16);
+
+    // rare: add gravity after short delay
+    if (rarity === 'rare') {
+      setTimeout(() => {
+        gravity = true;
+      }, 150); // allow confetti to shoot first
     }
-
-    setTimeout(() => confetti.remove(), duration * 1000);
   }
-}
 
 let clickCount = 0;
 
