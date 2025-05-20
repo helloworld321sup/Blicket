@@ -151,13 +151,14 @@ function spawnConfetti(rarity, originX, originY) {
       startY -= 105; // ⬆️ raised 15px more
       velocityX = (Math.random() - 0.5) * 220;
       velocityY = -Math.random() * 450 - 250;
-    } else if (rarity === 'rare') {
+   } else if (rarity === 'rare') {
       const leftCorner = 60;
       const rightCorner = window.innerWidth - 60;
       startX = i % 2 === 0 ? leftCorner : rightCorner;
       startY = window.innerHeight - 80;
       velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100; // 💥 strong side blast
       velocityY = -Math.random() * 600 - 300; // 💥 more vertical force
+      gravity = false;  // Added this line to remove gravity
     } else if (rarity === 'epic') {
       startX = i % 2 === 0 ? 0 : window.innerWidth;
       startY = Math.random() * window.innerHeight;
