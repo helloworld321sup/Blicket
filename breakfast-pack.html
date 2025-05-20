@@ -116,16 +116,16 @@ function getRandomBlook() {
   return null;
 }
 
-function spawnConfetti(rarity, originElement) {
+function spawnConfetti(rarity, originX, originY) {
   const colors = {
-    uncommon: '#00cc66',
-    rare: '#3399ff',
-    epic: '#9933ff',
-    legendary: '#ffaa00',
-    chroma: '#ff66cc'
+    uncommon: ['#a0e060', '#88c040'],
+    rare: ['#60b0e0', '#4080c0'],
+    epic: ['#c060e0', '#a040c0'],
+    legendary: ['#f7c338', '#d4a217'],
+    chroma: ['#ff3cac', '#784ba0']
   };
 
-  const amount = {
+  const countMap = {
     uncommon: 40,
     rare: 60,
     epic: 80,
@@ -133,53 +133,82 @@ function spawnConfetti(rarity, originElement) {
     chroma: 120
   };
 
-  for (let i = 0; i < amount[rarity]; i++) {
+  const count = countMap[rarity] || 30;
+  const colorSet = colors[rarity] || ['#ffffff'];
+
+  for (let i = 0; i < count; i++) {
     const confetti = document.createElement('div');
-    confetti.style.position = 'fixed';
-    confetti.style.width = '8px';
-    confetti.style.height = '8px';
-    confetti.style.borderRadius = '2px';
-    confetti.style.backgroundColor = colors[rarity];
-    confetti.style.opacity = '0.8';
-    confetti.style.pointerEvents = 'none';
-    confetti.style.zIndex = '9999';
+    confetti.classList.add('confetti-piece');
+    confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
 
-    // Starting position depends on origin element's bounding box
-    const rect = originElement.getBoundingClientRect();
-    let startX = rect.left + rect.width / 2 + (Math.random() - 0.5) * 60;
-    let startY = rect.top + rect.height / 2 + (Math.random() - 0.5) * 60;
+    let startX = originX || window.innerWidth / 2;
+    let startY = originY || window.innerHeight / 2;
+    let velocityX = 0, velocityY = 0;
+    let gravity = true;
 
-    // Random velocity for each piece
-    let velocityX = (Math.random() - 0.5) * 10;
-    let velocityY = (Math.random() - 0.5) * 10 - 5;
+    if (rarity === 'uncommon') {
+      startX += (Math.random() - 0.5) * 130;
+      startY -= 105; // ⬆️ raised 15px more
+      velocityX = (Math.random() - 0.5) * 220;
+      velocityY = -Math.random() * 450 - 250;
+    } else if (rarity === 'rare') {
+      const leftCorner = 60;
+      const rightCorner = window.innerWidth - 60;
+      startX = i % 2 === 0 ? leftCorner : rightCorner;
+      startY = window.innerHeight - 80;
+      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100; // 💥 strong side blast
+      velocityY = -Math.random() * 600 - 300; // 💥 more vertical force
+    } else if (rarity === 'epic') {
+      startX = i % 2 === 0 ? 0 : window.innerWidth;
+      startY = Math.random() * window.innerHeight;
+      velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
+      velocityY = (Math.random() - 0.5) * 100;
+      gravity = false;
+    } else if (rarity === 'legendary') {
+      startX = Math.random() * window.innerWidth;
+      startY = -10;
+      velocityX = (Math.random() - 0.5) * 100;
+      velocityY = Math.random() * 100 + 100;
+    } else if (rarity === 'chroma') {
+      const corners = [
+        [0, 0], [window.innerWidth, 0],
+        [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+      ];
+      const [x, y] = corners[i % 4];
+      startX = x;
+      startY = y;
+      velocityX = (Math.random() - 0.5) * 600;
+      velocityY = (Math.random() - 0.5) * 600;
+      gravity = false;
+    }
 
-    confetti.style.left = `${startX}px`;
-    confetti.style.top = `${startY}px`;
-
+    confetti.style.left = startX + 'px';
+    confetti.style.top = startY + 'px';
     document.body.appendChild(confetti);
 
-    let currentX = startX;
-    let currentY = startY;
-    let gravity = 0.2;
+    const duration = Math.random() * 2 + 2;
 
-    // Animate confetti
-    const animation = setInterval(() => {
-      velocityY += gravity;
-      currentX += velocityX;
-      currentY += velocityY;
+    confetti.animate([
+      { transform: `translate(0px, 0px)` },
+      { transform: `translate(${velocityX}px, ${velocityY}px)` }
+    ], {
+      duration: duration * 1000,
+      iterations: 1,
+      easing: 'ease-out'
+    });
 
-      confetti.style.left = `${currentX}px`;
-      confetti.style.top = `${currentY}px`;
+    if (gravity) {
+      confetti.animate([
+        { transform: 'translateY(0)' },
+        { transform: `translateY(${window.innerHeight}px)` }
+      ], {
+        duration: duration * 1000,
+        iterations: 1,
+        easing: 'ease-in'
+      });
+    }
 
-      // Remove confetti when offscreen
-      if (
-        currentX < -20 || currentX > window.innerWidth + 20 ||
-        currentY > window.innerHeight + 20
-      ) {
-        clearInterval(animation);
-        confetti.remove();
-      }
-    }, 16);
+    setTimeout(() => confetti.remove(), duration * 1000);
   }
 }
 
