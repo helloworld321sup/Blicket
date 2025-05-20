@@ -147,17 +147,17 @@ function spawnConfetti(rarity, originX, originY) {
     let gravity = true;
 
     if (rarity === 'uncommon') {
-      startX += (Math.random() - 0.5) * 130;
-      startY -= 105; // ⬆️ raised 15px more
-      velocityX = (Math.random() - 0.5) * 220;
-      velocityY = -Math.random() * 450 - 250;
+      startX += (Math.random() - 0.5) * 160; // wider spread
+      startY -= 120; // higher start
+      velocityX = (Math.random() - 0.5) * 240; // more spread
+      velocityY = -Math.random() * 500 - 300; // stronger upward
     } else if (rarity === 'rare') {
-      const leftCorner = 60;
-      const rightCorner = window.innerWidth - 60;
-      startX = i % 2 === 0 ? leftCorner : rightCorner;
-      startY = window.innerHeight - 80;
-      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100; // 💥 strong side blast
-      velocityY = -Math.random() * 600 - 300; // 💥 more vertical force
+      const fromLeft = i % 2 === 0;
+      startX = fromLeft ? 30 : window.innerWidth - 30;
+      startY = window.innerHeight - 30;
+      velocityX = fromLeft ? Math.random() * 900 + 200 : -Math.random() * 900 - 200;
+      velocityY = -Math.random() * 900 - 400; // 🔥 big upward push
+      gravity = true;
     } else if (rarity === 'epic') {
       startX = i % 2 === 0 ? 0 : window.innerWidth;
       startY = Math.random() * window.innerHeight;
