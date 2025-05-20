@@ -1,47 +1,51 @@
-<div class="pack-container">
-  <a href="breakfast-pack.html" class="pack-card breakfast-pack">
-    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-    <h3>Breakfast Pack</h3>
-    <p>Crack it open for a chance at tasty blooks!</p>
-  </a>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blicket</title>
+  <style>
+    /* Add your usual styles here */
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <nav>
+    <button onclick="showPage('main')">Home</button>
+    <button onclick="showPage('breakfast')">Breakfast Pack</button>
+  </nav>
 
-<style>
-.pack-container {
-  display: flex;
-  justify-content: center;
-  padding: 30px;
-}
+  <main id="content">
+    <!-- Dynamic content will be injected here -->
+  </main>
 
-.pack-card {
-  background: linear-gradient(to bottom right, #fff3cd, #f9e79f);
-  border: 3px solid #f7c948;
-  border-radius: 20px;
-  width: 220px;
-  text-align: center;
-  padding: 20px 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.25s, box-shadow 0.25s;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-}
-.pack-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-}
-.pack-card img {
-  width: 120px;
-  height: auto;
-  margin-bottom: 15px;
-}
-.pack-card h3 {
-  margin: 10px 0 5px;
-  font-size: 20px;
-  color: #6c4a00;
-}
-.pack-card p {
-  font-size: 14px;
-  color: #6c757d;
-}
-</style>
+  <!-- Main Page Template -->
+  <template id="main-page">
+    <h1>Welcome to Blicket!</h1>
+    <!-- Insert your index.html content here -->
+    <p>This is the main pack opener and login system.</p>
+  </template>
+
+  <!-- Breakfast Pack Template -->
+  <template id="breakfast-pack-page">
+    <h1>Breakfast Pack</h1>
+    <https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png>
+    <p>Open your sigma breakfast Blooks here!</p>
+  </template>
+
+  <script>
+    function showPage(page) {
+      const templates = {
+        main: document.getElementById("main-page"),
+        breakfast: document.getElementById("breakfast-pack-page")
+      };
+
+      const content = document.getElementById("content");
+      content.innerHTML = "";
+      content.appendChild(templates[page].content.cloneNode(true));
+    }
+
+    // Show the main page on load
+    window.onload = () => showPage("main");
+  </script>
+</body>
+</html>
