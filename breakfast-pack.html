@@ -62,7 +62,6 @@
       color: white;
       z-index: 15;
       transition: transform 0.3s ease;
-      will-change: transform;
     }
 
     #result img {
@@ -117,6 +116,48 @@
       return null;
     }
 
+    function spawnConfetti(rarity) {
+      const colors = {
+        uncommon: ['#a0e060', '#88c040'],
+        rare: ['#60b0e0', '#4080c0'],
+        epic: ['#c060e0', '#a040c0'],
+        legendary: ['#f7c338', '#d4a217'],
+        chroma: ['#ff3cac', '#784ba0']
+      };
+
+      const count = rarity === 'legendary' ? 100 :
+                    rarity === 'epic' ? 80 :
+                    rarity === 'rare' ? 60 :
+                    rarity === 'uncommon' ? 40 :
+                    rarity === 'chroma' ? 120 : 30;
+
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        const colorSet = colors[rarity] || ['#ffffff'];
+        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+        confetti.style.left = Math.random() * window.innerWidth + 'px';
+        confetti.style.top = '-10px';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(confetti);
+
+        const duration = Math.random() * 2 + 3;
+        const translateX = (Math.random() - 0.5) * 300;
+        const translateY = window.innerHeight + 200;
+
+        confetti.animate([
+          { transform: `translate(0, 0) rotate(0deg)` },
+          { transform: `translate(${translateX}px, ${translateY}px) rotate(${Math.random() * 720}deg)` }
+        ], {
+          duration: duration * 1000,
+          iterations: 1,
+          easing: 'ease-out'
+        });
+
+        setTimeout(() => confetti.remove(), duration * 1000);
+      }
+    }
+
     let clickCount = 0;
 
     document.getElementById('pack').addEventListener('click', function () {
@@ -130,6 +171,7 @@
           result.appendChild(img);
           setTimeout(() => {
             result.style.transform = 'translate(-50%, -50%) scale(1)';
+            spawnConfetti(blook.rarity);
           }, 200);
         }
         clickCount++;
