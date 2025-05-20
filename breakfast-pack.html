@@ -164,7 +164,7 @@ function spawnConfetti(rarity, originX, originY) {
       startY = Math.random() * window.innerHeight;
       velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
       velocityY = (Math.random() - 0.5) * 100;
-      gravity = false;
+      gravity = true;
     } else if (rarity === 'legendary') {
       startX = Math.random() * window.innerWidth;
       startY = -10;
