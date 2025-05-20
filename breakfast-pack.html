@@ -148,7 +148,7 @@ function spawnConfetti(rarity, originX, originY) {
 
     if (rarity === 'uncommon') {
       startX += (Math.random() - 0.5) * 130;
-      startY -= 105; // ⬆️ raised 15px more
+      startY -= 130; //
       velocityX = (Math.random() - 0.5) * 220;
       velocityY = -Math.random() * 450 - 250;
    } else if (rarity === 'rare') {
@@ -156,15 +156,15 @@ function spawnConfetti(rarity, originX, originY) {
       const rightCorner = window.innerWidth - 60;
       startX = i % 2 === 0 ? leftCorner : rightCorner;
       startY = window.innerHeight - 80;
-      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100; // 💥 strong side blast
-      velocityY = -Math.random() * 600 - 300; // 💥 more vertical force
-      gravity = false;  // Added this line to remove gravity
+      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
+      velocityY = -Math.random() * 600 - 300;
+      gravity = false;
     } else if (rarity === 'epic') {
       startX = i % 2 === 0 ? 0 : window.innerWidth;
       startY = Math.random() * window.innerHeight;
       velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
       velocityY = (Math.random() - 0.5) * 100;
-      gravity = true;
+      gravity = false;
     } else if (rarity === 'legendary') {
       startX = Math.random() * window.innerWidth;
       startY = -10;
