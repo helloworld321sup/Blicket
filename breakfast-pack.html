@@ -121,6 +121,9 @@ function getRandomBlook() {
   for (const blook of breakfastPack.blooks) {
     total += blook.chance;
     if (rand <= total) return blook;
+
+    updateLocker(blook.name);
+
   }
   return null;
 }
