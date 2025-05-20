@@ -117,202 +117,26 @@
       return null;
     }
 
-    function createLegendaryConfetti() {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = '#FFD700';  // Gold color
+    let clickCount = 0;
 
-      confetti.style.left = (Math.random() * window.innerWidth) + 'px';
-      confetti.style.top = '0px';
-      document.body.appendChild(confetti);
-
-      let velocityY = Math.random() * 3 + 2;
-      let velocityX = Math.random() * 4 - 2;
-      let posX = parseFloat(confetti.style.left);
-      let posY = parseFloat(confetti.style.top);
-
-      function update() {
-        posX += velocityX;
-        posY += velocityY;
-
-        confetti.style.left = posX + 'px';
-        confetti.style.top = posY + 'px';
-
-        if (posY < window.innerHeight) {
-          requestAnimationFrame(update);
-        } else {
-          confetti.remove();
-        }
-      }
-      requestAnimationFrame(update);
-
-      setTimeout(() => {
-        confetti.style.transition = 'opacity 1s';
-        confetti.style.opacity = '0';
-        setTimeout(() => confetti.remove(), 10);
-      }, 1000000);
-    }
-
-    function createConfetti(isLeftSide) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = '#0281e8';
-
-      confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
-      confetti.style.top = window.innerHeight + 'px';
-      document.body.appendChild(confetti);
-
-      let velocityY = -(Math.random() * 10 + 10);
-      let velocityX = isLeftSide ? (Math.random() * 4 + 2) : -(Math.random() * 4 + 2);
-      let gravity = 0.5;
-      let posX = parseFloat(confetti.style.left);
-      let posY = parseFloat(confetti.style.top);
-
-      function update() {
-        velocityY += gravity;
-        posX += velocityX;
-        posY += velocityY;
-
-        confetti.style.left = posX + 'px';
-        confetti.style.top = posY + 'px';
-
-        if (posY > window.innerHeight) {
-          confetti.remove();
-        } else {
-          requestAnimationFrame(update);
-        }
-      }
-      requestAnimationFrame(update);
-
-      setTimeout(() => {
-        confetti.style.transition = 'opacity 1s';
-        confetti.style.opacity = '0';
-        setTimeout(() => confetti.remove(), 1000);
-      }, 10000);
-    }
-
-    function createEpicConfetti(isLeftSide) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = '#ff0000';
-
-      confetti.style.left = isLeftSide ? '0px' : (window.innerWidth + 'px');
-      confetti.style.top = (Math.random() * window.innerHeight) + 'px';
-      document.body.appendChild(confetti);
-
-      let velocityY = -(Math.random() * 5 + 5);
-      let velocityX = isLeftSide ? (Math.random() * 4 + 2) : -(Math.random() * 4 + 2);
-      let gravity = 0.5;
-      let posX = parseFloat(confetti.style.left);
-      let posY = parseFloat(confetti.style.top);
-
-      function update() {
-        velocityY += gravity;
-        posX += velocityX;
-        posY += velocityY;
-
-        confetti.style.left = posX + 'px';
-        confetti.style.top = posY + 'px';
-
-        if (posY > window.innerHeight) {
-          confetti.remove();
-        } else {
-          requestAnimationFrame(update);
-        }
-      }
-      requestAnimationFrame(update);
-
-      setTimeout(() => {
-        confetti.style.transition = 'opacity 1s';
-        confetti.style.opacity = '0';
-        setTimeout(() => confetti.remove(), 1000);
-      }, 20000);
-    }
-
-    function spawnConfettiForRarity(rarity) {
-      if (rarity === 'uncommon') {
-        for (let i = 0; i < 40; i++) {
-          const confetti = document.createElement('div');
-          confetti.classList.add('confetti-piece');
-          confetti.style.backgroundColor = 'green';
-          confetti.style.left = (window.innerWidth / 2 + (Math.random() * 200 - 100)) + 'px';
-          confetti.style.top = (window.innerHeight / 2) + 'px';
-          document.body.appendChild(confetti);
-
-          let velocityY = -(Math.random() * 10 + 10);
-          let velocityX = Math.random() * 4 - 2;
-          let gravity = 0.5;
-          let posX = parseFloat(confetti.style.left);
-          let posY = parseFloat(confetti.style.top);
-
-          function update() {
-            velocityY += gravity;
-            posX += velocityX;
-            posY += velocityY;
-
-            confetti.style.left = posX + 'px';
-            confetti.style.top = posY + 'px';
-
-            if (posY > window.innerHeight) {
-              confetti.remove();
-            } else {
-              requestAnimationFrame(update);
-            }
-          }
-          requestAnimationFrame(update);
-
+    document.getElementById('pack').addEventListener('click', function () {
+      if (clickCount === 0) {
+        this.classList.add('torn');
+        const blook = getRandomBlook();
+        if (blook) {
+          const result = document.getElementById('result');
+          const img = document.createElement('img');
+          img.src = blook.name;
+          result.appendChild(img);
           setTimeout(() => {
-            confetti.style.transition = 'opacity 1s';
-            confetti.style.opacity = '0';
-            setTimeout(() => confetti.remove(), 1000);
-          }, 3000);
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+          }, 200);
         }
-      } else if (rarity === 'rare') {
-        for (let i = 0; i < 75; i++) {
-          createConfetti(true);
-          createConfetti(false);
-        }
-      } else if (rarity === 'epic') {
-        for (let i = 0; i < 75; i++) {
-          createEpicConfetti(true);
-          createEpicConfetti(false);
-        }
-      } else if (rarity === 'legendary') {
-        for (let i = 0; i < 100; i++) {
-          setTimeout(() => {
-            createLegendaryConfetti();
-          }, Math.random() * 50000);
-        }
+        clickCount++;
+      } else {
+        window.location.href = "index.html";
       }
-    }
-
-    const pack = document.getElementById('pack');
-const result = document.getElementById('result');
-let openedOnce = false;
-
-document.body.addEventListener('click', () => {
-  if (!openedOnce) {
-    if (pack.classList.contains('torn')) return;
-    pack.classList.add('torn');
-    const blook = getRandomBlook();
-    if (blook) {
-      result.innerHTML = '';
-      const img = document.createElement('img');
-      img.src = blook.name;
-      img.alt = "Blook";
-      result.appendChild(img);
-
-      result.style.transform = 'translate(-50%, -50%) scale(0.1)';
-      setTimeout(() => {
-        result.style.transition = 'transform 0.4s ease-out';
-        result.style.transform = 'translate(-50%, -50%) scale(1)';
-        spawnConfettiForRarity(blook.rarity);
-      }, 50);
-    }
-    openedOnce = true;
-  }
-});
-
+    });
   </script>
 </body>
 </html>
