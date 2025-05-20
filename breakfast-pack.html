@@ -141,25 +141,25 @@ function spawnConfetti(rarity, originX, originY) {
     confetti.classList.add('confetti-piece');
     confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
 
-    let startX = window.innerWidth / 2;
-    let startY = window.innerHeight / 2;
+    let startX = originX || window.innerWidth / 2;
+    let startY = originY || window.innerHeight / 2;
     let velocityX = 0, velocityY = 0;
     let gravity = true;
 
     if (rarity === 'uncommon') {
-      startX = originX;
-      startY = originY;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = -Math.random() * 400 - 100;
+      startX += (Math.random() - 0.5) * 100; // Spread out X
+      startY -= 50; // Lift off from blook
+      velocityX = (Math.random() - 0.5) * 200;
+      velocityY = -Math.random() * 400 - 200;
     } else if (rarity === 'rare') {
-      startX = (i % 2 === 0) ? 0 : window.innerWidth;
-      startY = window.innerHeight;
-      velocityX = (i % 2 === 0) ? Math.random() * 200 : -Math.random() * 200;
-      velocityY = -Math.random() * 400 - 100;
+      startX = (i % 2 === 0) ? 40 : window.innerWidth - 40;
+      startY = window.innerHeight - 20;
+      velocityX = (i % 2 === 0) ? Math.random() * 150 : -Math.random() * 150;
+      velocityY = -Math.random() * 400 - 150;
     } else if (rarity === 'epic') {
       startX = (i % 2 === 0) ? 0 : window.innerWidth;
       startY = Math.random() * window.innerHeight;
-      velocityX = (i % 2 === 0) ? Math.random() * 400 + 100 : -Math.random() * 400 - 100;
+      velocityX = (i % 2 === 0) ? Math.random() * 600 + 200 : -Math.random() * 600 - 200; // Faster
       velocityY = (Math.random() - 0.5) * 100;
       gravity = false;
     } else if (rarity === 'legendary') {
@@ -186,7 +186,7 @@ function spawnConfetti(rarity, originX, originY) {
 
     const duration = Math.random() * 2 + 2;
 
-    const animation = confetti.animate([
+    confetti.animate([
       { transform: `translate(0px, 0px)` },
       { transform: `translate(${velocityX}px, ${velocityY}px)` }
     ], {
@@ -196,7 +196,7 @@ function spawnConfetti(rarity, originX, originY) {
     });
 
     if (gravity) {
-      const gravityAnim = confetti.animate([
+      confetti.animate([
         { transform: 'translateY(0)' },
         { transform: `translateY(${window.innerHeight}px)` }
       ], {
