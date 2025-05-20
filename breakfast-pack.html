@@ -116,7 +116,7 @@ function getRandomBlook() {
   return null;
 }
 
-function spawnConfetti(rarity, blookElement) {
+function spawnConfetti(rarity, originElement) {
   const colors = {
     uncommon: '#00cc66',
     rare: '#3399ff',
@@ -135,82 +135,53 @@ function spawnConfetti(rarity, blookElement) {
 
   for (let i = 0; i < amount[rarity]; i++) {
     const confetti = document.createElement('div');
-    confetti.className = 'confetti';
-    confetti.style.backgroundColor = colors[rarity];
     confetti.style.position = 'fixed';
     confetti.style.width = '8px';
     confetti.style.height = '8px';
     confetti.style.borderRadius = '2px';
-    confetti.style.zIndex = 9999;
+    confetti.style.backgroundColor = colors[rarity];
+    confetti.style.opacity = '0.8';
+    confetti.style.pointerEvents = 'none';
+    confetti.style.zIndex = '9999';
 
-    let startX, startY, velocityX, velocityY, gravity = true;
+    // Starting position depends on origin element's bounding box
+    const rect = originElement.getBoundingClientRect();
+    let startX = rect.left + rect.width / 2 + (Math.random() - 0.5) * 60;
+    let startY = rect.top + rect.height / 2 + (Math.random() - 0.5) * 60;
 
-    if (rarity === 'uncommon') {
-      const rect = blookElement.getBoundingClientRect();
-      startX = rect.left + rect.width / 2 + (Math.random() - 0.5) * 60;
-      startY = rect.top + 10;
-      velocityX = (Math.random() - 0.5) * 2;
-      velocityY = -Math.random() * 4 - 3;
-    } else if (rarity === 'rare') {
-      const fromLeft = i % 2 === 0;
-      startX = fromLeft ? 30 : window.innerWidth - 30;
-      startY = window.innerHeight - 30;
-      velocityX = fromLeft ? Math.random() * 9 + 2 : -Math.random() * 9 - 2;
-      velocityY = -Math.random() * 9 - 4;
-      gravity = false; // delay gravity
-    } else if (rarity === 'epic') {
-      const fromLeft = i % 2 === 0;
-      startX = fromLeft ? 0 : window.innerWidth;
-      startY = Math.random() * window.innerHeight;
-      velocityX = fromLeft ? Math.random() * 20 + 10 : -Math.random() * 20 - 10;
-      velocityY = (Math.random() - 0.5) * 6;
-      gravity = false;
-    } else if (rarity === 'legendary') {
-      startX = Math.random() * window.innerWidth;
-      startY = -20;
-      velocityX = (Math.random() - 0.5) * 2;
-      velocityY = Math.random() * 4 + 2;
-    } else if (rarity === 'chroma') {
-      const fromX = i % 2 === 0 ? 0 : window.innerWidth;
-      const fromY = i % 4 < 2 ? 0 : window.innerHeight;
-      startX = fromX;
-      startY = fromY;
-      velocityX = (Math.random() - 0.5) * 25;
-      velocityY = (Math.random() - 0.5) * 25;
-      gravity = false;
-    }
+    // Random velocity for each piece
+    let velocityX = (Math.random() - 0.5) * 10;
+    let velocityY = (Math.random() - 0.5) * 10 - 5;
 
     confetti.style.left = `${startX}px`;
     confetti.style.top = `${startY}px`;
+
     document.body.appendChild(confetti);
 
     let currentX = startX;
     let currentY = startY;
+    let gravity = 0.2;
 
+    // Animate confetti
     const animation = setInterval(() => {
+      velocityY += gravity;
       currentX += velocityX;
       currentY += velocityY;
-      velocityY += gravity ? 0.2 : 0; // simple gravity
 
       confetti.style.left = `${currentX}px`;
       confetti.style.top = `${currentY}px`;
 
+      // Remove confetti when offscreen
       if (
-        currentX < -50 || currentX > window.innerWidth + 50 ||
-        currentY > window.innerHeight + 50
+        currentX < -20 || currentX > window.innerWidth + 20 ||
+        currentY > window.innerHeight + 20
       ) {
         clearInterval(animation);
         confetti.remove();
       }
     }, 16);
-
-    // rare: add gravity after short delay
-    if (rarity === 'rare') {
-      setTimeout(() => {
-        gravity = true;
-      }, 150); // allow confetti to shoot first
-    }
   }
+}
 
 let clickCount = 0;
 
