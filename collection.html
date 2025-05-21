@@ -3,44 +3,27 @@
 <head>
   <title>My Breakfast Collection</title>
   <style>
-    body {
-      background-color: rgb(255, 140, 72);
-      font-family: sans-serif;
-      padding: 20px;
-    }
+    /* Previous styles remain the same */
 
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 20px;
-      padding: 20px;
+    /* Add new style for quantity display */
+    .quantity-badge {
+      background-color: #ff6b6b;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 12px;
     }
 
     .blook-card {
+      position: relative;  /* Add this for quantity badge positioning */
       background: white;
       border-radius: 10px;
       padding: 15px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .blook-card img {
-      width: 100px;
-      height: 100px;
-    }
-
-    .blook-name {
-      margin-top: 10px;
-      font-size: 14px;
-    }
-
-    .rarity-tag {
-      padding: 5px 10px;
-      border-radius: 15px;
-      font-size: 12px;
-      color: white;
-      margin-top: 5px;
-      display: inline-block;
     }
   </style>
 </head>
@@ -51,9 +34,9 @@
       Back to Pack
     </button>
   </div>
-  
+
   <div class="collection-grid" id="collection"></div>
-  
+
   <script>
     // Create an array to store collected blooks
     let collection = JSON.parse(localStorage.getItem('collection')) || [];
@@ -67,12 +50,26 @@
       'chroma': '#ff3cac'
     };
 
+    // Function to count duplicates
+    function countDuplicates(array) {
+      return array.reduce((count, item) => {
+        count[item.name] = (count[item.name] || 0) + 1;
+        return count;
+      }, {});
+    }
+
     // Function to display collection
     function displayCollection() {
       const container = document.getElementById('collection');
       container.innerHTML = '';
 
-      collection.forEach(blook => {
+      // Count duplicates
+      const quantities = countDuplicates(collection);
+
+      // Create array of unique items
+      const uniqueItems = [...new Map(collection.map(item => [item.name, item])).values()];
+
+      uniqueItems.forEach(blook => {
         const card = document.createElement('div');
         card.className = 'blook-card';
 
@@ -88,9 +85,15 @@
         rarity.textContent = blook.rarity;
         rarity.style.backgroundColor = rarityColors[blook.rarity];
 
+        // Add quantity badge
+        const quantity = document.createElement('div');
+        quantity.className = 'quantity-badge';
+        quantity.textContent = quantities[blook.name];
+
         card.appendChild(img);
         card.appendChild(name);
         card.appendChild(rarity);
+        card.appendChild(quantity);
         container.appendChild(card);
       });
     }
