@@ -44,4 +44,19 @@
   font-size: 14px;
   color: #6c757d;
 }
+  const logoutButton = document.createElement('button');
+logoutButton.textContent = 'Logout';
+logoutButton.style.position = 'fixed';
+logoutButton.style.top = '20px';
+logoutButton.style.left = '20px';
+logoutButton.style.padding = '10px 20px';
+logoutButton.style.background = 'white';
+logoutButton.style.border = 'none';
+logoutButton.style.borderRadius = '5px';
+logoutButton.style.cursor = 'pointer';
+logoutButton.onclick = function() {
+  localStorage.removeItem('currentUser');
+  window.location.href = 'login.html';
+};
+document.body.appendChild(logoutButton);
 </style>
