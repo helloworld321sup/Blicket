@@ -98,8 +98,13 @@
       const itemCounts = getItemCounts();
 
       // Create array of unique items
-      const uniqueItems = Array.from(new Set(collection.map(item => JSON.stringify(item))))
-        .map(item => JSON.parse(item));
+     const seen = new Set();
+const uniqueItems = collection.filter(item => {
+  if (seen.has(item.name)) return false;
+  seen.add(item.name);
+  return true;
+});
+
 
       uniqueItems.forEach(blook => {
         const card = document.createElement('div');
