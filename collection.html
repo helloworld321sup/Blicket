@@ -67,11 +67,10 @@
 
   <div class="collection-grid" id="collection"></div>
 
-  <script>
-    // Create an array to store collected blooks
+<script>
+    // Get collection from localStorage
     let collection = JSON.parse(localStorage.getItem('collection')) || [];
 
-    // Define rarity colors
     const rarityColors = {
       'uncommon': '#a0e060',
       'rare': '#60b0e0',
@@ -80,24 +79,27 @@
       'chroma': '#ff3cac'
     };
 
-    // Function to count duplicates
-    function countDuplicates(array) {
-      return array.reduce((count, item) => {
-        count[item.name] = (count[item.name] || 0) + 1;
-        return count;
-      }, {});
+    // Improved function to count duplicates
+    function getItemCounts() {
+      const counts = {};
+      collection.forEach(item => {
+        // Use the full item name as the key
+        const key = item.name;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      return counts;
     }
 
-    // Function to display collection
     function displayCollection() {
       const container = document.getElementById('collection');
       container.innerHTML = '';
 
-      // Count duplicates
-      const quantities = countDuplicates(collection);
+      // Get counts of all items
+      const itemCounts = getItemCounts();
 
       // Create array of unique items
-      const uniqueItems = [...new Map(collection.map(item => [item.name, item])).values()];
+      const uniqueItems = Array.from(new Set(collection.map(item => JSON.stringify(item))))
+        .map(item => JSON.parse(item));
 
       uniqueItems.forEach(blook => {
         const card = document.createElement('div');
@@ -115,10 +117,10 @@
         rarity.textContent = blook.rarity;
         rarity.style.backgroundColor = rarityColors[blook.rarity];
 
-        // Add quantity badge
+        // Add quantity badge with correct count
         const quantity = document.createElement('div');
         quantity.className = 'quantity-badge';
-        quantity.textContent = quantities[blook.name];
+        quantity.textContent = itemCounts[blook.name];
 
         card.appendChild(img);
         card.appendChild(name);
