@@ -3,6 +3,7 @@
 <head>
   <title>VideoGame Pack Open</title>
   <style>
+    <button class="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
     body {
       background-color: rgb(21, 9, 90);
       margin: 0;
@@ -63,16 +64,14 @@
       z-index: 15;
       transition: transform 0.3s ease;
     }
-
     .corner-image {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 50px;
-      height: 50px;
-      z-index: 5;
+     position: fixed;
+     bottom: 20px;
+     right: 20px;
+     width: 50px;
+     height: 50px;
+     z-index: 5;
     }
-
     #result img {
       width: 150px;
       height: auto;
@@ -87,6 +86,19 @@
       z-index: 20;
       border-radius: 2px;
     }
+    .collection-button {
+     position: fixed;
+     top: 20px;
+     right: 20px;
+     padding: 10px 20px;
+     background: white;
+     border: none;
+     border-radius: 5px;
+     cursor: pointer;
+     font-weight: bold;
+     z-index: 9999;
+    }
+
   </style>
 </head>
 <body>
@@ -94,95 +106,183 @@
     <div class="half top-half"></div>
     <div class="half bottom-half"></div>
   </div>
+
+   <div id="result"></div>
+   <img src="https://ac.blooket.com/dashclassic/assets/Nav_Icon_Breakfast-B4PUbejt.svg" class="corner-image">
+
+   <button onclick="window.location.href='collection.html'" style="position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
+     View Collection
+   </button>
   
   <script>
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      window.location.href = 'login.html';
+const currentUser = localStorage.getItem('currentUser');
+if (!currentUser) {
+  window.location.href = 'login.html';
+}
+const videoGamePack = {
+  blooks: [
+    { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 14, rarity: 'uncommon' },
+    { name: "https://blacket.org/content/blooks/Space%20Invader.webp", chance: 14, rarity: 'uncommon' },
+    { name: "https://blacket.org/content/blooks/Among%20Us.webp", chance: 14, rarity: 'uncommon' },
+    { name: "https://blacket.org/content/blooks/Poke%20Ball.webp", chance: 14, rarity: 'uncommon' },
+    { name: "https://blacket.org/content/blooks/Flappy%20Bird.webp", chance: 14, rarity: 'uncommon' },
+    { name: "https://blacket.org/content/blooks/Goomba.webp", chance: 18, rarity: 'rare' },
+    { name: "https://blacket.org/content/blooks/Big%20Shield.webp", chance: 18, rarity: 'rare' },
+    { name: "https://blacket.org/content/blooks/Creeper.webp", chance: 18, rarity: 'rare' },
+    { name: "https://blacket.org/content/blooks/Red%20Bird.webp", chance: 2.6, rarity: 'epic' },
+    { name: "https://blacket.org/content/blooks/Companion%20Cube.webp", chance: 2.6, rarity: 'epic' },
+    { name: "https://blacket.org/content/blooks/Enderman.webp", chance: 1, rarity: 'legendary' },
+    { name: "https://blacket.org/content/blooks/Master%20Chief.webp", chance: 0.7, rarity: 'legendary' },
+    { name: "https://blacket.org/content/blooks/Golden%20Among%20Us.webp", chance: 0.1, rarity: 'chroma' },
+    { name: "https://blacket.org/content/blooks/Puffed%20Pig.webp", chance: 0.02, rarity: 'chroma' },
+    { name: "https://blacket.org/content/blooks/Gaming%20Mouse.webp", chance: 0.006, rarity: 'mystical' }
+  ]
+};
+function getRandomBlook() {
+  const rand = Math.random() * 100;
+  let total = 0;
+  for (const blook of breakfastPack.blooks) {
+    total += blook.chance;
+    if (rand <= total) return blook;
+  }
+  return null;
+}
+
+const colors = {
+  uncommon: ['#a0e060', '#88c040'],
+  rare: ['#60b0e0', '#4080c0'],
+  epic: ['#c060e0', '#a040c0'],
+  legendary: ['#f7c338', '#d4a217'],
+  chroma: ['#15c2eb', '#17a5e6'],
+  mystical: ['#4b0082', '#301934']
+};
+
+const countMap = {
+  uncommon: 40,
+  rare: 60,
+  epic: 80,
+  legendary: 100,
+  chroma: 120,
+  mystical: 150
+};
+
+  const count = countMap[rarity] || 30;
+  const colorSet = colors[rarity] || ['#ffffff'];
+
+  for (let i = 0; i < count; i++) {
+    const confetti = document.createElement('div');
+    confetti.classList.add('confetti-piece');
+    confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+
+    let startX = originX || window.innerWidth / 2;
+    let startY = originY || window.innerHeight / 2;
+    let velocityX = 0, velocityY = 0;
+    let gravity = true;
+
+    if (rarity === 'uncommon') {
+      startX += (Math.random() - 0.5) * 130;
+      startY -= 150; //
+      velocityX = (Math.random() - 0.5) * 200;
+      velocityY = -Math.random() * 450 - 400;
+   } else if (rarity === 'rare') {
+      const leftCorner = 60;
+      const rightCorner = window.innerWidth - 60;
+      startX = i % 2 === 0 ? leftCorner : rightCorner;
+      startY = window.innerHeight - 80;
+      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
+      velocityY = -Math.random() * 600 - 300;
+      gravity = false;
+    } else if (rarity === 'epic') {
+      startX = i % 2 === 0 ? 0 : window.innerWidth;
+      startY = Math.random() * window.innerHeight;
+      velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
+      velocityY = (Math.random() - 0.5) * 100;
+      gravity = false;
+    } else if (rarity === 'legendary') {
+      startX = Math.random() * window.innerWidth;
+      startY = -10;
+      velocityX = (Math.random() - 0.5) * 100;
+      velocityY = Math.random() * 100 + 100;
+    } else if (rarity === 'chroma') {
+      const corners = [
+        [0, 0], [window.innerWidth, 0],
+        [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+      ];
+      const [x, y] = corners[i % 4];
+      startX = x;
+      startY = y;
+      velocityX = (Math.random() - 0.5) * 600;
+      velocityY = (Math.random() - 0.5) * 600;
+      gravity = false;
+    } else if (rarity === 'mystical') {
+      startX = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
+      startY = window.innerHeight / 2 + 100;
+      velocityX = (Math.random() - 0.5) * 100;
+      velocityY = -Math.random() * 300 - 100;
+      gravity = false;
     }
 
-    const packWrapper = document.getElementById('pack');
-    const resultDiv = document.getElementById('result');
-    let clickCount = 0;
-    let openedBlook = null;
+    confetti.style.left = startX + 'px';
+    confetti.style.top = startY + 'px';
+    document.body.appendChild(confetti);
 
-    const videoGamePack = {
-      blooks: [
-        { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 14, rarity: 'uncommon' },
-        { name: "https://blacket.org/content/blooks/Space%20Invader.webp", chance: 14, rarity: 'uncommon' },
-        { name: "https://blacket.org/content/blooks/Among%20Us.webp", chance: 14, rarity: 'uncommon' },
-        { name: "https://blacket.org/content/blooks/Poke%20Ball.webp", chance: 14, rarity: 'uncommon' },
-        { name: "https://blacket.org/content/blooks/Flappy%20Bird.webp", chance: 14, rarity: 'uncommon' },
-        { name: "https://blacket.org/content/blooks/Goomba.webp", chance: 18, rarity: 'rare' },
-        { name: "https://blacket.org/content/blooks/Big%20Shield.webp", chance: 18, rarity: 'rare' },
-        { name: "https://blacket.org/content/blooks/Creeper.webp", chance: 18, rarity: 'rare' },
-        { name: "https://blacket.org/content/blooks/Red%20Bird.webp", chance: 2.6, rarity: 'epic' },
-        { name: "https://blacket.org/content/blooks/Companion%20Cube.webp", chance: 2.6, rarity: 'epic' },
-        { name: "https://blacket.org/content/blooks/Enderman.webp", chance: 1, rarity: 'legendary' },
-        { name: "https://blacket.org/content/blooks/Master%20Chief.webp", chance: 0.7, rarity: 'legendary' },
-        { name: "https://blacket.org/content/blooks/Golden%20Among%20Us.webp", chance: 0.1, rarity: 'chroma' },
-        { name: "https://blacket.org/content/blooks/Puffed%20Pig.webp", chance: 0.02, rarity: 'chroma' },
-        { name: "https://blacket.org/content/blooks/Gaming%20Mouse.webp", chance: 0.006, rarity: 'mystical' }
-      ]
-    };
+    const duration = Math.random() * 2 + 2;
 
-    const colors = {
-      uncommon: ['#a0e060', '#88c040'],
-      rare: ['#60b0e0', '#4080c0'],
-      epic: ['#c060e0', '#a040c0'],
-      legendary: ['#f7c338', '#d4a217'],
-      chroma: ['#15c2eb', '#17a5e6'],
-      mystical: ['#4b0082', '#301934']
-    };
-
-    const countMap = {
-      uncommon: 40,
-      rare: 60,
-      epic: 80,
-      legendary: 100,
-      chroma: 120,
-      mystical: 150
-    };
-
-    function getRandomBlook() {
-      const rand = Math.random() * 100;
-      let total = 0;
-      for (const blook of videoGamePack.blooks) {
-        total += blook.chance;
-        if (rand <= total) return blook;
-      }
-      return videoGamePack.blooks[0];
-    }
-
-    function spawnConfetti(rarity) {
-      const count = countMap[rarity] || 30;
-      const colorSet = colors[rarity] || ['#ffffff'];
-      for (let i = 0; i < count; i++) {
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti-piece');
-        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-        confetti.style.left = `${Math.random() * 100}%`;
-        confetti.style.top = `${Math.random() * 100}%`;
-        confetti.style.animation = `fall ${Math.random() * 2 + 3}s linear infinite`;
-        document.body.appendChild(confetti);
-      }
-    }
-
-    packWrapper.addEventListener('click', () => {
-      clickCount++;
-      if (clickCount === 1) {
-        packWrapper.classList.add('torn');
-        openedBlook = getRandomBlook();
-        const img = document.createElement('img');
-        img.src = openedBlook.name;
-        resultDiv.innerHTML = '';
-        resultDiv.appendChild(img);
-        resultDiv.style.transform = 'translate(-50%, -50%) scale(1)';
-        spawnConfetti(openedBlook.rarity);
-      } else if (clickCount === 2) {
-        window.location.href = 'index.html';
-      }
+    confetti.animate([
+      { transform: `translate(0px, 0px)` },
+      { transform: `translate(${velocityX}px, ${velocityY}px)` }
+    ], {
+      duration: duration * 1000,
+      iterations: 1,
+      easing: 'ease-out'
     });
-  </script>
+
+    if (gravity) {
+      confetti.animate([
+        { transform: 'translateY(0)' },
+        { transform: `translateY(${window.innerHeight}px)` }
+      ], {
+        duration: duration * 1000,
+        iterations: 1,
+        easing: 'ease-in'
+      });
+    }
+
+    setTimeout(() => confetti.remove(), duration * 1000);
+  }
+}
+
+let clickCount = 0;
+
+document.getElementById('pack').addEventListener('click', function () {
+  if (clickCount === 0) {
+    this.classList.add('torn');
+    const blook = getRandomBlook();
+    if (blook) {
+      // Save to collection
+      const collection = JSON.parse(localStorage.getItem('collection')) || [];
+      if (!collection.find(b => b.name === blook.name)) {
+        collection.push(blook);
+        localStorage.setItem('collection', JSON.stringify(collection));
+      }
+
+      const result = document.getElementById('result');
+      const img = document.createElement('img');
+      img.src = blook.name;
+      result.appendChild(img);
+      setTimeout(() => {
+        result.style.transform = 'translate(-50%, -50%) scale(1)';
+        const rect = result.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+        spawnConfetti(blook.rarity, originX, originY);
+      }, 200);
+    }
+    clickCount++;
+  } else {
+    window.location.href = "index.html";
+  }
+});
+</script>
 </body>
 </html>
