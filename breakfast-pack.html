@@ -102,6 +102,10 @@
    </button>
   
   <script>
+const currentUser = localStorage.getItem('currentUser');
+if (!currentUser) {
+  window.location.href = 'login.html';
+}
 const breakfastPack = {
   blooks: [
     { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
