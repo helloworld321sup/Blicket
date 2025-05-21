@@ -1,62 +1,85 @@
-<div class="pack-container">
-  <a href="breakfast-pack.html" class="pack-card breakfast-pack">
-    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-    <h3>Breakfast Pack</h3>
-    <p>Crack it open for a chance at tasty blooks!</p>
-  </a>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blicket Packs</title>
+  <style>
+    .pack-container {
+      display: flex;
+      justify-content: center;
+      padding: 30px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
 
-<style>
-.pack-container {
-  display: flex;
-  justify-content: center;
-  padding: 30px;
-}
+    .pack-card {
+      background: linear-gradient(to bottom right, #fff3cd, #f9e79f);
+      border: 3px solid #f7c948;
+      border-radius: 20px;
+      width: 220px;
+      text-align: center;
+      padding: 20px 15px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      transition: transform 0.25s, box-shadow 0.25s;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
 
-.pack-card {
-  background: linear-gradient(to bottom right, #fff3cd, #f9e79f);
-  border: 3px solid #f7c948;
-  border-radius: 20px;
-  width: 220px;
-  text-align: center;
-  padding: 20px 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  transition: transform 0.25s, box-shadow 0.25s;
-  cursor: pointer;
-  text-decoration: none;
-  color: inherit;
-}
-.pack-card:hover {
-  transform: scale(1.05);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-}
-.pack-card img {
-  width: 120px;
-  height: auto;
-  margin-bottom: 15px;
-}
-.pack-card h3 {
-  margin: 10px 0 5px;
-  font-size: 20px;
-  color: #6c4a00;
-}
-.pack-card p {
-  font-size: 14px;
-  color: #6c757d;
-}
-  const logoutButton = document.createElement('button');
-logoutButton.textContent = 'Logout';
-logoutButton.style.position = 'fixed';
-logoutButton.style.top = '20px';
-logoutButton.style.left = '20px';
-logoutButton.style.padding = '10px 20px';
-logoutButton.style.background = 'white';
-logoutButton.style.border = 'none';
-logoutButton.style.borderRadius = '5px';
-logoutButton.style.cursor = 'pointer';
-logoutButton.onclick = function() {
-  localStorage.removeItem('currentUser');
-  window.location.href = 'login.html';
-};
-document.body.appendChild(logoutButton);
-</style>
+    .pack-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .pack-card img {
+      width: 120px;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    .pack-card h3 {
+      margin: 10px 0 5px;
+      font-size: 20px;
+      color: #6c4a00;
+    }
+
+    .pack-card p {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    #logout-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      padding: 10px 20px;
+      background: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="pack-container">
+    <a href="breakfast-pack.html" class="pack-card breakfast-pack">
+      <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
+      <h3>Breakfast Pack</h3>
+      <p>Crack it open for a chance at tasty blooks!</p>
+    </a>
+    <!-- Add more packs here -->
+  </div>
+
+  <button id="logout-button">Logout</button>
+
+  <script>
+    const logoutButton = document.getElementById('logout-button');
+    logoutButton.onclick = function () {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'login.html';
+    };
+  </script>
+</body>
+</html>
