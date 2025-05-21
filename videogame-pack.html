@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>VideoGame Pack Open</title>
+  <title>Video Game Pack Open</title>
   <style>
-    <button class="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
     body {
-      background-color: rgb(21, 9, 90);
+      background-color: rgb(255, 140, 72);
       margin: 0;
       display: flex;
       justify-content: center;
@@ -28,7 +27,7 @@
       position: absolute;
       width: 100%;
       height: 50%;
-      background-image: url('https://blacket.org/content/packs/Video%20Game.webp');
+      background-image: url('https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png');
       background-size: cover;
       background-repeat: no-repeat;
       transition: transform 0.6s ease, opacity 0.6s ease;
@@ -86,19 +85,7 @@
       z-index: 20;
       border-radius: 2px;
     }
-    .collection-button {
-     position: fixed;
-     top: 20px;
-     right: 20px;
-     padding: 10px 20px;
-     background: white;
-     border: none;
-     border-radius: 5px;
-     cursor: pointer;
-     font-weight: bold;
-     z-index: 9999;
-    }
-
+    
   </style>
 </head>
 <body>
@@ -119,23 +106,20 @@ const currentUser = localStorage.getItem('currentUser');
 if (!currentUser) {
   window.location.href = 'login.html';
 }
-const videoGamePack = {
+const breakfastPack = {
   blooks: [
-    { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 14, rarity: 'uncommon' },
-    { name: "https://blacket.org/content/blooks/Space%20Invader.webp", chance: 14, rarity: 'uncommon' },
-    { name: "https://blacket.org/content/blooks/Among%20Us.webp", chance: 14, rarity: 'uncommon' },
-    { name: "https://blacket.org/content/blooks/Poke%20Ball.webp", chance: 14, rarity: 'uncommon' },
-    { name: "https://blacket.org/content/blooks/Flappy%20Bird.webp", chance: 14, rarity: 'uncommon' },
-    { name: "https://blacket.org/content/blooks/Goomba.webp", chance: 18, rarity: 'rare' },
-    { name: "https://blacket.org/content/blooks/Big%20Shield.webp", chance: 18, rarity: 'rare' },
-    { name: "https://blacket.org/content/blooks/Creeper.webp", chance: 18, rarity: 'rare' },
-    { name: "https://blacket.org/content/blooks/Red%20Bird.webp", chance: 2.6, rarity: 'epic' },
-    { name: "https://blacket.org/content/blooks/Companion%20Cube.webp", chance: 2.6, rarity: 'epic' },
-    { name: "https://blacket.org/content/blooks/Enderman.webp", chance: 1, rarity: 'legendary' },
-    { name: "https://blacket.org/content/blooks/Master%20Chief.webp", chance: 0.7, rarity: 'legendary' },
-    { name: "https://blacket.org/content/blooks/Golden%20Among%20Us.webp", chance: 0.1, rarity: 'chroma' },
-    { name: "https://blacket.org/content/blooks/Puffed%20Pig.webp", chance: 0.02, rarity: 'chroma' },
-    { name: "https://blacket.org/content/blooks/Gaming%20Mouse.webp", chance: 0.006, rarity: 'mystical' }
+    { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.316, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 9, rarity: 'rare' },
+    { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 9, rarity: 'rare' },
+    { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 5, rarity: 'epic' },
+    { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 2, rarity: 'legendary' },
+    { name: "https://ac.blooket.com/marketassets/blooks/sandwich.svg", chance: 1, rarity: 'legendary' },
+    { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
   ]
 };
 function getRandomBlook() {
@@ -148,23 +132,22 @@ function getRandomBlook() {
   return null;
 }
 
-const colors = {
-  uncommon: ['#a0e060', '#88c040'],
-  rare: ['#60b0e0', '#4080c0'],
-  epic: ['#c060e0', '#a040c0'],
-  legendary: ['#f7c338', '#d4a217'],
-  chroma: ['#15c2eb', '#17a5e6'],
-  mystical: ['#4b0082', '#301934']
-};
+function spawnConfetti(rarity, originX, originY) {
+  const colors = {
+    uncommon: ['#a0e060', '#88c040'],
+    rare: ['#60b0e0', '#4080c0'],
+    epic: ['#c060e0', '#a040c0'],
+    legendary: ['#f7c338', '#d4a217'],
+    chroma: ['#ff3cac', '#784ba0']
+  };
 
-const countMap = {
-  uncommon: 40,
-  rare: 60,
-  epic: 80,
-  legendary: 100,
-  chroma: 120,
-  mystical: 150
-};
+  const countMap = {
+    uncommon: 40,
+    rare: 60,
+    epic: 80,
+    legendary: 100,
+    chroma: 120
+  };
 
   const count = countMap[rarity] || 30;
   const colorSet = colors[rarity] || ['#ffffff'];
@@ -213,12 +196,6 @@ const countMap = {
       startY = y;
       velocityX = (Math.random() - 0.5) * 600;
       velocityY = (Math.random() - 0.5) * 600;
-      gravity = false;
-    } else if (rarity === 'mystical') {
-      startX = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
-      startY = window.innerHeight / 2 + 100;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = -Math.random() * 300 - 100;
       gravity = false;
     }
 
