@@ -68,75 +68,66 @@
   <div class="collection-grid" id="collection"></div>
 
 <script>
-    // Get collection from localStorage
-    let collection = JSON.parse(localStorage.getItem('collection')) || [];
+  let collection = JSON.parse(localStorage.getItem('collection')) || [];
 
-    const rarityColors = {
-      'uncommon': '#a0e060',
-      'rare': '#60b0e0',
-      'epic': '#c060e0',
-      'legendary': '#f7c338',
-      'chroma': '#ff3cac'
-    };
+  const rarityColors = {
+    'uncommon': '#a0e060',
+    'rare': '#60b0e0',
+    'epic': '#c060e0',
+    'legendary': '#f7c338',
+    'chroma': '#ff3cac'
+  };
 
-    // Improved function to count duplicates
-    function getItemCounts() {
-      const counts = {};
-      collection.forEach(item => {
-        // Use the full item name as the key
-        const key = item.name;
-        counts[key] = (counts[key] || 0) + 1;
-      });
-      return counts;
+  function displayCollection() {
+    const container = document.getElementById('collection');
+    container.innerHTML = '';
+
+    // Count quantities and keep first instance for each item
+    const itemMap = {};
+    collection.forEach(blook => {
+      if (itemMap[blook.name]) {
+        itemMap[blook.name].count += 1;
+      } else {
+        itemMap[blook.name] = {
+          ...blook,
+          count: 1
+        };
+      }
+    });
+
+    // Loop over each unique blook
+    for (let key in itemMap) {
+      const blook = itemMap[key];
+
+      const card = document.createElement('div');
+      card.className = 'blook-card';
+
+      const img = document.createElement('img');
+      img.src = blook.name;
+
+      const name = document.createElement('div');
+      name.className = 'blook-name';
+      name.textContent = blook.name.split('/').pop().split('.')[0];
+
+      const rarity = document.createElement('div');
+      rarity.className = 'rarity-tag';
+      rarity.textContent = blook.rarity;
+      rarity.style.backgroundColor = rarityColors[blook.rarity];
+
+      const quantity = document.createElement('div');
+      quantity.className = 'quantity-badge';
+      quantity.textContent = blook.count;
+
+      card.appendChild(img);
+      card.appendChild(name);
+      card.appendChild(rarity);
+      card.appendChild(quantity);
+      container.appendChild(card);
     }
+  }
 
-    function displayCollection() {
-      const container = document.getElementById('collection');
-      container.innerHTML = '';
-
-      // Get counts of all items
-      const itemCounts = getItemCounts();
-
-      // Create array of unique items
-     const seen = new Set();
-const uniqueItems = collection.filter(item => {
-  if (seen.has(item.name)) return false;
-  seen.add(item.name);
-  return true;
-});
-
-
-      uniqueItems.forEach(blook => {
-        const card = document.createElement('div');
-        card.className = 'blook-card';
-
-        const img = document.createElement('img');
-        img.src = blook.name;
-
-        const name = document.createElement('div');
-        name.className = 'blook-name';
-        name.textContent = blook.name.split('/').pop().split('.')[0];
-
-        const rarity = document.createElement('div');
-        rarity.className = 'rarity-tag';
-        rarity.textContent = blook.rarity;
-        rarity.style.backgroundColor = rarityColors[blook.rarity];
-
-        // Add quantity badge with correct count
-        const quantity = document.createElement('div');
-        quantity.className = 'quantity-badge';
-        quantity.textContent = itemCounts[blook.name];
-
-        card.appendChild(img);
-        card.appendChild(name);
-        card.appendChild(rarity);
-        card.appendChild(quantity);
-        container.appendChild(card);
-      });
-    }
-
-    // Initial display
-    displayCollection();
-  </script>
+  // Display on page load
+  displayCollection();
+</script>
 </body>
 </html>
