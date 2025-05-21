@@ -114,7 +114,28 @@ const breakfastPack = {
     { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
   ]
 };
+if (blook) {    
+    { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.3168, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.316, rarity: 'uncommon' },
+    { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 9, rarity: 'rare' },
+    { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 9, rarity: 'rare' },
+    { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 5, rarity: 'epic' },
+    { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 2, rarity: 'legendary' },
+    { name: "https://ac.blooket.com/marketassets/blooks/sandwich.svg", chance: 1, rarity: 'legendary' },
+    { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
+  ]
 
+  // Save to collection
+  const collection = JSON.parse(localStorage.getItem('collection')) || [];
+  if (!collection.find(b => b.name === blook.name)) {
+    collection.push(blook);
+    localStorage.setItem('collection', JSON.stringify(collection));
+  }
+}
 function getRandomBlook() {
   const rand = Math.random() * 100;
   let total = 0;
