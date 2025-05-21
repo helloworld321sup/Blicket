@@ -3,9 +3,48 @@
 <head>
   <title>My Breakfast Collection</title>
   <style>
-    /* Previous styles remain the same */
+    body {
+      background-color: rgb(255, 140, 72);
+      font-family: sans-serif;
+      padding: 20px;
+    }
 
-    /* Add new style for quantity display */
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Made smaller */
+      gap: 10px; /* Reduced gap */
+      padding: 10px;
+    }
+
+    .blook-card {
+      position: relative;
+      background: white;
+      border-radius: 8px; /* Made smaller */
+      padding: 8px; /* Made smaller */
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .blook-card img {
+      width: 50px;  /* Much smaller! */
+      height: 50px; /* Much smaller! */
+      object-fit: contain;
+    }
+
+    .blook-name {
+      margin-top: 5px;
+      font-size: 12px; /* Smaller text */
+    }
+
+    .rarity-tag {
+      padding: 3px 6px; /* Smaller padding */
+      border-radius: 10px;
+      font-size: 10px; /* Smaller text */
+      color: white;
+      margin-top: 3px;
+      display: inline-block;
+    }
+
     .quantity-badge {
       background-color: #ff6b6b;
       color: white;
@@ -14,16 +53,7 @@
       position: absolute;
       top: -5px;
       right: -5px;
-      font-size: 12px;
-    }
-
-    .blook-card {
-      position: relative;  /* Add this for quantity badge positioning */
-      background: white;
-      border-radius: 10px;
-      padding: 15px;
-      text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      font-size: 10px;
     }
   </style>
 </head>
