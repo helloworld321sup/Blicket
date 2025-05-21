@@ -106,6 +106,7 @@ const currentUser = localStorage.getItem('currentUser');
 if (!currentUser) {
   window.location.href = 'login.html';
 }
+
 const videoGamePack = {
   blooks: [
     { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 14, rarity: 'uncommon' },
@@ -125,6 +126,7 @@ const videoGamePack = {
     { name: "https://blacket.org/content/blooks/Gaming%20Mouse.webp", chance: 0.006, rarity: 'mystical' }
   ]
 };
+
 function getRandomBlook() {
   const rand = Math.random() * 100;
   let total = 0;
@@ -153,147 +155,7 @@ const countMap = {
   mystical: 150
 };
 
-  const count = countMap[rarity] || 30;
-  const colorSet = colors[rarity] || ['#ffffff'];
-
-  for (let i = 0; i < count; i++) {
-    const confetti = document.createElement('div');
-    confetti.classList.add('confetti-piece');
-    confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-
-    let startX = originX || window.innerWidth / 2;
-    let startY = originY || window.innerHeight / 2;
-    let velocityX = 0, velocityY = 0;
-    let gravity = true;
-
-    if (rarity === 'uncommon') {
-      startX += (Math.random() - 0.5) * 130;
-      startY -= 150; //
-      velocityX = (Math.random() - 0.5) * 200;
-      velocityY = -Math.random() * 450 - 400;
-   } else if (rarity === 'rare') {
-      const leftCorner = 60;
-      const rightCorner = window.innerWidth - 60;
-      startX = i % 2 === 0 ? leftCorner : rightCorner;
-      startY = window.innerHeight - 80;
-      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
-      velocityY = -Math.random() * 600 - 300;
-      gravity = false;
-    } else if (rarity === 'epic') {
-      startX = i % 2 === 0 ? 0 : window.innerWidth;
-      startY = Math.random() * window.innerHeight;
-      velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-      velocityY = (Math.random() - 0.5) * 100;
-      gravity = false;
-    } else if (rarity === 'legendary') {
-      startX = Math.random() * window.innerWidth;
-      startY = -10;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = Math.random() * 100 + 100;
-    } else if (rarity === 'chroma') {
-      const corners = [
-        [0, 0], [window.innerWidth, 0],
-        [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-      ];
-      const [x, y] = corners[i % 4];
-      startX = x;
-      startY = y;
-      velocityX = (Math.random() - 0.5) * 600;
-      velocityY = (Math.random() - 0.5) * 600;
-      gravity = false;
-    } else if (rarity === 'mystical') {
-      startX = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
-      startY = window.innerHeight / 2 + 100;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = -Math.random() * 300 - 100;
-      gravity = false;
-    }
-
-    confetti.style.left = startX + 'px';
-    confetti.style.top = startY + 'px';
-    document.body.appendChild(confetti);
-
-    const duration = Math.random() * 2 + 2;
-
-    confetti.animate([
-      { transform: `translate(0px, 0px)` },
-      { transform: `translate(${velocityX}px, ${velocityY}px)` }
-    ], {
-      duration: duration * 1000,
-      iterations: 1,
-      easing: 'ease-out'
-    });
-
-    if (gravity) {
-      confetti.animate([
-        { transform: 'translateY(0)' },
-        { transform: `translateY(${window.innerHeight}px)` }
-      ], {
-        duration: duration * 1000,
-        iterations: 1,
-        easing: 'ease-in'
-      });
-    }
-
-    setTimeout(() => confetti.remove(), duration * 1000);
-  }
-}
-
-let clickCount = 0;
-
-document.getElementById('pack').addEventListener('click', function () {
-  if (clickCount === 0) {
-    this.classList.add('torn');
-    const blook = getRandomBlook();
-    if (blook) {
-      // Save to collection
-      const collection = JSON.parse(localStorage.getItem('collection')) || [];
-      if (!collection.find(b => b.name === blook.name)) {
-        collection.push(blook);
-        localStorage.setItem('collection', JSON.stringify(collection));
-      }
-
-      const result = document.getElementById('result');
-      const img = document.createElement('img');
-      img.src = blook.name;
-      result.appendChild(img);
-      setTimeout(() => {
-        result.style.transform = 'translate(-50%, -50%) scale(1)';
-        const rect = result.getBoundingClientRect();
-        const originX = rect.left + rect.width / 2;
-        const originY = rect.top + rect.height / 2;
-        spawnConfetti(blook.rarity, originX, originY);
-      }, 200);
-    }
-    clickCount++;
-  } else {
-    window.location.href = "index.html";
-  }
-});
-    document.getElementById("pack").addEventListener("click", () => {
-  const wrapper = document.getElementById("pack");
-  if (wrapper.classList.contains("torn")) return;
-
-  wrapper.classList.add("torn");
-
-  setTimeout(() => {
-    const blook = getRandomBlook();
-    if (!blook) return;
-
-    const result = document.getElementById("result");
-    const rarity = blook.rarity;
-    const img = document.createElement("img");
-    img.src = blook.name;
-
-    result.innerHTML = '';
-    result.appendChild(img);
-    result.style.transform = "translate(-50%, -50%) scale(1)";
-
-    spawnConfetti(rarity);
-  }, 600);
-});
-
-function spawnConfetti(rarity) {
+function launchConfetti(rarity) {
   const count = countMap[rarity] || 30;
   const colorSet = colors[rarity] || ['#ffffff'];
 
@@ -304,87 +166,53 @@ function spawnConfetti(rarity) {
 
     let startX = window.innerWidth / 2;
     let startY = window.innerHeight / 2;
-    let velocityX = 0, velocityY = 0;
-    let gravity = true;
-
-    if (rarity === 'uncommon') {
-      startX += (Math.random() - 0.5) * 130;
-      startY -= 150;
-      velocityX = (Math.random() - 0.5) * 200;
-      velocityY = -Math.random() * 450 - 400;
-    } else if (rarity === 'rare') {
-      const leftCorner = 60;
-      const rightCorner = window.innerWidth - 60;
-      startX = i % 2 === 0 ? leftCorner : rightCorner;
-      startY = window.innerHeight - 80;
-      velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
-      velocityY = -Math.random() * 600 - 300;
-      gravity = false;
-    } else if (rarity === 'epic') {
-      startX = i % 2 === 0 ? 0 : window.innerWidth;
-      startY = Math.random() * window.innerHeight;
-      velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-      velocityY = (Math.random() - 0.5) * 100;
-      gravity = false;
-    } else if (rarity === 'legendary') {
-      startX = Math.random() * window.innerWidth;
-      startY = -10;
-      velocityX = (Math.random() - 0.5) * 100;
-      velocityY = Math.random() * 100 + 100;
-    } else if (rarity === 'chroma') {
-      const corners = [
-        [0, 0], [window.innerWidth, 0],
-        [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-      ];
-      const [x, y] = corners[i % 4];
-      startX = x;
-      startY = y;
-      velocityX = (Math.random() - 0.5) * 600;
-      velocityY = (Math.random() - 0.5) * 600;
-      gravity = false;
-    } else if (rarity === 'mystical') {
-      startX = Math.random() * window.innerWidth;
-      startY = Math.random() * window.innerHeight;
-      velocityX = (Math.random() - 0.5) * 1000;
-      velocityY = (Math.random() - 0.5) * 1000;
-      gravity = false;
-    }
+    let velocityX = (Math.random() - 0.5) * 500;
+    let velocityY = (Math.random() - 1) * 500;
 
     confetti.style.left = `${startX}px`;
     confetti.style.top = `${startY}px`;
 
     document.body.appendChild(confetti);
 
-    const duration = 2000 + Math.random() * 1000;
-
-    const animate = () => {
-      const startTime = performance.now();
-
-      function frame(time) {
-        const progress = (time - startTime) / duration;
-        if (progress > 1) {
+    (function animatePiece() {
+      let x = startX;
+      let y = startY;
+      const fall = () => {
+        x += velocityX * 0.016;
+        y += velocityY * 0.016;
+        velocityY += 9.8;
+        confetti.style.transform = `translate(${x - startX}px, ${y - startY}px) rotate(${x + y}deg)`;
+        if (y < window.innerHeight + 100) {
+          requestAnimationFrame(fall);
+        } else {
           confetti.remove();
-          return;
         }
-
-        if (gravity) {
-          velocityY += 9.8;
-        }
-
-        startX += velocityX * 0.016;
-        startY += velocityY * 0.016;
-        confetti.style.left = `${startX}px`;
-        confetti.style.top = `${startY}px`;
-
-        requestAnimationFrame(frame);
-      }
-
-      requestAnimationFrame(frame);
-    };
-
-    animate();
+      };
+      fall();
+    })();
   }
 }
+
+document.getElementById("pack").addEventListener("click", function () {
+  const wrapper = document.querySelector(".pack-wrapper");
+  if (wrapper.classList.contains("torn")) return;
+
+  const blook = getRandomBlook();
+  if (!blook) return;
+
+  wrapper.classList.add("torn");
+
+  const result = document.getElementById("result");
+  result.innerHTML = `<img src="${blook.name}">`;
+  result.style.transform = "translate(-50%, -50%) scale(1)";
+
+  launchConfetti(blook.rarity);
+
+  // Save to localStorage collection
+  const userData = JSON.parse(localStorage.getItem(currentUser)) || { collection: {} };
+  userData.collection[blook.name] = (userData.collection[blook.name] || 0) + 1;
+  localStorage.setItem(currentUser, JSON.stringify(userData));
+});
 </script>
 </body>
 </html>
