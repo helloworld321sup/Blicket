@@ -61,15 +61,6 @@
       'chroma': '#ff3cac'
     };
 
-    // Function to add a blook to collection
-    function addToCollection(blook) {
-      if (!collection.find(b => b.name === blook.name)) {
-        collection.push(blook);
-        localStorage.setItem('collection', JSON.stringify(collection));
-        displayCollection();
-      }
-    }
-
     // Function to display collection
     function displayCollection() {
       const container = document.getElementById('collection');
