@@ -96,6 +96,10 @@
 
    <div id="result"></div>
    <img src="https://ac.blooket.com/dashclassic/assets/Nav_Icon_Breakfast-B4PUbejt.svg" class="corner-image">
+
+   <button onclick="window.location.href='collection.html'" style="position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
+     View Collection
+   </button>
   
   <script>
 const breakfastPack = {
@@ -114,15 +118,6 @@ const breakfastPack = {
     { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
   ]
 };
-if (blook) {
-
-  // Save to collection
-  const collection = JSON.parse(localStorage.getItem('collection')) || [];
-  if (!collection.find(b => b.name === blook.name)) {
-    collection.push(blook);
-    localStorage.setItem('collection', JSON.stringify(collection));
-  }
-}
 function getRandomBlook() {
   const rand = Math.random() * 100;
   let total = 0;
@@ -237,6 +232,13 @@ document.getElementById('pack').addEventListener('click', function () {
     this.classList.add('torn');
     const blook = getRandomBlook();
     if (blook) {
+      // Save to collection
+      const collection = JSON.parse(localStorage.getItem('collection')) || [];
+      if (!collection.find(b => b.name === blook.name)) {
+        collection.push(blook);
+        localStorage.setItem('collection', JSON.stringify(collection));
+      }
+
       const result = document.getElementById('result');
       const img = document.createElement('img');
       img.src = blook.name;
