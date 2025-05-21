@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Breakfast Collection</title>
+  <style>
+    body {
+      background-color: rgb(255, 140, 72);
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .blook-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .blook-card img {
+      width: 100px;
+      height: 100px;
+    }
+
+    .blook-name {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .rarity-tag {
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      color: white;
+      margin-top: 5px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>My Collection</h1>
+  <div class="collection-grid" id="collection"></div>
+
+  <script>
+    // Create an array to store collected blooks
+    let collection = JSON.parse(localStorage.getItem('collection')) || [];
+
+    // Define rarity colors
+    const rarityColors = {
+      'uncommon': '#a0e060',
+      'rare': '#60b0e0',
+      'epic': '#c060e0',
+      'legendary': '#f7c338',
+      'chroma': '#ff3cac'
+    };
+
+    // Function to add a blook to collection
+    function addToCollection(blook) {
+      if (!collection.find(b => b.name === blook.name)) {
+        collection.push(blook);
+        localStorage.setItem('collection', JSON.stringify(collection));
+        displayCollection();
+      }
+    }
+
+    // Function to display collection
+    function displayCollection() {
+      const container = document.getElementById('collection');
+      container.innerHTML = '';
+
+      collection.forEach(blook => {
+        const card = document.createElement('div');
+        card.className = 'blook-card';
+
+        const img = document.createElement('img');
+        img.src = blook.name;
+
+        const name = document.createElement('div');
+        name.className = 'blook-name';
+        name.textContent = blook.name.split('/').pop().split('.')[0];
+
+        const rarity = document.createElement('div');
+        rarity.className = 'rarity-tag';
+        rarity.textContent = blook.rarity;
+        rarity.style.backgroundColor = rarityColors[blook.rarity];
+
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(rarity);
+        container.appendChild(card);
+      });
+    }
+
+    // Initial display
+    displayCollection();
+  </script>
+</body>
+</html>
