@@ -10,81 +10,60 @@
       margin: 0;
       font-family: sans-serif;
     }
+.pack-container {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 40px;
+  flex-wrap: wrap; /* optional if you want mobile responsiveness */
+}
 
-    .pack-container {
-      display: flex;
-      justify-content: center;
-      padding: 30px;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
+.pack-card {
+  background-color: #333;
+  border: 3px solid gold;
+  border-radius: 20px;
+  padding: 10px;
+  width: 150px;
+  text-align: center;
+  transition: transform 0.2s;
+}
 
-    .pack-card {
-      background: linear-gradient(to bottom right, #bebebe, #bebebe);
-      border: 3px solid #f7c948;
-      border-radius: 20px;
-      width: 220px;
-      text-align: center;
-      padding: 20px 15px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      transition: transform 0.25s, box-shadow 0.25s;
-      cursor: pointer;
-      text-decoration: none;
-      color: inherit;
-    }
+.pack-card img {
+  width: 100%;
+  border-radius: 10px;
+}
 
-    .pack-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
-    }
+.pack-card:hover {
+  transform: scale(1.05);
+}
 
-    .pack-card img {
-      width: 120px;
-      height: auto;
-      margin-bottom: 15px;
-    }
-
-    .pack-card h3 {
-      margin: 10px 0 5px;
-      font-size: 20px;
-      color: #6c4a00;
-    }
-
-    .pack-card p {
-      font-size: 14px;
-      color: #6c757d;
-    }
-
-    #logout-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      background: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+.cost {
+  margin-top: 10px;
+  color: gold;
+  font-weight: bold;
+  font-size: 20px;
+}
   </style>
 </head>
 <body>
 
+  <div class="pack-container">
     <a href="breakfast-pack.html" class="pack-card breakfast-pack">
-      <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-      <h3>20 🪙</h3>
-    </a>
+    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
+    <div class="cost">20 🪙</div>
+  </a>
 
-    <a href="videogame-pack.html" class="pack-card videogame-pack">
-      <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
-      <h3>25 🪙</h3>
-    </a>
-    <div class="pack-container">
-      
-    <a href="fruit-pack.html" class="pack-card fruit-pack">
-      <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
-      <h3>25 🪙</h3>
-    </a>
-  </div>
+  <a href="videogame-pack.html" class="pack-card videogame-pack">
+    <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
+    <div class="cost">25 🪙</div>
+  </a>
+
+  <a href="fruit-pack.html" class="pack-card fruit-pack">
+    <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
+    <div class="cost">25 🪙</div>
+  </a>
+</div>
+
 
   <button id="logout-button">Logout</button>
 
