@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login - Breakfast Pack</title>
+  <title>Login</title>
   <style>
     body {
-      background-color: rgb(255, 140, 72);
+      background-color: rgb(0, 0, 0);
       margin: 0;
       display: flex;
       justify-content: center;
@@ -60,7 +60,7 @@
 </head>
 <body>
   <div class="login-container">
-    <h2>Welcome to Breakfast Pack</h2>
+    <h2>Welcome to Blicket</h2>
     <div class="input-group">
       <input type="text" id="username" placeholder="Username" required>
     </div>
@@ -104,7 +104,7 @@
         };
         localStorage.setItem('users', JSON.stringify(users));
         localStorage.setItem('currentUser', username);
-        window.location.href = 'breakfast-pack.html';
+        window.location.href = 'index.html';
       }
     }
 
