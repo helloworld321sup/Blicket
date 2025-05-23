@@ -14,40 +14,27 @@
     .pack-container {
       display: flex;
       justify-content: center;
+      align-items: flex-start;
       padding: 30px;
       gap: 20px;
       flex-wrap: wrap;
     }
 
-    .breakfast-container {
-      background-color: #fffae6;
-    }
-
-    .videogame-container {
-      background-color: #e6f7ff;
-    }
-
-    .fruit-container {
-      background-color: #e6ffe6;
-    }
-
     .pack-card {
-      background: linear-gradient(to bottom right, #bebebe, #bebebe);
-      border: 3px solid #a0a0a0;
-      border-radius: 20px;
       width: 220px;
-      text-align: center;
+      background-color: #f5f5f5;
+      border-radius: 20px;
       padding: 20px 15px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-      transition: transform 0.25s, box-shadow 0.25s;
-      cursor: pointer;
+      text-align: center;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
       text-decoration: none;
-      color: inherit;
+      color: black;
     }
 
     .pack-card:hover {
       transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
 
     .pack-card img {
@@ -59,12 +46,24 @@
     .pack-card h3 {
       margin: 10px 0 5px;
       font-size: 20px;
-      color: #6c4a00;
     }
 
     .pack-card p {
       font-size: 14px;
-      color: #6c757d;
+      color: #555;
+    }
+
+    /* Custom backgrounds for cards */
+    .breakfast {
+      background-color: #fff7d6;
+    }
+
+    .videogame {
+      background-color: #d6f0ff;
+    }
+
+    .fruit {
+      background-color: #d6ffe0;
     }
 
     #logout-button {
@@ -81,22 +80,18 @@
 </head>
 <body>
 
-  <div class="pack-container breakfast-container">
-    <a href="breakfast-pack.html" class="pack-card breakfast-pack">
+  <div class="pack-container">
+    <a href="breakfast-pack.html" class="pack-card breakfast">
       <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
       <h3>20 🪙</h3>
     </a>
-  </div>
 
-  <div class="pack-container videogame-container">
-    <a href="videogame-pack.html" class="pack-card videogame-pack">
+    <a href="videogame-pack.html" class="pack-card videogame">
       <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
       <h3>25 🪙</h3>
     </a>
-  </div>
 
-  <div class="pack-container fruit-container">
-    <a href="fruit-pack.html" class="pack-card fruit-pack">
+    <a href="fruit-pack.html" class="pack-card fruit">
       <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
       <h3>25 🪙</h3>
     </a>
@@ -105,11 +100,11 @@
   <button id="logout-button">Logout</button>
 
   <script>
-    const logoutButton = document.getElementById('logout-button');
-    logoutButton.onclick = function () {
-      localStorage.removeItem('currentUser');
-      window.location.href = 'login.html';
+    document.getElementById("logout-button").onclick = function () {
+      localStorage.removeItem("currentUser");
+      window.location.href = "login.html";
     };
   </script>
+
 </body>
 </html>
