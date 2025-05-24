@@ -83,21 +83,17 @@
         return;
       }
 
-      // Get existing users or create empty object
       let users = JSON.parse(localStorage.getItem('users')) || {};
 
       if (users[username]) {
-        // User exists - check password
         if (users[username].password === password) {
-          // Login successful
           localStorage.setItem('currentUser', username);
-          window.location.href = 'breakfast-pack.html';
+          window.location.href = 'index.html';
         } else {
           errorMessage.textContent = 'Incorrect password';
           errorMessage.style.display = 'block';
         }
       } else {
-        // New user - register
         users[username] = {
           password: password,
           collection: []
@@ -108,7 +104,6 @@
       }
     }
 
-    // Handle Enter key
     document.addEventListener('keypress', function(e) {
       if (e.key === 'Enter') {
         handleLogin();
