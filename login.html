@@ -1,37 +1,170 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blicket</title>
+  <title>Login</title>
+  <style>
+    body {
+      background-color: rgb(0, 0, 0);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+      perspective: 1000px; /* needed for 3D flip */
+    }
+
+    .login-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      position: relative;
+    }
+
+    /* flipped state */
+    .login-container.flipped {
+      transform: rotateY(180deg);
+    }
+
+    /* front and back faces */
+    .front, .back {
+      position: absolute;
+      width: 100%;
+      backface-visibility: hidden;
+      left: 0;
+      top: 0;
+    }
+
+    .front {
+      /* front face visible */
+    }
+
+    .back {
+      background: rgb(255, 140, 72);
+      color: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-sizing: border-box;
+      transform: rotateY(180deg);
+      font-size: 24px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+    }
+
+    .input-group {
+      margin: 20px 0;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    button {
+      background: rgb(255, 140, 72);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      width: 100%;
+    }
+
+    button:hover {
+      background: rgb(20, 20, 20);
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <h1 id="welcome-message">Loading...</h1>
-  <button id="logout-btn">Logout</button>
+  <div class="login-container" id="loginContainer">
+    <div class="front">
+      <h2>Welcome to Blicket</h2>
+      <div class="input-group">
+        <input type="text" id="username" placeholder="Username" required>
+      </div>
+      <div class="input-group">
+        <input type="password" id="password" placeholder="Password" required>
+      </div>
+      <button onclick="handleLogin()">Login / Register</button>
+      <p id="error-message" class="error-message"></p>
+    </div>
+    <div class="back">
+      Logging you in...
+    </div>
+  </div>
 
   <script>
-    // Load current user
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      // No user logged in — send back to login page
-      window.location.href = 'login.html';
-    } else {
-      // Show welcome and user collection example
-      const users = JSON.parse(localStorage.getItem('users')) || {};
-      const userData = users[currentUser];
+    const loginContainer = document.getElementById('loginContainer');
+    const errorMessage = document.getElementById('error-message');
 
-      if (!userData) {
-        // User data missing, log out
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
+    function handleLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
+
+      errorMessage.style.display = 'none';
+
+      if (!username || !password) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.style.display = 'block';
+        return;
       }
 
-      document.getElementById('welcome-message').textContent = `Hello, ${currentUser}! Your collection: ${JSON.stringify(userData.collection)}`;
+      let users = JSON.parse(localStorage.getItem('users')) || {};
 
-      // Logout function
-      document.getElementById('logout-btn').onclick = () => {
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-      };
+      if (users[username]) {
+        if (users[username].password === password) {
+          // Correct password - flip and redirect
+          localStorage.setItem('currentUser', username);
+          flipAndRedirect();
+        } else {
+          errorMessage.textContent = 'Incorrect password';
+          errorMessage.style.display = 'block';
+        }
+      } else {
+        // New user - register and flip
+        users[username] = {
+          password: password,
+          collection: []
+        };
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', username);
+        flipAndRedirect();
+      }
     }
+
+    function flipAndRedirect() {
+      loginContainer.classList.add('flipped');
+      // wait for the flip animation, then redirect
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 800); // matches the CSS transition duration
+    }
+
+    // handle enter key
+    document.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        handleLogin();
+      }
+    });
   </script>
 </body>
 </html>
