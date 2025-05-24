@@ -79,6 +79,13 @@
 </head>
 <body>
 
+  <script>
+    // Redirect to login.html if no user is logged in
+    if (!localStorage.getItem("currentUser")) {
+      window.location.href = "login.html";
+    }
+  </script>
+
   <div class="pack-container">
     <a href="breakfast-pack.html" class="pack-card breakfast">
       <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
