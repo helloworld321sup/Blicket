@@ -116,40 +116,43 @@
     const loginContainer = document.getElementById('loginContainer');
     const errorMessage = document.getElementById('error-message');
 
-    function handleLogin() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+function handleLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
 
-      errorMessage.style.display = 'none';
+  errorMessage.style.display = 'none';
 
-      if (!username || !password) {
-        errorMessage.textContent = 'Please fill in all fields';
-        errorMessage.style.display = 'block';
-        return;
-      }
+  if (!username || !password) {
+    errorMessage.textContent = 'Please fill in all fields';
+    errorMessage.style.display = 'block';
+    return;
+  }
 
-      let users = JSON.parse(localStorage.getItem('users')) || {};
+  let users = JSON.parse(localStorage.getItem('users')) || {};
 
-      if (users[username]) {
-        if (users[username].password === password) {
-          // Correct password - flip and redirect
-          localStorage.setItem('currentUser', username);
-          flipAndRedirect();
-        } else {
-          errorMessage.textContent = 'Incorrect password';
-          errorMessage.style.display = 'block';
-        }
-      } else {
-        // New user - register and flip
-        users[username] = {
-          password: password,
-          collection: []
-        };
-        localStorage.setItem('users', JSON.stringify(users));
-        localStorage.setItem('currentUser', username);
-        flipAndRedirect();
-      }
+  if (users[username]) {
+    if (users[username].password === password) {
+      // Load saved data
+      localStorage.setItem('currentUser', username);
+      localStorage.setItem('currentUserData', JSON.stringify(users[username]));
+      flipAndRedirect();
+    } else {
+      errorMessage.textContent = 'Incorrect password';
+      errorMessage.style.display = 'block';
     }
+  } else {
+    // New user - register
+    const newUser = {
+      password: password,
+      collection: [] // start empty
+    };
+    users[username] = newUser;
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('currentUser', username);
+    localStorage.setItem('currentUserData', JSON.stringify(newUser));
+    flipAndRedirect();
+  }
+}
 
     function flipAndRedirect() {
       loginContainer.classList.add('flipped');
