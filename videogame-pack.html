@@ -222,37 +222,44 @@
       }
     }
 
-    let clickCount = 0;
+let clicked = false;
 
-    document.getElementById('pack').addEventListener('click', function () {
-      if (clickCount === 0) {
-        this.classList.add('torn');
-        const blook = getRandomBlook();
-        if (blook) {
-          const collection = JSON.parse(localStorage.getItem('collection')) || [];
-          if (!collection.find(b => b.name === blook.name)) {
-            collection.push(blook);
-            localStorage.setItem('collection', JSON.stringify(collection));
-          }
+document.getElementById('pack').addEventListener('click', function () {
+  if (clicked) return;
+  clicked = true;
 
-          const result = document.getElementById('result');
-          const img = document.createElement('img');
-          img.src = blook.name;
-          img.alt = 'Blook image';
-          result.appendChild(img);
-          setTimeout(() => {
-            result.style.transform = 'translate(-50%, -50%) scale(1)';
-            const rect = result.getBoundingClientRect();
-            const originX = rect.left + rect.width / 2;
-            const originY = rect.top + rect.height / 2;
-            spawnConfetti(blook.rarity, originX, originY);
-          }, 200);
-        }
-        clickCount++;
-      } else {
-        window.location.href = "index.html";
+  if (clickCount === 0) {
+    this.classList.add('torn');
+    const blook = getRandomBlook();
+    if (blook) {
+      const result = document.getElementById('result');
+      result.innerHTML = ''; // ✅ clear previous image
+      const img = document.createElement('img');
+      img.src = blook.name;
+      img.alt = 'Blook image';
+      result.appendChild(img);
+
+      // ✅ save per-user collection
+      const collectionKey = `collection_${currentUser}`;
+      const collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+      if (!collection.find(b => b.name === blook.name)) {
+        collection.push(blook);
+        localStorage.setItem(collectionKey, JSON.stringify(collection));
       }
-    });
+
+      setTimeout(() => {
+        result.style.transform = 'translate(-50%, -50%) scale(1)';
+        const rect = result.getBoundingClientRect();
+        const originX = rect.left + rect.width / 2;
+        const originY = rect.top + rect.height / 2;
+        spawnConfetti(blook.rarity, originX, originY);
+      }, 200);
+    }
+    clickCount++;
+  } else {
+    window.location.href = "index.html";
+  }
+});
   </script>
 </body>
 </html>
