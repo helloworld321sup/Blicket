@@ -139,7 +139,8 @@
         rare: 60,
         epic: 80,
         legendary: 100,
-        chroma: 120
+        chroma: 120,
+        mystical: 150
       };
 
       const count = countMap[rarity] || 30;
@@ -222,44 +223,44 @@
       }
     }
 
-let clicked = false;
+    let clicked = false;
+    let clickCount = 0;
 
-document.getElementById('pack').addEventListener('click', function () {
-  if (clicked) return;
-  clicked = true;
+    document.getElementById('pack').addEventListener('click', function () {
+      if (clicked) return;
+      clicked = true;
 
-  if (clickCount === 0) {
-    this.classList.add('torn');
-    const blook = getRandomBlook();
-    if (blook) {
-      const result = document.getElementById('result');
-      result.innerHTML = ''; // ✅ clear previous image
-      const img = document.createElement('img');
-      img.src = blook.name;
-      img.alt = 'Blook image';
-      result.appendChild(img);
+      if (clickCount === 0) {
+        this.classList.add('torn');
+        const blook = getRandomBlook();
+        if (blook) {
+          const result = document.getElementById('result');
+          result.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = blook.name;
+          img.alt = 'Blook image';
+          result.appendChild(img);
 
-      // ✅ save per-user collection
-      const collectionKey = `collection_${currentUser}`;
-      const collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
-      if (!collection.find(b => b.name === blook.name)) {
-        collection.push(blook);
-        localStorage.setItem(collectionKey, JSON.stringify(collection));
+          const collectionKey = `collection_${currentUser}`;
+          const collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+          if (!collection.find(b => b.name === blook.name)) {
+            collection.push(blook);
+            localStorage.setItem(collectionKey, JSON.stringify(collection));
+          }
+
+          setTimeout(() => {
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+            const rect = result.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            spawnConfetti(blook.rarity, originX, originY);
+          }, 200);
+        }
+        clickCount++;
+      } else {
+        window.location.href = "index.html";
       }
-
-      setTimeout(() => {
-        result.style.transform = 'translate(-50%, -50%) scale(1)';
-        const rect = result.getBoundingClientRect();
-        const originX = rect.left + rect.width / 2;
-        const originY = rect.top + rect.height / 2;
-        spawnConfetti(blook.rarity, originX, originY);
-      }, 200);
-    }
-    clickCount++;
-  } else {
-    window.location.href = "index.html";
-  }
-});
+    });
   </script>
 </body>
 </html>
