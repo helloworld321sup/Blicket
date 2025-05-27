@@ -11,6 +11,31 @@
       font-family: sans-serif;
     }
 
+    .top-left {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #logout-button,
+    #collection-button {
+      padding: 10px 20px;
+      background: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #username-display {
+      color: white;
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
     .pack-container {
       display: flex;
       justify-content: center;
@@ -48,44 +73,30 @@
       font-size: 20px;
     }
 
-    /* Custom backgrounds for cards */
-    .breakfast {
-      background-color: #eb7b38;
-    }
-
-    .videogame {
-      background-color: #0d1772;
-    }
-
-    .fruit {
-      background-color: #c3c3c3;
-    }
-
-    .blizzard {
-      background-color: #00b9e4;
-    }
-
-    #logout-button {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      padding: 10px 20px;
-      background: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
+    .breakfast { background-color: #eb7b38; }
+    .videogame { background-color: #0d1772; }
+    .fruit     { background-color: #c3c3c3; }
+    .blizzard  { background-color: #00b9e4; }
   </style>
 </head>
 <body>
 
   <script>
     // Redirect to login.html if no user is logged in
-    if (!localStorage.getItem("currentUser")) {
+    const user = localStorage.getItem("currentUser");
+    if (!user) {
       window.location.href = "login.html";
     }
   </script>
 
+  <!-- Top Left: Logout + View Collection + Username -->
+  <div class="top-left">
+    <div id="username-display">Hello, user!</div>
+    <button id="logout-button">Logout</button>
+    <button id="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
+  </div>
+
+  <!-- Pack Cards -->
   <div class="pack-container">
     <a href="breakfast-pack.html" class="pack-card breakfast">
       <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
@@ -108,13 +119,17 @@
     </a>
   </div>
 
-  <button id="logout-button">Logout</button>
-
   <script>
     document.getElementById("logout-button").onclick = function () {
       localStorage.removeItem("currentUser");
       window.location.href = "login.html";
     };
+
+    // Set the username text
+    const displayName = localStorage.getItem("currentUser");
+    if (displayName) {
+      document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
+    }
   </script>
 
 </body>
