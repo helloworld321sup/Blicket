@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Blicket/Fruit Pack</title>
   <style>
     body {
@@ -78,18 +79,6 @@
       z-index: 20;
       border-radius: 2px;
     }
-
-    .view-collection-button {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      z-index: 50;
-    }
   </style>
 </head>
 <body>
@@ -99,13 +88,11 @@
     <div class="half bottom-half"></div>
   </div>
 
-  <button class="view-collection-button" onclick="window.location.href='collection.html'">
-    View Collection
-  </button>
-
   <script>
     const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) window.location.href = 'login.html';
+    if (!currentUser) {
+      window.location.href = 'login.html';
+    }
 
     const fruitPack = {
       blooks: [
@@ -125,7 +112,7 @@
         { name: "https://blacket.org/content/blooks/Golden%20Apple.webp", chance: 0.007, rarity: 'mystical' }
       ]
     };
-
+    
     function getRandomBlook() {
       const rand = Math.random() * 100;
       let total = 0;
@@ -133,7 +120,7 @@
         total += blook.chance;
         if (rand <= total) return blook;
       }
-      return null;
+      return fruitPack.blooks[fruitPack.blooks.length - 1];
     }
 
     function spawnConfetti(rarity, originX, originY) {
@@ -145,14 +132,16 @@
         chroma: ['#19c0f1', '#19c0f1'],
         mystical: ['#520781', '#520781']
       };
+
       const countMap = {
         uncommon: 40,
         rare: 60,
         epic: 80,
         legendary: 100,
         chroma: 120,
-        mystical: 140
+        mystical: 150
       };
+
       const count = countMap[rarity] || 30;
       const colorSet = colors[rarity] || ['#ffffff'];
 
@@ -163,7 +152,8 @@
 
         let startX = originX || window.innerWidth / 2;
         let startY = originY || window.innerHeight / 2;
-        let velocityX = 0, velocityY = 0, gravity = true;
+        let velocityX = 0, velocityY = 0;
+        let gravity = true;
 
         if (rarity === 'uncommon') {
           startX += (Math.random() - 0.5) * 130;
@@ -171,8 +161,9 @@
           velocityX = (Math.random() - 0.5) * 200;
           velocityY = -Math.random() * 450 - 400;
         } else if (rarity === 'rare') {
-          const left = 60, right = window.innerWidth - 60;
-          startX = i % 2 === 0 ? left : right;
+          const leftCorner = 60;
+          const rightCorner = window.innerWidth - 60;
+          startX = i % 2 === 0 ? leftCorner : rightCorner;
           startY = window.innerHeight - 80;
           velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
           velocityY = -Math.random() * 600 - 300;
@@ -183,7 +174,12 @@
           velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
           velocityY = (Math.random() - 0.5) * 100;
           gravity = false;
-        } else if (['legendary', 'chroma', 'mystical'].includes(rarity)) {
+        } else if (rarity === 'legendary') {
+          startX = Math.random() * window.innerWidth;
+          startY = -10;
+          velocityX = (Math.random() - 0.5) * 100;
+          velocityY = Math.random() * 100 + 100;
+        } else if (rarity === 'chroma') {
           const corners = [
             [0, 0], [window.innerWidth, 0],
             [0, window.innerHeight], [window.innerWidth, window.innerHeight]
@@ -201,43 +197,64 @@
         document.body.appendChild(confetti);
 
         const duration = Math.random() * 2 + 2;
+
         confetti.animate([
-          { transform: 'translate(0px, 0px)' },
+          { transform: `translate(0px, 0px)` },
           { transform: `translate(${velocityX}px, ${velocityY}px)` }
-        ], { duration: duration * 1000, iterations: 1, easing: 'ease-out' });
+        ], {
+          duration: duration * 1000,
+          iterations: 1,
+          easing: 'ease-out'
+        });
 
         if (gravity) {
           confetti.animate([
             { transform: 'translateY(0)' },
             { transform: `translateY(${window.innerHeight}px)` }
-          ], { duration: duration * 1000, iterations: 1, easing: 'ease-in' });
+          ], {
+            duration: duration * 1000,
+            iterations: 1,
+            easing: 'ease-in'
+          });
         }
 
         setTimeout(() => confetti.remove(), duration * 1000);
       }
     }
 
+    let clicked = false;
     let clickCount = 0;
 
     document.getElementById('pack').addEventListener('click', function () {
+      if (clicked) return;
+      clicked = true;
+
       if (clickCount === 0) {
         this.classList.add('torn');
         const blook = getRandomBlook();
         if (blook) {
-          const collection = JSON.parse(localStorage.getItem('collection')) || [];
-          if (!collection.find(b => b.name === blook.name)) {
-            collection.push(blook);
-            localStorage.setItem('collection', JSON.stringify(collection));
-          }
           const result = document.getElementById('result');
+          result.innerHTML = '';
           const img = document.createElement('img');
           img.src = blook.name;
+          img.alt = 'Blook image';
           result.appendChild(img);
+
+          const collectionKey = `collection_${currentUser}`;
+          const collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+          if (!collection.find(b => b.name === blook.name)) {
+            collection.push(blook);
+            localStorage.setItem(collectionKey, JSON.stringify(collection));
+          }
+
           setTimeout(() => {
-            result.style.transform = 'translate(-50%, -50%) scale(1)';
-            const rect = result.getBoundingClientRect();
-            spawnConfetti(blook.rarity, rect.left + rect.width / 2, rect.top + rect.height / 2);
-          }, 200);
+           result.style.transform = 'translate(-50%, -50%) scale(1)';
+           const rect = result.getBoundingClientRect();
+           const originX = rect.left + rect.width / 2;
+           const originY = rect.top + rect.height / 2;
+           spawnConfetti(blook.rarity, originX, originY);
+           clicked = false; // Allow second click to trigger index.html redirect
+         }, 200);
         }
         clickCount++;
       } else {
