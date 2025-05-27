@@ -95,10 +95,6 @@
     <div class="half bottom-half"></div>
   </div>
 
-   <button onclick="window.location.href='collection.html'" style="position: fixed; top: 20px; right: 20px; padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer;">
-     View Collection
-   </button>
-  
   <script>
 const currentUser = localStorage.getItem('currentUser');
 if (!currentUser) {
@@ -148,7 +144,8 @@ function spawnConfetti(rarity, originX, originY) {
     rare: 60,
     epic: 80,
     legendary: 100,
-    chroma: 120
+    chroma: 120,
+    mystical: 170
   };
 
   const count = countMap[rarity] || 30;
@@ -248,6 +245,7 @@ document.getElementById('pack').addEventListener('click', function () {
       const result = document.getElementById('result');
       const img = document.createElement('img');
       img.src = blook.name;
+      result.innerHTML = ''; // Clear previous content
       result.appendChild(img);
       setTimeout(() => {
         result.style.transform = 'translate(-50%, -50%) scale(1)';
