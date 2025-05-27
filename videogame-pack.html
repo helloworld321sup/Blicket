@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Blicket | Open Video Game Pack</title>
+  <title>Blicket/Video Game Pack</title>
   <style>
     body {
       background-color: rgb(21, 14, 90);
@@ -249,12 +249,13 @@
           }
 
           setTimeout(() => {
-            result.style.transform = 'translate(-50%, -50%) scale(1)';
-            const rect = result.getBoundingClientRect();
-            const originX = rect.left + rect.width / 2;
-            const originY = rect.top + rect.height / 2;
-            spawnConfetti(blook.rarity, originX, originY);
-          }, 200);
+           result.style.transform = 'translate(-50%, -50%) scale(1)';
+           const rect = result.getBoundingClientRect();
+           const originX = rect.left + rect.width / 2;
+           const originY = rect.top + rect.height / 2;
+           spawnConfetti(blook.rarity, originX, originY);
+           clicked = false; // Allow second click to trigger index.html redirect
+         }, 200);
         }
         clickCount++;
       } else {
