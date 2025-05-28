@@ -15,7 +15,6 @@
       position: relative;
       font-family: sans-serif;
     }
-
     .pack-wrapper {
       position: relative;
       width: 300px;
@@ -23,7 +22,6 @@
       cursor: pointer;
       z-index: 10;
     }
-
     .half {
       position: absolute;
       width: 100%;
@@ -33,27 +31,22 @@
       background-repeat: no-repeat;
       transition: transform 0.6s ease, opacity 0.6s ease;
     }
-
     .top-half {
       background-position: top;
       top: 0;
     }
-
     .bottom-half {
       background-position: bottom;
       bottom: 0;
     }
-
     .torn .top-half {
       transform: translateY(-150%) rotate(-15deg);
       opacity: 0;
     }
-
     .torn .bottom-half {
       transform: translateY(150%) rotate(15deg);
       opacity: 0;
     }
-
     #result {
       position: absolute;
       top: 60%;
@@ -65,14 +58,12 @@
       transition: transform 0.1s ease;
       pointer-events: none;
     }
-
     #result img {
       width: 150px;
       height: auto;
       user-select: none;
       pointer-events: none;
     }
-
     .confetti-piece {
       position: fixed;
       width: 12px;
@@ -92,13 +83,11 @@
   </div>
 
   <script>
-    // Redirect to login if no user logged in
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
       window.location.href = 'login.html';
     }
 
-    // Fruit pack blooks with chance and rarity
     const fruitPack = {
       blooks: [
         { name: "https://blacket.org/content/blooks/Apple.webp", chance: 14, rarity: 'uncommon' },
@@ -118,7 +107,6 @@
       ]
     };
 
-    // Pick a random blook weighted by chance
     function getRandomBlook() {
       const rand = Math.random() * 100;
       let total = 0;
@@ -126,11 +114,9 @@
         total += blook.chance;
         if (rand <= total) return blook;
       }
-      // Fallback in case sum(chance) < 100
       return fruitPack.blooks[fruitPack.blooks.length - 1];
     }
 
-    // Confetti spawn function (you already had this solid)
     function spawnConfetti(rarity, originX, originY) {
       const colors = {
         uncommon: ['#a0e060', '#88c040'],
@@ -230,16 +216,14 @@
       }
     }
 
-    // Variables to handle click states
     let clicked = false;
     let clickCount = 0;
 
     document.getElementById('pack').addEventListener('click', function () {
-      if (clicked) return; // prevent double clicks during animation
+      if (clicked) return;
       clicked = true;
 
       if (clickCount === 0) {
-        // First click - open pack animation
         this.classList.add('torn');
 
         const blook = getRandomBlook();
@@ -251,37 +235,25 @@
           img.alt = 'Blook image';
           result.appendChild(img);
 
-          // Load user collection or empty array
           const collectionKey = `collection_${currentUser}`;
           let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
 
-          // Find if this blook already exists in collection by name (URL)
-          let existingIndex = collection.findIndex(b => b.name === blook.name);
-          if (existingIndex !== -1) {
-            // Increase quantity if exists
-            collection[existingIndex].quantity = (collection[existingIndex].quantity || 0) + 1;
-          } else {
-            // Add new blook with quantity 1
-            collection.push({ ...blook, quantity: 1 });
-          }
+          // Push blook directly (no quantity)
+          collection.push(blook);
 
-          // Save updated collection
           localStorage.setItem(collectionKey, JSON.stringify(collection));
 
-          // Show the blook image with scale animation and spawn confetti
           setTimeout(() => {
             result.style.transform = 'translate(-50%, -50%) scale(1)';
             const rect = result.getBoundingClientRect();
             const originX = rect.left + rect.width / 2;
             const originY = rect.top + rect.height / 2;
             spawnConfetti(blook.rarity, originX, originY);
-
-            clicked = false; // allow second click after animation
+            clicked = false;
           }, 200);
         }
         clickCount++;
       } else {
-        // Second click - go back to main page
         window.location.href = "index.html";
       }
     });
