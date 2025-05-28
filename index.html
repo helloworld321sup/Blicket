@@ -95,6 +95,7 @@
 
   <!-- Top Left: Logout + View Collection + Username -->
   <div class="bottom-left">
+    <div id="username-display"></div>
     <div id="tokenDisplay">Tokens: 0</div>
     <button id="logout-button">Logout</button>
     <button id="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
@@ -215,24 +216,31 @@ function spinWheel() {
 
 function updateTokenDisplay() {
   const user = localStorage.getItem("currentUser");
-  console.log("Current user:", user);
-  if (!user) {
-    console.log("No user logged in.");
-    return;
-  }
+  if (!user) return;
   const tokens = localStorage.getItem(`${user}_tokens`) || 0;
-  console.log("Tokens found:", tokens);
+  console.log(`[Token Update] ${user} has ${tokens} tokens`);
   const display = document.getElementById("tokenDisplay");
   if (display) {
     display.textContent = `Tokens: ${tokens}`;
-    console.log("Token display updated.");
-  } else {
-    console.log("tokenDisplay element not found!");
   }
 }
 
     window.onload = function() {
+  const user = localStorage.getItem("currentUser");
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("username-display").textContent = "Hello, " + user + "!";
+
+  // Ensure token key exists
+  if (!localStorage.getItem(`${user}_tokens`)) {
+    localStorage.setItem(`${user}_tokens`, 0);
+  }
+
   updateTokenDisplay();
+  updateWheelUI();
 };
 
 
