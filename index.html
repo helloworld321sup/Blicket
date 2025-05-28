@@ -136,7 +136,8 @@
     const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
 
 function canSpinWheel() {
-    const lastSpin = localStorage.getItem("lastWheelSpin");
+    const user = localStorage.getItem("currentUser");
+    const lastSpin = localStorage.getItem("lastWheelSpin_" + user);
     if (!lastSpin) return true;
     return Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
 }
@@ -188,13 +189,15 @@ function spinWheel() {
         }
     }
 
-    // Give tokens
-    let tokens = parseInt(localStorage.getItem("tokens")) || 0;
+    const user = localStorage.getItem("currentUser");
+    let tokens = parseInt(localStorage.getItem(`${user}_tokens`)) || 0;
     tokens += selected.tokens;
-    localStorage.setItem("tokens", tokens);
-    localStorage.setItem("lastWheelSpin", Date.now());
+    localStorage.setItem(`${user}_tokens`, tokens);
+    localStorage.setItem(`lastWheelSpin_${user}`, Date.now());
 
-    document.getElementById("wheelMessage").textContent = `🎉 You won ${selected.tokens} tokens! Come back in 12 hours.`;
+
+
+    document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
     document.getElementById("spinWheelBtn").disabled = true;
     updateTokenDisplay();
 }
