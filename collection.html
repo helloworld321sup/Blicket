@@ -11,35 +11,35 @@
 
     .collection-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* Made smaller */
-      gap: 10px; /* Reduced gap */
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
       padding: 10px;
     }
 
     .blook-card {
       position: relative;
       background: white;
-      border-radius: 8px; /* Made smaller */
-      padding: 8px; /* Made smaller */
+      border-radius: 8px;
+      padding: 8px;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .blook-card img {
-      width: 70px;  /* Much smaller! */
-      height: 70px; /* Much smaller! */
+      width: 70px;
+      height: 70px;
       object-fit: contain;
     }
 
     .blook-name {
       margin-top: 5px;
-      font-size: 12px; /* Smaller text */
+      font-size: 12px;
     }
 
     .rarity-tag {
-      padding: 3px 6px; /* Smaller padding */
+      padding: 3px 6px;
       border-radius: 10px;
-      font-size: 10px; /* Smaller text */
+      font-size: 10px;
       color: white;
       margin-top: 3px;
       display: inline-block;
@@ -58,7 +58,7 @@
   </style>
 </head>
 <body>
-    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
     <h1>My Collection</h1>
     <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
       Back to Packs
@@ -67,69 +67,53 @@
 
   <div class="collection-grid" id="collection"></div>
 
-<script>
-  const currentUser = localStorage.getItem('currentUser');
-  const collection = JSON.parse(localStorage.getItem(`collection_${currentUser}`)) || [];
+  <script>
+    const currentUser = localStorage.getItem('currentUser');
+    const collection = JSON.parse(localStorage.getItem(`collection_${currentUser}`)) || [];
 
-  const rarityColors = {
-    'uncommon': '#a0e060',
-    'rare': '#60b0e0',
-    'epic': '#c060e0',
-    'legendary': '#f7c338',
-    'chroma': '#ff3cac'
-  };
+    const rarityColors = {
+      'uncommon': '#a0e060',
+      'rare': '#60b0e0',
+      'epic': '#c060e0',
+      'legendary': '#f7c338',
+      'chroma': '#ff3cac'
+    };
 
-  function displayCollection() {
-    const container = document.getElementById('collection');
-    container.innerHTML = '';
+    function displayCollection() {
+      const container = document.getElementById('collection');
+      container.innerHTML = '';
 
-    const itemMap = {};
-    collection.forEach(blook => {
-      const key = blook.name;
-      if (itemMap[key]) {
-        itemMap[key].count += 1;
-      } else {
-        itemMap[key] = {
-          ...blook,
-          count: 1
-        };
-      }
-    });
+      collection.forEach(blook => {
+        const card = document.createElement('div');
+        card.className = 'blook-card';
 
-    for (let key in itemMap) {
-      const blook = itemMap[key];
+        const img = document.createElement('img');
+        img.src = blook.name;
 
-      const card = document.createElement('div');
-      card.className = 'blook-card';
+        const name = document.createElement('div');
+        name.className = 'blook-name';
 
-      const img = document.createElement('img');
-      img.src = blook.name;
+        const fileName = blook.name.split('/').pop().split('.')[0];
+        name.textContent = decodeURIComponent(fileName);
 
-      const name = document.createElement('div');
-      name.className = 'blook-name';
+        const rarity = document.createElement('div');
+        rarity.className = 'rarity-tag';
+        rarity.textContent = blook.rarity;
+        rarity.style.backgroundColor = rarityColors[blook.rarity] || '#888';
 
-      // ✅ Fix name display by decoding URI
-      const fileName = blook.name.split('/').pop().split('.')[0];
-      name.textContent = decodeURIComponent(fileName);
+        const quantity = document.createElement('div');
+        quantity.className = 'quantity-badge';
+        quantity.textContent = blook.quantity || 1;
 
-      const rarity = document.createElement('div');
-      rarity.className = 'rarity-tag';
-      rarity.textContent = blook.rarity;
-      rarity.style.backgroundColor = rarityColors[blook.rarity];
-
-      const quantity = document.createElement('div');
-      quantity.className = 'quantity-badge';
-      quantity.textContent = blook.count;
-
-      card.appendChild(img);
-      card.appendChild(name);
-      card.appendChild(rarity);
-      card.appendChild(quantity);
-      container.appendChild(card);
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(rarity);
+        card.appendChild(quantity);
+        container.appendChild(card);
+      });
     }
-  }
 
-  displayCollection();
-</script>
+    displayCollection();
+  </script>
 </body>
 </html>
