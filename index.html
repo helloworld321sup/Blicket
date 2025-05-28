@@ -212,15 +212,14 @@ function spinWheel() {
 }
 
 function updateTokenDisplay() {
-  const user = localStorage.getItem("currentUser");
-  if (!user) return;
-
-  const tokens = localStorage.getItem(`${user}_tokens`) || 0;
-  const display = document.getElementById("tokenDisplay");
-  if (display) {
-    display.textContent = `Tokens: ${tokens}`;
-  }
+    const user = localStorage.getItem("currentUser");
+    const tokens = localStorage.getItem(`${user}_tokens`) || 0;
+    const display = document.getElementById("tokenDisplay");
+    if (display) {
+        display.textContent = `Tokens: ${tokens}`;
+    }
 }
+
 
 updateWheelUI();
 updateTokenDisplay();
