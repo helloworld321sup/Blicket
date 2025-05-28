@@ -214,12 +214,21 @@ function spinWheel() {
 }
 
 function updateTokenDisplay() {
-    const user = localStorage.getItem("currentUser");
-    const tokens = localStorage.getItem(`${user}_tokens`) || 0;
-    const display = document.getElementById("tokenDisplay");
-    if (display) {
-        display.textContent = `Tokens: ${tokens}`;
-    }
+  const user = localStorage.getItem("currentUser");
+  console.log("Current user:", user);
+  if (!user) {
+    console.log("No user logged in.");
+    return;
+  }
+  const tokens = localStorage.getItem(`${user}_tokens`) || 0;
+  console.log("Tokens found:", tokens);
+  const display = document.getElementById("tokenDisplay");
+  if (display) {
+    display.textContent = `Tokens: ${tokens}`;
+    console.log("Token display updated.");
+  } else {
+    console.log("tokenDisplay element not found!");
+  }
 }
 
     window.onload = function() {
