@@ -184,7 +184,22 @@
           velocityX = (Math.random() - 0.5) * 600;
           velocityY = (Math.random() - 0.5) * 600;
           gravity = false;
-        }
+        } else if (rarity === 'mystical') {
+        const corners = [
+          [0, 0], [window.innerWidth, 0],
+          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+        ];
+        const [x, y] = corners[i % 4];
+        startX = x;
+        startY = y;
+        velocityX = (Math.random() - 0.5) * 800;
+        velocityY = (Math.random() - 0.5) * 800;
+        gravity = false;
+        confetti.style.width = '14px';
+        confetti.style.height = '14px';
+        confetti.style.borderRadius = '50%';
+        confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
+      }
 
         confetti.style.left = startX + 'px';
         confetti.style.top = startY + 'px';
