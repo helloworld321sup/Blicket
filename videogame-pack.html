@@ -242,12 +242,19 @@
           img.alt = 'Blook image';
           result.appendChild(img);
 
-          const collectionKey = `collection_${currentUser}`;
-          const collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
-          if (!collection.find(b => b.name === blook.name)) {
-            collection.push(blook);
-            localStorage.setItem(collectionKey, JSON.stringify(collection));
-          }
+         const collectionKey = `collection_${currentUser}`;
+let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+
+// Check if blook already exists in collection
+let existing = collection.find(b => b.name === blook.name);
+if (existing) {
+  existing.quantity = (existing.quantity || 1) + 1;
+} else {
+  collection.push({ ...blook, quantity: 1 });
+}
+
+localStorage.setItem(collectionKey, JSON.stringify(collection));
+
 
           setTimeout(() => {
            result.style.transform = 'translate(-50%, -50%) scale(1)';
