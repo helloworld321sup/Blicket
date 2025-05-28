@@ -235,13 +235,17 @@
           img.alt = 'Blook image';
           result.appendChild(img);
 
-          const collectionKey = `collection_${currentUser}`;
-          let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+         const collectionKey = `collection_${currentUser}`;
+let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
 
-          // Push blook directly (no quantity)
-          collection.push(blook);
+const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
+if (existingBlookIndex !== -1) {
+  collection[existingBlookIndex].quantity += 1;
+} else {
+  collection.push({ ...blook, quantity: 1 });
+}
 
-          localStorage.setItem(collectionKey, JSON.stringify(collection));
+localStorage.setItem(collectionKey, JSON.stringify(collection));
 
           setTimeout(() => {
             result.style.transform = 'translate(-50%, -50%) scale(1)';
