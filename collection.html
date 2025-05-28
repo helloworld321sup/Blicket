@@ -68,7 +68,9 @@
   <div class="collection-grid" id="collection"></div>
 
 <script>
-  let collection = JSON.parse(localStorage.getItem('collection')) || [];
+  const currentUser = localStorage.getItem('currentUser');
+  const collection = JSON.parse(localStorage.getItem(`collection_${currentUser}`)) || [];
+
 
   const rarityColors = {
     'uncommon': '#a0e060',
