@@ -92,9 +92,11 @@
 
   <!-- Top Left: Logout + View Collection + Username -->
   <div class="top-left">
-    <div id="username-display">Hello, user!</div>
+    <div id="tokenDisplay">Tokens: 0</div>
     <button id="logout-button">Logout</button>
     <button id="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
+    <button id="spinWheelBtn" onclick="spinWheel()">🎡 Spin for Tokens</button>
+    <p id="wheelMessage"></p>
   </div>
 
   <!-- Pack Cards -->
@@ -131,6 +133,82 @@
     if (displayName) {
       document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
     }
+    const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
+
+function canSpinWheel() {
+    const lastSpin = localStorage.getItem("lastWheelSpin");
+    if (!lastSpin) return true;
+    return Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
+}
+
+function updateWheelUI() {
+    const btn = document.getElementById("spinWheelBtn");
+    const msg = document.getElementById("wheelMessage");
+
+    if (canSpinWheel()) {
+        btn.disabled = false;
+        msg.textContent = "Ready to spin!";
+    } else {
+        const nextSpin = new Date(parseInt(localStorage.getItem("lastWheelSpin")) + SPIN_INTERVAL);
+        const timeLeft = nextSpin - Date.now();
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        msg.textContent = `Come back in ${hours}h ${minutes}m.`;
+        btn.disabled = true;
+    }
+}
+
+function spinWheel() {
+    if (!canSpinWheel()) {
+        alert("You must wait 12 hours between spins.");
+        return;
+    }
+
+    // Define weighted rewards
+    const rewards = [
+        { tokens: 3000, weight: 0.8 },
+        { tokens: 500, weight: 24.8 },
+        { tokens: 550, weight: 24.8 },
+        { tokens: 700, weight: 24.8 },
+        { tokens: 800, weight: 12.4 },
+        { tokens: 1000, weight: 12.4 }
+    ];
+
+    // Convert weights to total weight
+    const totalWeight = rewards.reduce((acc, r) => acc + r.weight, 0);
+    const rand = Math.random() * totalWeight;
+    let sum = 0;
+    let selected = rewards[0];
+
+    for (const reward of rewards) {
+        sum += reward.weight;
+        if (rand <= sum) {
+            selected = reward;
+            break;
+        }
+    }
+
+    // Give tokens
+    let tokens = parseInt(localStorage.getItem("tokens")) || 0;
+    tokens += selected.tokens;
+    localStorage.setItem("tokens", tokens);
+    localStorage.setItem("lastWheelSpin", Date.now());
+
+    document.getElementById("wheelMessage").textContent = `🎉 You won ${selected.tokens} tokens! Come back in 12 hours.`;
+    document.getElementById("spinWheelBtn").disabled = true;
+    updateTokenDisplay();
+}
+
+function updateTokenDisplay() {
+    const tokens = localStorage.getItem("tokens") || 0;
+    const display = document.getElementById("tokenDisplay");
+    if (display) {
+        display.textContent = `Tokens: ${tokens}`;
+    }
+}
+
+updateWheelUI();
+setInterval(updateWheelUI, 60000); // Update every 1 min
   </script>
 
 </body>
