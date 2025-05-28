@@ -1,184 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Blicket | Breakfast Pack</title>
-<style>
-  body {
-    margin: 0;
-    height: 100vh;
-    background: rgb(255, 140, 72);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: sans-serif;
-    overflow: hidden;
-    position: relative;
-  }
-  .pack-wrapper {
-    width: 300px;
-    height: 300px;
-    cursor: pointer;
-    position: relative;
-    z-index: 10;
-  }
-  .half {
-    position: absolute;
-    width: 100%;
-    height: 50%;
-    background-image: url('https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png');
-    background-size: cover;
-    background-repeat: no-repeat;
-    transition: transform 0.6s ease, opacity 0.6s ease;
-  }
-  .top-half {
-    top: 0;
-    background-position: top;
-  }
-  .bottom-half {
-    bottom: 0;
-    background-position: bottom;
-  }
-  .torn .top-half {
-    transform: translateY(-150%) rotate(-15deg);
-    opacity: 0;
-  }
-  .torn .bottom-half {
-    transform: translateY(150%) rotate(15deg);
-    opacity: 0;
-  }
-  #result {
-    position: absolute;
-    top: 60%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.001);
-    font-size: 4.5rem;
-    color: white;
-    z-index: 15;
-    transition: transform 0.3s ease;
-  }
-  #result img {
-    width: 150px;
-    height: auto;
-    user-select: none;
-  }
-  .corner-image {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 50px;
-    height: 50px;
-    z-index: 5;
-    user-select: none;
-  }
-  .confetti-piece {
-    position: fixed;
-    width: 12px;
-    height: 12px;
-    opacity: 0.8;
-    pointer-events: none;
-    z-index: 20;
-    border-radius: 2px;
-  }
-  button {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    background: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    z-index: 20;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <title>Blicket | Breakfast Pack</title>
+  <style>
+    body {
+      background-color: rgb(255, 140, 72);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      font-family: sans-serif;
+    }
+    .pack-wrapper {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .half {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      background-image: url('https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+    .top-half {
+      background-position: top;
+      top: 0;
+    }
+    .bottom-half {
+      background-position: bottom;
+      bottom: 0;
+    }
+    .torn .top-half {
+      transform: translateY(-150%) rotate(-15deg);
+      opacity: 0;
+    }
+    .torn .bottom-half {
+      transform: translateY(150%) rotate(15deg);
+      opacity: 0;
+    }
+    #result {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.1);
+      font-size: 4.5rem;
+      color: white;
+      z-index: 15;
+      transition: transform 0.1s ease;
+      pointer-events: none;
+    }
+    #result img {
+      width: 150px;
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+    }
+    .confetti-piece {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 20;
+      border-radius: 2px;
+    }
+  </style>
 </head>
 <body>
   <div class="pack-wrapper" id="pack">
+    <div id="result"></div>
     <div class="half top-half"></div>
     <div class="half bottom-half"></div>
   </div>
 
-  <div id="result"></div>
-
-  <img src="https://ac.blooket.com/dashclassic/assets/Nav_Icon_Breakfast-B4PUbejt.svg" class="corner-image" alt="Breakfast Pack Icon" />
-
-  <button id="view-collection">View Collection</button>
-
-<script>
-  // Redirect if not logged in
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) window.location.href = 'login.html';
-
-  // Breakfast pack blooks and rarity chances
-  const breakfastPack = {
-    blooks: [
-      { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.3168, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.3168, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.3168, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.3168, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.316, rarity: 'uncommon' },
-      { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 9, rarity: 'rare' },
-      { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 9, rarity: 'rare' },
-      { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 5, rarity: 'epic' },
-      { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 2, rarity: 'legendary' },
-      { name: "https://ac.blooket.com/marketassets/blooks/sandwich.svg", chance: 1, rarity: 'legendary' },
-      { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
-    ]
-  };
-
-  // Pick blook based on chances
-  function getRandomBlook() {
-    const rand = Math.random() * 100;
-    let total = 0;
-    for (const blook of breakfastPack.blooks) {
-      total += blook.chance;
-      if (rand <= total) return blook;
+  <script>
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      window.location.href = 'login.html';
     }
-    // fallback
-    return breakfastPack.blooks[0];
-  }
 
-  // Confetti spawn logic from your video game pack style
-  function spawnConfetti(rarity, originX, originY) {
-    const colors = {
-      uncommon: ['#a0e060', '#88c040'],
-      rare: ['#60b0e0', '#4080c0'],
-      epic: ['#c060e0', '#a040c0'],
-      legendary: ['#f7c338', '#d4a217'],
-      chroma: ['#0583f2', '#05c3f2']
+    const breakfastPack = {
+      blooks: [
+        { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 12.3168, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.3168, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/yogurt.svg", chance: 12.3168, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/breakfastcombo.svg", chance: 12.3168, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/orangejuice.svg", chance: 12.3168, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/milk.svg", chance: 12.316, rarity: 'uncommon' },
+        { name: "https://ac.blooket.com/marketassets/blooks/waffle.svg", chance: 9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pancakes.svg", chance: 9, rarity: 'rare' },
+        { name: "https://ac.blooket.com/marketassets/blooks/frenchtoast.svg", chance: 5, rarity: 'epic' },
+        { name: "https://ac.blooket.com/marketassets/blooks/pizza.svg", chance: 2, rarity: 'legendary' },
+        { name: "https://ac.blooket.com/marketassets/blooks/sandwich.svg", chance: 1, rarity: 'legendary' },
+        { name: "https://blacket.org/content/blooks/Chocolate%20Milk.webp", chance: 0.1, rarity: 'chroma' }
+      ]
     };
-    const countMap = {
-      uncommon: 40,
-      rare: 60,
-      epic: 80,
-      legendary: 100,
-      chroma: 120
-    };
-    const count = countMap[rarity] || 30;
-    const colorSet = colors[rarity] || ['#ffffff'];
 
-    for (let i = 0; i < count; i++) {
-      const confetti = document.createElement('div');
-      confetti.className = 'confetti-piece';
-      confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+    function getRandomBlook() {
+      const rand = Math.random() * 100;
+      let total = 0;
+      for (const blook of breakfastPack.blooks) {
+        total += blook.chance;
+        if (rand <= total) return blook;
+      }
+      return breakfastPack.blooks[breakfastPack.blooks.length - 1];
+    }
 
-      let startX = originX || window.innerWidth / 2;
-      let startY = originY || window.innerHeight / 2;
-      let velocityX = 0, velocityY = 0;
-      let gravity = true;
+    function spawnConfetti(rarity, originX, originY) {
+      const colors = {
+        uncommon: ['#a0e060', '#88c040'],
+        rare: ['#60b0e0', '#4080c0'],
+        epic: ['#c060e0', '#a040c0'],
+        legendary: ['#f7c338', '#d4a217'],
+        chroma: ['#19c0f1', '#19c0f1']
+      };
 
-      switch(rarity) {
-        case 'uncommon':
+      const countMap = {
+        uncommon: 40,
+        rare: 60,
+        epic: 80,
+        legendary: 100,
+        chroma: 120
+      };
+
+      const count = countMap[rarity] || 30;
+      const colorSet = colors[rarity] || ['#ffffff'];
+
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+
+        let startX = originX || window.innerWidth / 2;
+        let startY = originY || window.innerHeight / 2;
+        let velocityX = 0, velocityY = 0;
+        let gravity = true;
+
+        if (rarity === 'uncommon') {
           startX += (Math.random() - 0.5) * 130;
           startY -= 150;
           velocityX = (Math.random() - 0.5) * 200;
           velocityY = -Math.random() * 450 - 400;
-          break;
-        case 'rare':
+        } else if (rarity === 'rare') {
           const leftCorner = 60;
           const rightCorner = window.innerWidth - 60;
           startX = i % 2 === 0 ? leftCorner : rightCorner;
@@ -186,101 +158,105 @@
           velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
           velocityY = -Math.random() * 600 - 300;
           gravity = false;
-          break;
-        case 'epic':
+        } else if (rarity === 'epic') {
           startX = i % 2 === 0 ? 0 : window.innerWidth;
           startY = Math.random() * window.innerHeight;
           velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
           velocityY = (Math.random() - 0.5) * 100;
           gravity = false;
-          break;
-        case 'legendary':
+        } else if (rarity === 'legendary') {
           startX = Math.random() * window.innerWidth;
           startY = -10;
           velocityX = (Math.random() - 0.5) * 100;
           velocityY = Math.random() * 100 + 100;
-          break;
-        case 'chroma':
+        } else if (rarity === 'chroma') {
           const corners = [
             [0, 0], [window.innerWidth, 0],
             [0, window.innerHeight], [window.innerWidth, window.innerHeight]
           ];
-          [startX, startY] = corners[i % 4];
+          const [x, y] = corners[i % 4];
+          startX = x;
+          startY = y;
           velocityX = (Math.random() - 0.5) * 600;
           velocityY = (Math.random() - 0.5) * 600;
           gravity = false;
-          break;
-        default:
-          velocityX = (Math.random() - 0.5) * 300;
-          velocityY = -Math.random() * 300;
-          break;
+        }
+
+        confetti.style.left = startX + 'px';
+        confetti.style.top = startY + 'px';
+        document.body.appendChild(confetti);
+
+        const duration = Math.random() * 2 + 2;
+
+        confetti.animate([
+          { transform: `translate(0px, 0px)` },
+          { transform: `translate(${velocityX}px, ${velocityY}px)` }
+        ], {
+          duration: duration * 1000,
+          iterations: 1,
+          easing: 'ease-out'
+        });
+
+        if (gravity) {
+          confetti.animate([
+            { transform: 'translateY(0)' },
+            { transform: `translateY(${window.innerHeight}px)` }
+          ], {
+            duration: duration * 1000,
+            iterations: 1,
+            easing: 'ease-in'
+          });
+        }
+
+        setTimeout(() => confetti.remove(), duration * 1000);
       }
-
-      confetti.style.left = `${startX}px`;
-      confetti.style.top = `${startY}px`;
-      document.body.appendChild(confetti);
-
-      const duration = Math.random() * 2000 + 2000;
-
-      confetti.animate(
-        [{ transform: 'translate(0, 0)' }, { transform: `translate(${velocityX}px, ${velocityY}px)` }],
-        { duration, easing: 'ease-out', fill: 'forwards' }
-      );
-
-      if (gravity) {
-        confetti.animate(
-          [{ transform: 'translateY(0)' }, { transform: `translateY(${window.innerHeight}px)` }],
-          { duration, easing: 'ease-in', fill: 'forwards' }
-        );
-      }
-
-      setTimeout(() => confetti.remove(), duration);
-    }
-  }
-
-  // Handle click to open pack
-  let opened = false;
-  const pack = document.getElementById('pack');
-  const result = document.getElementById('result');
-
-  pack.addEventListener('click', () => {
-    if (opened) {
-      // After first open, clicking redirects back home or index
-      window.location.href = 'index.html';
-      return;
     }
 
-    opened = true;
-    pack.classList.add('torn');
+    let clicked = false;
+    let clickCount = 0;
 
-    const blook = getRandomBlook();
+    document.getElementById('pack').addEventListener('click', function () {
+      if (clicked) return;
+      clicked = true;
 
-    if (blook) {
-      // Save collection if not already saved
-      let collection = JSON.parse(localStorage.getItem('collection')) || [];
-      if (!collection.some(item => item.name === blook.name)) {
-        collection.push(blook);
-        localStorage.setItem('collection', JSON.stringify(collection));
+      if (clickCount === 0) {
+        this.classList.add('torn');
+
+        const blook = getRandomBlook();
+        if (blook) {
+          const result = document.getElementById('result');
+          result.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = blook.name;
+          img.alt = 'Blook image';
+          result.appendChild(img);
+
+         const collectionKey = `collection_${currentUser}`;
+let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+
+const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
+if (existingBlookIndex !== -1) {
+  collection[existingBlookIndex].quantity += 1;
+} else {
+  collection.push({ ...blook, quantity: 1 });
+}
+
+localStorage.setItem(collectionKey, JSON.stringify(collection));
+
+          setTimeout(() => {
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+            const rect = result.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            spawnConfetti(blook.rarity, originX, originY);
+            clicked = false;
+          }, 200);
+        }
+        clickCount++;
+      } else {
+        window.location.href = "index.html";
       }
-
-      const img = document.createElement('img');
-      img.src = blook.name;
-      img.alt = 'Unlocked blook';
-      result.appendChild(img);
-
-      // Small delay before scaling result and spawning confetti
-      setTimeout(() => {
-        result.style.transform = 'translate(-50%, -50%) scale(1)';
-        const rect = result.getBoundingClientRect();
-        spawnConfetti(blook.rarity, rect.left + rect.width / 2, rect.top + rect.height / 2);
-      }, 200);
-    }
-  });
-
-  // View collection button
-  document.getElementById('view-collection').addEventListener('click', () => {
-    window.location.href = 'collection.html';
-  });
-</script>
+    });
+  </script>
 </body>
 </html>
