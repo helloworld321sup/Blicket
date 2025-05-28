@@ -12,14 +12,15 @@
       font-family: sans-serif;
     }
 
-    .top-left {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    .bottom-left {
+     position: fixed;
+     bottom: 20px;
+     left: 20px;
+     display: flex;
+     flex-direction: column;
+     gap: 10px;
+   }
+
 
     #logout-button,
     #collection-button {
@@ -91,7 +92,7 @@
   </script>
 
   <!-- Top Left: Logout + View Collection + Username -->
-  <div class="top-left">
+  <div class="bottom-left">
     <div id="tokenDisplay">Tokens: 0</div>
     <button id="logout-button">Logout</button>
     <button id="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
