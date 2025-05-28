@@ -71,7 +71,6 @@
   const currentUser = localStorage.getItem('currentUser');
   const collection = JSON.parse(localStorage.getItem(`collection_${currentUser}`)) || [];
 
-
   const rarityColors = {
     'uncommon': '#a0e060',
     'rare': '#60b0e0',
@@ -84,20 +83,19 @@
     const container = document.getElementById('collection');
     container.innerHTML = '';
 
-    // Count quantities and keep first instance for each item
     const itemMap = {};
     collection.forEach(blook => {
-      if (itemMap[blook.name]) {
-        itemMap[blook.name].count += 1;
+      const key = blook.name;
+      if (itemMap[key]) {
+        itemMap[key].count += 1;
       } else {
-        itemMap[blook.name] = {
+        itemMap[key] = {
           ...blook,
           count: 1
         };
       }
     });
 
-    // Loop over each unique blook
     for (let key in itemMap) {
       const blook = itemMap[key];
 
@@ -109,7 +107,10 @@
 
       const name = document.createElement('div');
       name.className = 'blook-name';
-      name.textContent = blook.name.split('/').pop().split('.')[0];
+
+      // ✅ Fix name display by decoding URI
+      const fileName = blook.name.split('/').pop().split('.')[0];
+      name.textContent = decodeURIComponent(fileName);
 
       const rarity = document.createElement('div');
       rarity.className = 'rarity-tag';
@@ -128,7 +129,6 @@
     }
   }
 
-  // Display on page load
   displayCollection();
 </script>
 </body>
