@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Blicket/Video Game Pack</title>
+  <meta charset="UTF-8" />
+  <title>Blicket / Video Game Pack</title>
   <style>
     body {
       background-color: rgb(21, 14, 90);
@@ -63,11 +63,14 @@
       color: white;
       z-index: 15;
       transition: transform 0.1s ease;
+      pointer-events: none;
     }
 
     #result img {
       width: 150px;
       height: auto;
+      user-select: none;
+      pointer-events: none;
     }
 
     .confetti-piece {
@@ -89,11 +92,13 @@
   </div>
 
   <script>
+    // Redirect to login if no user logged in
     const currentUser = localStorage.getItem('currentUser');
     if (!currentUser) {
       window.location.href = 'login.html';
     }
 
+    // Video game pack blooks with chance and rarity
     const videoGamePack = {
       blooks: [
         { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 13, rarity: 'uncommon' },
@@ -115,6 +120,7 @@
       ]
     };
 
+    // Pick a random blook weighted by chance
     function getRandomBlook() {
       const rand = Math.random() * 100;
       let total = 0;
@@ -122,9 +128,11 @@
         total += blook.chance;
         if (rand <= total) return blook;
       }
+      // Fallback in case sum(chance) < 100
       return videoGamePack.blooks[videoGamePack.blooks.length - 1];
     }
 
+    // Confetti spawn function (you already had this solid)
     function spawnConfetti(rarity, originX, originY) {
       const colors = {
         uncommon: ['#a0e060', '#88c040'],
@@ -224,15 +232,18 @@
       }
     }
 
+    // Variables to handle click states
     let clicked = false;
     let clickCount = 0;
 
     document.getElementById('pack').addEventListener('click', function () {
-      if (clicked) return;
+      if (clicked) return; // prevent double clicks during animation
       clicked = true;
 
       if (clickCount === 0) {
+        // First click - open pack animation
         this.classList.add('torn');
+
         const blook = getRandomBlook();
         if (blook) {
           const result = document.getElementById('result');
@@ -242,29 +253,37 @@
           img.alt = 'Blook image';
           result.appendChild(img);
 
-         const collectionKey = `collection_${currentUser}`;
-let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+          // Load user collection or empty array
+          const collectionKey = `collection_${currentUser}`;
+          let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
 
-let existing = collection.find(b => b.name === blook.name);
-if (existing) {
-  existing.quantity = (typeof existing.quantity === 'number' ? existing.quantity : 0) + 1;
-} else {
-  collection.push({ ...blook, quantity: 1 });
-}
+          // Find if this blook already exists in collection by name (URL)
+          let existingIndex = collection.findIndex(b => b.name === blook.name);
+          if (existingIndex !== -1) {
+            // Increase quantity if exists
+            collection[existingIndex].quantity = (collection[existingIndex].quantity || 0) + 1;
+          } else {
+            // Add new blook with quantity 1
+            collection.push({ ...blook, quantity: 1 });
+          }
 
-localStorage.setItem(collectionKey, JSON.stringify(collection));
+          // Save updated collection
+          localStorage.setItem(collectionKey, JSON.stringify(collection));
 
+          // Show the blook image with scale animation and spawn confetti
           setTimeout(() => {
-           result.style.transform = 'translate(-50%, -50%) scale(1)';
-           const rect = result.getBoundingClientRect();
-           const originX = rect.left + rect.width / 2;
-           const originY = rect.top + rect.height / 2;
-           spawnConfetti(blook.rarity, originX, originY);
-           clicked = false; // Allow second click to trigger index.html redirect
-         }, 200);
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+            const rect = result.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            spawnConfetti(blook.rarity, originX, originY);
+
+            clicked = false; // allow second click after animation
+          }, 200);
         }
         clickCount++;
       } else {
+        // Second click - go back to main page
         window.location.href = "index.html";
       }
     });
