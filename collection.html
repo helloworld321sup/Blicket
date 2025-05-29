@@ -86,35 +86,34 @@
     };
 
     const rarityValues = {
-      uncommon: 5,
-      rare: 20,
-      epic: 75,
-      legendary: 200,
-      chroma: 700,
-      mystical: 5000
+      Uncommon: 5,
+      Rare: 20,
+      Epic: 75,
+      Legendary: 200,
+      Chroma: 700,
+      Mystical: 5000
     };
 
     function displayCollection() {
       const container = document.getElementById('collection');
       container.innerHTML = '';
 
-      collection.sort((a, b) => a.name.localeCompare(b.name));
-
       collection.forEach((blook, index) => {
         const card = document.createElement('div');
         card.className = 'blook-card';
 
         const img = document.createElement('img');
-        img.src = `blooks/${blook.name}.png`;
+        img.src = blook.name;
 
         const name = document.createElement('div');
         name.className = 'blook-name';
-        name.textContent = blook.name;
+        const fileName = blook.name.split('/').pop().split('.')[0];
+        name.textContent = decodeURIComponent(fileName);
 
         const rarity = document.createElement('div');
         rarity.className = 'rarity-tag';
         rarity.textContent = blook.rarity;
-        rarity.style.backgroundColor = rarityColors[(blook.rarity || '').toLowerCase()] || '#888';
+        rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
 
         const quantity = document.createElement('div');
         quantity.className = 'quantity-badge';
@@ -143,10 +142,10 @@
       const blook = collection[index];
       const maxQuantity = blook.quantity || 1;
       const rarity = blook.rarity;
-      const sellValue = rarityValues[(rarity || '').toLowerCase()] || 0;
+      const sellValue = rarityValues[rarity] || 0;
 
-      let amount = prompt(`How many ${blook.name} do you want to sell? (1-${maxQuantity})`);
-      if (amount === null) return;
+      let amount = prompt(`How many ${decodeURIComponent(blook.name.split('/').pop().split('.')[0])} do you want to sell? (1-${maxQuantity})`);
+      if (amount === null) return; // user canceled
 
       amount = parseInt(amount);
       if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
@@ -157,7 +156,7 @@
       userData.tokens = (userData.tokens || 0) + sellValue * amount;
 
       if (maxQuantity === amount) {
-        collection.splice(index, 1);
+        collection.splice(index, 1); // remove the blook
       } else {
         collection[index].quantity -= amount;
       }
@@ -170,14 +169,12 @@
     }
 
     function sellAllBlooks() {
-      if (!confirm("Are you sure you want to sell ALL blooks?")) return;
-
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
       let totalTokens = 0;
 
       collection.forEach(blook => {
         const quantity = blook.quantity || 1;
-        const value = rarityValues[(blook.rarity || '').toLowerCase()] || 0;
+        const value = rarityValues[blook.rarity] || 0;
         totalTokens += value * quantity;
       });
 
@@ -192,8 +189,6 @@
     }
 
     function sellAllDuplicates() {
-      if (!confirm("Sell all duplicate blooks (keeping 1 of each)?")) return;
-
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
       let totalTokens = 0;
 
@@ -201,7 +196,7 @@
         const quantity = blook.quantity || 1;
         if (quantity > 1) {
           const duplicates = quantity - 1;
-          const value = rarityValues[(blook.rarity || '').toLowerCase()] || 0;
+          const value = rarityValues[blook.rarity] || 0;
           totalTokens += duplicates * value;
           blook.quantity = 1;
         }
@@ -217,7 +212,7 @@
       displayCollection();
     }
 
-    // Initial display
+    // Initial display call
     displayCollection();
   </script>
 </body>
