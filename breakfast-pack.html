@@ -91,9 +91,11 @@
 
   const PACK_COST = 20;
   let tokens = parseInt(localStorage.getItem(`${currentUser}_tokens`)) || 0;
-  const canOpen = tokens >= PACK_COST;
 
-  if (canOpen) {
+  if (tokens < PACK_COST) {
+    alert("Not enough tokens to open this pack.");
+    window.location.href = "packs.html";
+  } else {
     tokens -= PACK_COST;
     localStorage.setItem(`${currentUser}_tokens`, tokens);
   }
@@ -226,8 +228,7 @@
   let clickCount = 0;
 
   document.getElementById('pack').addEventListener('click', function () {
-    if (!canOpen || clicked) return;
-
+    if (clicked) return;
     clicked = true;
 
     if (clickCount === 0) {
@@ -268,6 +269,6 @@
       window.location.href = "index.html";
     }
   });
-  </script>
+</script>
 </body>
 </html>
