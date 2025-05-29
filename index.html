@@ -1,240 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blicket | Packs</title>
+  <title>Blicket/Collection</title>
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
     body {
-      background-color: #818181;
-      margin: 0;
+      background-color: rgb(0, 0, 0);
       font-family: sans-serif;
+      padding: 20px;
     }
 
-    .bottom-left {
-     position: fixed;
-     bottom: 20px;
-     left: 20px;
-     display: flex;
-     flex-direction: column;
-     gap: 10px;
-     align-items: flex-start;
-   }
+    .collection-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+      padding: 10px;
+    }
 
-
-
-    #logout-button,
-    #collection-button {
-      padding: 10px 20px;
+    .blook-card {
+      position: relative;
       background: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #username-display {
-      color: white;
-      font-size: 16px;
-      margin-bottom: 5px;
-    }
-
-    .pack-container {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 30px;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .pack-card {
-      width: 220px;
-      background-color: #f5f5f5;
-      border-radius: 20px;
-      padding: 20px 15px;
+      border-radius: 8px;
+      padding: 8px;
       text-align: center;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s, box-shadow 0.2s;
-      text-decoration: none;
-      color: black;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
-    .pack-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    .blook-card img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
     }
 
-    .pack-card img {
-      width: 120px;
-      height: auto;
-      margin-bottom: 15px;
+    .blook-name {
+      margin-top: 5px;
+      font-size: 12px;
     }
 
-    .pack-card h3 {
-      margin: 10px 0 5px;
-      font-size: 20px;
+    .rarity-tag {
+      padding: 3px 6px;
+      border-radius: 10px;
+      font-size: 10px;
+      color: white;
+      margin-top: 3px;
+      display: inline-block;
     }
 
-    .breakfast { background-color: #eb7b38; }
-    .videogame { background-color: #0d1772; }
-    .fruit     { background-color: #c3c3c3; }
-    .blizzard  { background-color: #00b9e4; }
+    .quantity-badge {
+      background-color: #ff6b6b;
+      color: white;
+      border-radius: 50%;
+      padding: 2px 6px;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      font-size: 10px;
+    }
   </style>
 </head>
 <body>
-
-  <script>
-    // Redirect to login.html if no user is logged in
-    const user = localStorage.getItem("currentUser");
-    if (!user) {
-      window.location.href = "login.html";
-    }
-  </script>
-
-  <!-- Top Left: Logout + View Collection + Username -->
-  <div class="bottom-left">
-    <div id="username-display"></div>
-    <div id="tokenDisplay">Tokens: 0</div>
-    <button id="logout-button">Logout</button>
-    <button id="collection-button" onclick="window.location.href='collection.html'">View Collection</button>
-    <button id="spinWheelBtn" onclick="spinWheel()">🎡 Spin for Tokens</button>
-    <p id="wheelMessage"></p>
+  <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
+    <h1>My Collection</h1>
+    <button onclick="window.location.href='index.html'" style="padding: 10px 20px; background: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+      Back to Packs
+    </button>
+  </div>
+  <div style="padding: 10px 20px; display: flex; gap: 10px; justify-content: center;">
+    <button onclick="sellAllBlooks()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">Sell All Blooks</button>
+    <button onclick="sellAllDuplicates()" style="padding: 10px 20px; font-size: 14px; cursor: pointer;">Sell All Duplicates</button>
   </div>
 
-  <!-- Pack Cards -->
-  <div class="pack-container">
-    <a href="breakfast-pack.html" class="pack-card breakfast">
-      <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-      <h3>20 🪙</h3>
-    </a>
-
-    <a href="fruit-pack.html" class="pack-card fruit">
-      <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
-      <h3>20 🪙</h3>
-    </a>
-
-    <a href="videogame-pack.html" class="pack-card videogame">
-      <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
-      <h3>25 🪙</h3>
-    </a>
-
-    <a href="blizzard-pack.html" class="pack-card blizzard">
-      <img src="https://blacket.org/content/packs/Blizzard.webp" alt="Blizzard Pack">
-      <h3>25 🪙</h3>
-    </a>
-  </div>
+  <div class="collection-grid" id="collection"></div>
 
   <script>
-  const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
+    const currentUser = localStorage.getItem('currentUser');
+    let collection = JSON.parse(localStorage.getItem(`collection_${currentUser}`)) || [];
 
-  function getUserData() {
-    const username = localStorage.getItem("currentUser");
-    if (!username) return null;
-    const raw = localStorage.getItem(`user_${username}`);
-    return raw ? JSON.parse(raw) : null;
-  }
+    const rarityColors = {
+      'uncommon': '#a0e060',
+      'rare': '#60b0e0',
+      'epic': '#c060e0',
+      'legendary': '#f7c338',
+      'chroma': '#19c0f1',
+      'mystical': '#ca17e6'
+    };
 
-  function saveUserData(data) {
-    if (!data || !data.username) return;
-    localStorage.setItem(`user_${data.username}`, JSON.stringify(data));
-  }
+    const rarityValues = {
+    uncommon: 5,
+    rare: 20,
+    epic: 75,
+    legendary: 200,
+    chroma: 700,
+    mystical: 5000
+  };
 
-  function updateTokenDisplay() {
-    const data = getUserData();
-    if (!data) return;
-    const display = document.getElementById("tokenDisplay");
-    if (display) {
-      display.textContent = `Tokens: ${data.tokens || 0}`;
+  const sellValue = rarityValues[rarity.toLowerCase()] || 0;
+
+    function displayCollection() {
+      const container = document.getElementById('collection');
+      container.innerHTML = '';
+
+      collection.forEach((blook, index) => {
+        const card = document.createElement('div');
+        card.className = 'blook-card';
+
+        const img = document.createElement('img');
+        img.src = blook.name;
+
+        const name = document.createElement('div');
+        name.className = 'blook-name';
+        const fileName = blook.name.split('/').pop().split('.')[0];
+        name.textContent = decodeURIComponent(fileName);
+
+        const rarity = document.createElement('div');
+        rarity.className = 'rarity-tag';
+        rarity.textContent = blook.rarity;
+        rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
+
+        const quantity = document.createElement('div');
+        quantity.className = 'quantity-badge';
+        quantity.textContent = blook.quantity || 1;
+
+        const sellBtn = document.createElement('button');
+        sellBtn.textContent = 'Sell';
+        sellBtn.style.marginTop = '8px';
+        sellBtn.style.padding = '4px 8px';
+        sellBtn.style.cursor = 'pointer';
+        sellBtn.onclick = () => sellXBlook(index);
+
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(rarity);
+        card.appendChild(quantity);
+        card.appendChild(sellBtn);
+
+        container.appendChild(card);
+      });
     }
-  }
 
-  function updateWheelUI() {
-    const btn = document.getElementById("spinWheelBtn");
-    const msg = document.getElementById("wheelMessage");
-    const username = localStorage.getItem("currentUser");
-    if (!username) {
-      btn.disabled = true;
-      msg.textContent = "Log in to spin the wheel.";
-      return;
-    }
+    function sellXBlook(index) {
+      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
-    const lastSpin = localStorage.getItem(`lastWheelSpin_${username}`);
-    if (!lastSpin || Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL) {
-      btn.disabled = false;
-      msg.textContent = "Ready to spin!";
-    } else {
-      const timeLeft = new Date(parseInt(lastSpin) + SPIN_INTERVAL - Date.now());
-      const h = Math.floor(timeLeft / (1000 * 60 * 60));
-      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      msg.textContent = `Come back in ${h}h ${m}m.`;
-      btn.disabled = true;
-    }
-  }
+      const blook = collection[index];
+      const maxQuantity = blook.quantity || 1;
+      const rarity = blook.rarity;
+      const sellValue = rarityValues[rarity] || 0;
 
-  function spinWheel() {
-    const data = getUserData();
-    if (!data) return;
+      let amount = prompt(`How many ${decodeURIComponent(blook.name.split('/').pop().split('.')[0])} do you want to sell? (1-${maxQuantity})`);
+      if (amount === null) return; // user canceled
 
-    const rewards = [
-      { tokens: 3000, weight: 0.8 },
-      { tokens: 500,  weight: 24.8 },
-      { tokens: 550,  weight: 24.8 },
-      { tokens: 700,  weight: 24.8 },
-      { tokens: 800,  weight: 12.4 },
-      { tokens: 1000, weight: 12.4 }
-    ];
-
-    const totalWeight = rewards.reduce((a, r) => a + r.weight, 0);
-    let rand = Math.random() * totalWeight;
-    let reward = rewards[0];
-    for (let r of rewards) {
-      rand -= r.weight;
-      if (rand <= 0) {
-        reward = r;
-        break;
+      amount = parseInt(amount);
+      if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
+        alert(`Enter a valid number between 1 and ${maxQuantity}.`);
+        return;
       }
+
+      userData.tokens = (userData.tokens || 0) + sellValue * amount;
+
+      if (maxQuantity === amount) {
+        collection.splice(index, 1); // remove the blook
+      } else {
+        collection[index].quantity -= amount;
+      }
+
+      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+
+      alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
+      displayCollection();
     }
 
-    data.tokens = (data.tokens || 0) + reward.tokens;
-    saveUserData(data);
-    localStorage.setItem(`lastWheelSpin_${data.username}`, Date.now());
+    function sellAllBlooks() {
+      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+      let totalTokens = 0;
 
-    document.getElementById("wheelMessage").textContent = `You won ${reward.tokens} tokens. Come back in 12 hours.`;
-    document.getElementById("spinWheelBtn").disabled = true;
-    updateTokenDisplay();
-  }
+      collection.forEach(blook => {
+        const quantity = blook.quantity || 1;
+        const value = rarityValues[blook.rarity] || 0;
+        totalTokens += value * quantity;
+      });
 
-  window.onload = () => {
-    const username = localStorage.getItem("currentUser");
-    if (!username) {
-      window.location.href = "login.html";
-      return;
+      collection = [];
+      userData.tokens = (userData.tokens || 0) + totalTokens;
+
+      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+
+      alert(`Sold all blooks for ${totalTokens} tokens!`);
+      displayCollection();
     }
 
-    let data = getUserData();
-    if (!data) {
-      data = { username, tokens: 0, collection: [] };
-      saveUserData(data);
+    function sellAllDuplicates() {
+      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+      let totalTokens = 0;
+
+      collection = collection.map(blook => {
+        const quantity = blook.quantity || 1;
+        if (quantity > 1) {
+          const duplicates = quantity - 1;
+          const value = rarityValues[blook.rarity] || 0;
+          totalTokens += duplicates * value;
+          blook.quantity = 1;
+        }
+        return blook;
+      });
+
+      userData.tokens = (userData.tokens || 0) + totalTokens;
+
+      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+
+      alert(`Sold all duplicates for ${totalTokens} tokens!`);
+      displayCollection();
     }
 
-    document.getElementById("username-display").textContent = "Hello, " + username + "!";
-    updateTokenDisplay();
-    updateWheelUI();
-  };
-
-  document.getElementById("logout-button").onclick = () => {
-    localStorage.removeItem("currentUser");
-    window.location.href = "login.html";
-  };
-
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden) updateTokenDisplay();
-  });
-
-  window.addEventListener('focus', updateTokenDisplay);
-  setInterval(updateWheelUI, 60000); // refresh every 1 min
-</script>
+    // Initial display call
+    displayCollection();
+  </script>
 </body>
 </html>
