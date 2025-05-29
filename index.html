@@ -242,8 +242,29 @@ function updateTokenDisplay() {
   updateTokenDisplay();
   updateWheelUI();
 };
+    function updateTokenDisplay() {
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) return;
+  const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+  const tokenDisplay = document.getElementById('token-count');
+  if (tokenDisplay) {
+    tokenDisplay.textContent = `Tokens: ${userData.tokens}`;
+  }
+}
 
+// Update tokens immediately on load
+updateTokenDisplay();
 
+// Update tokens when user returns to this page (tab/window)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    updateTokenDisplay();
+  }
+});
+
+window.addEventListener('focus', () => {
+  updateTokenDisplay();
+});
 
 updateWheelUI();
 updateTokenDisplay();
