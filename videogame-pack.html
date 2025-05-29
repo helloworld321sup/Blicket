@@ -133,11 +133,11 @@
     function getRandomBlook() {
     const rand = Math.random() * 100;
     let total = 0;
-    for (const blook of videogmaPack.blooks) {
+    for (const blook of videoGamePack.blooks) {
       total += blook.chance;
       if (rand <= total) return blook;
     }
-    return videogamePack.blooks[videogamePack.blooks.length - 1];
+    return videoGamePack.blooks[videoGamePack.blooks.length - 1];
   }
 
   function spawnConfetti(rarity, originX, originY) {
