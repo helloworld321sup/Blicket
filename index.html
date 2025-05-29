@@ -127,148 +127,114 @@
   </div>
 
   <script>
-    document.getElementById("logout-button").onclick = function () {
-  localStorage.removeItem("currentUser");
-  window.location.href = "login.html";
-};
+  const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
 
-// Set the username text
-const displayName = localStorage.getItem("currentUser");
-if (displayName) {
-  document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
-}
-
-const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
-
-function canSpinWheel() {
-  const user = localStorage.getItem("currentUser");
-  if (!user) return false;
-  const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
-  if (!lastSpin) return true;
-  return Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
-}
-
-function updateWheelUI() {
-  const btn = document.getElementById("spinWheelBtn");
-  const msg = document.getElementById("wheelMessage");
-  const user = localStorage.getItem("currentUser");
-  if (!user) {
-    btn.disabled = true;
-    msg.textContent = "Log in to spin the wheel.";
-    return;
+  function getUserData() {
+    const username = localStorage.getItem("currentUser");
+    if (!username) return null;
+    const raw = localStorage.getItem(`user_${username}`);
+    return raw ? JSON.parse(raw) : null;
   }
 
-  const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
-
-  if (canSpinWheel()) {
-    btn.disabled = false;
-    msg.textContent = "Ready to spin!";
-  } else {
-    const nextSpin = new Date(parseInt(lastSpin) + SPIN_INTERVAL);
-    const timeLeft = nextSpin - Date.now();
-    const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-    msg.textContent = `Come back in ${hours}h ${minutes}m.`;
-    btn.disabled = true;
-  }
-}
-
-function spinWheel() {
-  if (!canSpinWheel()) {
-    alert("You must wait 12 hours between spins.");
-    return;
+  function saveUserData(data) {
+    if (!data || !data.username) return;
+    localStorage.setItem(`user_${data.username}`, JSON.stringify(data));
   }
 
-  // Weighted rewards
-  const rewards = [
-    { tokens: 3000, weight: 0.8 },
-    { tokens: 500, weight: 24.8 },
-    { tokens: 550, weight: 24.8 },
-    { tokens: 700, weight: 24.8 },
-    { tokens: 800, weight: 12.4 },
-    { tokens: 1000, weight: 12.4 }
-  ];
-
-  // Pick a reward based on weights
-  const totalWeight = rewards.reduce((acc, r) => acc + r.weight, 0);
-  const rand = Math.random() * totalWeight;
-  let sum = 0;
-  let selected = rewards[0];
-
-  for (const reward of rewards) {
-    sum += reward.weight;
-    if (rand <= sum) {
-      selected = reward;
-      break;
+  function updateTokenDisplay() {
+    const data = getUserData();
+    if (!data) return;
+    const display = document.getElementById("tokenDisplay");
+    if (display) {
+      display.textContent = `Tokens: ${data.tokens || 0}`;
     }
   }
 
-  const user = localStorage.getItem("currentUser");
-  let tokens = parseInt(localStorage.getItem(`${user}_tokens`)) || 0;
-  tokens += selected.tokens;
-  localStorage.setItem(`${user}_tokens`, tokens);
-  localStorage.setItem(`lastWheelSpin_${user}`, Date.now());
+  function updateWheelUI() {
+    const btn = document.getElementById("spinWheelBtn");
+    const msg = document.getElementById("wheelMessage");
+    const username = localStorage.getItem("currentUser");
+    if (!username) {
+      btn.disabled = true;
+      msg.textContent = "Log in to spin the wheel.";
+      return;
+    }
 
-  document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
-  document.getElementById("spinWheelBtn").disabled = true;
-  updateTokenDisplay();
-}
-
-function updateTokenDisplay() {
-  const user = localStorage.getItem("currentUser");
-  if (!user) return;
-  const tokens = localStorage.getItem(`${user}_tokens`) || 0;
-  console.log(`[Token Update] ${user} has ${tokens} tokens`);
-  const display = document.getElementById("tokenDisplay");
-  if (display) {
-    display.textContent = `Tokens: ${tokens}`;
-  }
-}
-
-    window.onload = function() {
-  const user = localStorage.getItem("currentUser");
-  if (!user) {
-    window.location.href = "login.html";
-    return;
+    const lastSpin = localStorage.getItem(`lastWheelSpin_${username}`);
+    if (!lastSpin || Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL) {
+      btn.disabled = false;
+      msg.textContent = "Ready to spin!";
+    } else {
+      const timeLeft = new Date(parseInt(lastSpin) + SPIN_INTERVAL - Date.now());
+      const h = Math.floor(timeLeft / (1000 * 60 * 60));
+      const m = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      msg.textContent = `Come back in ${h}h ${m}m.`;
+      btn.disabled = true;
+    }
   }
 
-  document.getElementById("username-display").textContent = "Hello, " + user + "!";
+  function spinWheel() {
+    const data = getUserData();
+    if (!data) return;
 
-  // Ensure token key exists
-  if (!localStorage.getItem(`${user}_tokens`)) {
-    localStorage.setItem(`${user}_tokens`, 0);
-  }
+    const rewards = [
+      { tokens: 3000, weight: 0.8 },
+      { tokens: 500,  weight: 24.8 },
+      { tokens: 550,  weight: 24.8 },
+      { tokens: 700,  weight: 24.8 },
+      { tokens: 800,  weight: 12.4 },
+      { tokens: 1000, weight: 12.4 }
+    ];
 
-  updateTokenDisplay();
-  updateWheelUI();
-};
-    function updateTokenDisplay() {
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) return;
-  const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
-  const tokenDisplay = document.getElementById('token-count');
-  if (tokenDisplay) {
-    tokenDisplay.textContent = `Tokens: ${userData.tokens}`;
-  }
-}
+    const totalWeight = rewards.reduce((a, r) => a + r.weight, 0);
+    let rand = Math.random() * totalWeight;
+    let reward = rewards[0];
+    for (let r of rewards) {
+      rand -= r.weight;
+      if (rand <= 0) {
+        reward = r;
+        break;
+      }
+    }
 
-// Update tokens immediately on load
-updateTokenDisplay();
+    data.tokens = (data.tokens || 0) + reward.tokens;
+    saveUserData(data);
+    localStorage.setItem(`lastWheelSpin_${data.username}`, Date.now());
 
-// Update tokens when user returns to this page (tab/window)
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden) {
+    document.getElementById("wheelMessage").textContent = `You won ${reward.tokens} tokens. Come back in 12 hours.`;
+    document.getElementById("spinWheelBtn").disabled = true;
     updateTokenDisplay();
   }
-});
 
-window.addEventListener('focus', () => {
-  updateTokenDisplay();
-});
+  window.onload = () => {
+    const username = localStorage.getItem("currentUser");
+    if (!username) {
+      window.location.href = "login.html";
+      return;
+    }
 
-updateWheelUI();
-updateTokenDisplay();
-setInterval(updateWheelUI, 60000); // Update every 1 min
-  </script>
+    let data = getUserData();
+    if (!data) {
+      data = { username, tokens: 0, collection: [] };
+      saveUserData(data);
+    }
+
+    document.getElementById("username-display").textContent = "Hello, " + username + "!";
+    updateTokenDisplay();
+    updateWheelUI();
+  };
+
+  document.getElementById("logout-button").onclick = () => {
+    localStorage.removeItem("currentUser");
+    window.location.href = "login.html";
+  };
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) updateTokenDisplay();
+  });
+
+  window.addEventListener('focus', updateTokenDisplay);
+  setInterval(updateWheelUI, 60000); // refresh every 1 min
+</script>
 </body>
 </html>
