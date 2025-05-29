@@ -83,22 +83,24 @@
     <div class="half bottom-half"></div>
   </div>
 
-  <script>
+<script>
   const currentUser = localStorage.getItem('currentUser');
   if (!currentUser) {
     window.location.href = 'login.html';
   }
 
   const PACK_COST = 20;
-  let tokens = parseInt(localStorage.getItem(`${currentUser}_tokens`)) || 0;
+  const userDataKey = `userData_${currentUser}`;
+  let userData = JSON.parse(localStorage.getItem(userDataKey)) || { tokens: 0 };
 
-  if (tokens < PACK_COST) {
+  if (userData.tokens < PACK_COST) {
     alert("Not enough tokens to open this pack.");
-    window.location.href = "packs.html";
-  } else {
-    tokens -= PACK_COST;
-    localStorage.setItem(`${currentUser}_tokens`, tokens);
+    return; // 🚨 STOP — prevent broken redirect
   }
+
+  // Deduct token cost
+  userData.tokens -= PACK_COST;
+  localStorage.setItem(userDataKey, JSON.stringify(userData));
 
   const breakfastPack = {
     blooks: [
