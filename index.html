@@ -102,27 +102,28 @@
   </div>
 
   <!-- Pack Cards -->
-  <div class="pack-container">
-    <a href="breakfast-pack.html" class="pack-card breakfast">
-      <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
-      <h3>20 🪙</h3>
-    </a>
-
-    <a href="fruit-pack.html" class="pack-card fruit">
-      <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
-      <h3>20 🪙</h3>
-    </a>
-
-    <a href="videogame-pack.html" class="pack-card videogame">
-      <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
-      <h3>25 🪙</h3>
-    </a>
-
-    <a href="blizzard-pack.html" class="pack-card blizzard">
-      <img src="https://blacket.org/content/packs/Blizzard.webp" alt="Blizzard Pack">
-      <h3>25 🪙</h3>
-    </a>
+  <!-- Pack Cards (changed from <a> to <div> with data-cost and data-href) -->
+<div class="pack-container">
+  <div class="pack-card breakfast" data-cost="20" data-href="breakfast-pack.html">
+    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
+    <h3>20 🪙</h3>
   </div>
+
+  <div class="pack-card fruit" data-cost="20" data-href="fruit-pack.html">
+    <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
+    <h3>20 🪙</h3>
+  </div>
+
+  <div class="pack-card videogame" data-cost="25" data-href="videogame-pack.html">
+    <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
+    <h3>25 🪙</h3>
+  </div>
+
+  <div class="pack-card blizzard" data-cost="25" data-href="blizzard-pack.html">
+    <img src="https://blacket.org/content/packs/Blizzard.webp" alt="Blizzard Pack">
+    <h3>25 🪙</h3>
+  </div>
+</div>
 
   <script>
     document.getElementById("logout-button").onclick = function () {
