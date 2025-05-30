@@ -262,16 +262,7 @@
     if (!user) return alert('Not logged in.');
 
     let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
-    if (userData.tokens >= cost) {
-      // Deduct tokens
-      userData.tokens -= cost;
-      localStorage.setItem(`user_${user}`, JSON.stringify(userData));
-      updateTokenDisplay();
-      // Go to pack page
-      window.location.href = href;
-    } else {
-      alert(`You need ${cost} tokens to open this pack. You only have ${userData.tokens}.`);
-    }
+window.location.href = href;
   });
 });
 
