@@ -89,8 +89,17 @@
     window.location.href = 'login.html';
   }
 
-  const PACK_COST = 20;
-  let tokens = parseInt(localStorage.getItem(`${currentUser}_tokens`)) || 0;
+  const PACK_COST = 25;
+let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+
+if (userData.tokens < PACK_COST) {
+  alert("Not enough tokens to open this pack. Click the back button to go back to blicket.");
+  window.location.href = "packs.html";
+} else {
+  userData.tokens -= PACK_COST;
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+}
+
 
     const fruitPack = {
       blooks: [
