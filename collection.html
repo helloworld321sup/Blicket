@@ -94,11 +94,6 @@
       mystical: 5000
     };
 
-    function updateTokenDisplay() {
-     const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
-     document.getElementById('tokenDisplay').textContent = `Tokens: ${userData.tokens}`;
-   }
-
     function displayCollection() {
   const container = document.getElementById('collection');
   container.innerHTML = '';
@@ -139,85 +134,87 @@
 
     container.appendChild(card);
   });
+}
 
-    function sellXBlook(index) {
-      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+function sellXBlook(index) {
+  let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
-      const blook = collection[index];
-      const maxQuantity = blook.quantity || 1;
-      const rarity = blook.rarity;
-      const sellValue = rarityValues[rarity] || 0;
+  const blook = collection[index];
+  const maxQuantity = blook.quantity || 1;
+  const rarity = blook.rarity;
+  const sellValue = rarityValues[rarity] || 0;
 
-      let amount = prompt(`How many ${decodeURIComponent(blook.name.split('/').pop().split('.')[0])} do you want to sell? (1-${maxQuantity})`);
-      if (amount === null) return; // user canceled
+  let amount = prompt(`How many ${decodeURIComponent(blook.name.split('/').pop().split('.')[0])} do you want to sell? (1-${maxQuantity})`);
+  if (amount === null) return;
 
-      amount = parseInt(amount);
-      if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
-        alert(`Enter a valid number between 1 and ${maxQuantity}.`);
-        return;
-      }
+  amount = parseInt(amount);
+  if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
+    alert(`Enter a valid number between 1 and ${maxQuantity}.`);
+    return;
+  }
 
-      userData.tokens = (userData.tokens || 0) + sellValue * amount;
+  userData.tokens = (userData.tokens || 0) + sellValue * amount;
 
-      if (maxQuantity === amount) {
-        collection.splice(index, 1); // remove the blook
-      } else {
-        collection[index].quantity -= amount;
-      }
+  if (maxQuantity === amount) {
+    collection.splice(index, 1);
+  } else {
+    collection[index].quantity -= amount;
+  }
 
-      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
-      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+  localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
 
-      alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
-      displayCollection();
+  alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
+  displayCollection();
+}
+
+function sellAllBlooks() {
+  let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+  let totalTokens = 0;
+
+  collection.forEach(blook => {
+    const quantity = blook.quantity || 1;
+    const value = rarityValues[blook.rarity] || 0;
+    totalTokens += value * quantity;
+  });
+
+  collection = [];
+  userData.tokens += totalTokens;
+
+  localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+
+  alert(`Sold all blooks for ${totalTokens} tokens!`);
+  displayCollection();
+}
+
+function sellAllDuplicates() {
+  let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+  let totalTokens = 0;
+
+  collection = collection.map(blook => {
+    const quantity = blook.quantity || 1;
+    if (quantity > 1) {
+      const duplicates = quantity - 1;
+      const value = rarityValues[blook.rarity] || 0;
+      totalTokens += duplicates * value;
+      blook.quantity = 1;
     }
+    return blook;
+  });
 
-    function sellAllBlooks() {
-      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
-      let totalTokens = 0;
+  userData.tokens += totalTokens;
 
-      collection.forEach(blook => {
-        const quantity = blook.quantity || 1;
-        const value = rarityValues[blook.rarity] || 0;
-        totalTokens += value * quantity;
-      });
+  localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
 
-      collection = [];
-      userData.tokens = (userData.tokens || 0) + totalTokens;
+  alert(`Sold all duplicates for ${totalTokens} tokens!`);
+  displayCollection();
+}
 
-      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
-      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+// Initial call after all functions are defined
+displayCollection();
 
-      alert(`Sold all blooks for ${totalTokens} tokens!`);
-      displayCollection();
-    }
-
-    function sellAllDuplicates() {
-      let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
-      let totalTokens = 0;
-
-      collection = collection.map(blook => {
-        const quantity = blook.quantity || 1;
-        if (quantity > 1) {
-          const duplicates = quantity - 1;
-          const value = rarityValues[blook.rarity] || 0;
-          totalTokens += duplicates * value;
-          blook.quantity = 1;
-        }
-        return blook;
-      });
-
-      userData.tokens = (userData.tokens || 0) + totalTokens;
-
-      localStorage.setItem(`collection_${currentUser}`, JSON.stringify(collection));
-      localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
-
-      alert(`Sold all duplicates for ${totalTokens} tokens!`);
-      displayCollection();
-    }
-
-    // Initial display call
-    displayCollection();
   </script>
 </body>
 </html>
