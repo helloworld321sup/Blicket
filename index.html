@@ -252,6 +252,29 @@
     updateWheelUI();
     updateTokenDisplay();
     setInterval(updateWheelUI, 60000); // Update every 1 min
+
+    document.querySelectorAll('.pack-card').forEach(card => {
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', () => {
+    const cost = parseInt(card.getAttribute('data-cost'), 10);
+    const href = card.getAttribute('data-href');
+    const user = localStorage.getItem('currentUser');
+    if (!user) return alert('Not logged in.');
+
+    let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+    if (userData.tokens >= cost) {
+      // Deduct tokens
+      userData.tokens -= cost;
+      localStorage.setItem(`user_${user}`, JSON.stringify(userData));
+      updateTokenDisplay();
+      // Go to pack page
+      window.location.href = href;
+    } else {
+      alert(`You need ${cost} tokens to open this pack. You only have ${userData.tokens}.`);
+    }
+  });
+});
+
   </script>
 </body>
 </html>
