@@ -92,14 +92,6 @@
   const PACK_COST = 20;
   let tokens = parseInt(localStorage.getItem(`${currentUser}_tokens`)) || 0;
 
-  if (tokens < PACK_COST) {
-    alert("Not enough tokens to open this pack. Click the back button to go back to blicket.");
-    window.location.href = "packs.html";
-  } else {
-    tokens -= PACK_COST;
-    localStorage.setItem(`${currentUser}_tokens`, tokens);
-  }
-
     const fruitPack = {
       blooks: [
         { name: "https://blacket.org/content/blooks/Apple.webp", chance: 14, rarity: 'uncommon' },
