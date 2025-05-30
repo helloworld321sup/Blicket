@@ -97,48 +97,61 @@
       mystical: 5000
     };
 
+    function updateTokenDisplay() {
+     const userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+     document.getElementById('tokenDisplay').textContent = `Tokens: ${userData.tokens}`;
+   }
 
     function displayCollection() {
-      const container = document.getElementById('collection');
-      container.innerHTML = '';
+  const container = document.getElementById('collection');
+  container.innerHTML = '';
 
-      collection.forEach((blook, index) => {
-        const card = document.createElement('div');
-        card.className = 'blook-card';
+  collection.forEach((blook, index) => {
+    const card = document.createElement('div');
+    card.className = 'blook-card';
 
-        const img = document.createElement('img');
-        img.src = blook.name;
+    const img = document.createElement('img');
+    img.src = blook.name;
 
-        const name = document.createElement('div');
-        name.className = 'blook-name';
-        const fileName = blook.name.split('/').pop().split('.')[0];
-        name.textContent = decodeURIComponent(fileName);
+    const name = document.createElement('div');
+    name.className = 'blook-name';
+    const fileName = blook.name.split('/').pop().split('.')[0];
+    name.textContent = decodeURIComponent(fileName);
 
-        const rarity = document.createElement('div');
-        rarity.className = 'rarity-tag';
-        rarity.textContent = blook.rarity;
-        rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
+    const rarity = document.createElement('div');
+    rarity.className = 'rarity-tag';
+    rarity.textContent = blook.rarity;
+    rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
 
-        const quantity = document.createElement('div');
-        quantity.className = 'quantity-badge';
-        quantity.textContent = blook.quantity || 1;
+    const quantity = document.createElement('div');
+    quantity.className = 'quantity-badge';
+    quantity.textContent = blook.quantity || 1;
 
-        const sellBtn = document.createElement('button');
-        sellBtn.textContent = 'Sell';
-        sellBtn.style.marginTop = '8px';
-        sellBtn.style.padding = '4px 8px';
-        sellBtn.style.cursor = 'pointer';
-        sellBtn.onclick = () => sellXBlook(index);
+    const sellBtn = document.createElement('button');
+    sellBtn.textContent = 'Sell';
+    sellBtn.style.marginTop = '8px';
+    sellBtn.style.padding = '4px 8px';
+    sellBtn.style.cursor = 'pointer';
+    sellBtn.onclick = () => sellXBlook(index);
 
-        card.appendChild(img);
-        card.appendChild(name);
-        card.appendChild(rarity);
-        card.appendChild(quantity);
-        card.appendChild(sellBtn);
+    card.appendChild(img);
+    card.appendChild(name);
+    card.appendChild(rarity);
+    card.appendChild(quantity);
+    card.appendChild(sellBtn);
 
-        container.appendChild(card);
-      });
-    }
+    container.appendChild(card);
+  });
+
+  updateTokenDisplay(); // ✅ This will now run properly
+}
+
+    function displayCollection() {
+  const container = document.getElementById('collection');
+  container.innerHTML = '';
+  // (existing code to create cards...)
+  updateTokenDisplay(); // 👈 add this at the bottom
+}
 
     function sellXBlook(index) {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
