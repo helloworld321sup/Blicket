@@ -89,7 +89,7 @@
     window.location.href = 'login.html';
   }
 
-  const PACK_COST = 25;
+  const PACK_COST = 20;
 let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
 if (userData.tokens < PACK_COST) {
