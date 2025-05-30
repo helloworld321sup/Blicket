@@ -146,13 +146,6 @@
   updateTokenDisplay(); // ✅ This will now run properly
 }
 
-    function displayCollection() {
-  const container = document.getElementById('collection');
-  container.innerHTML = '';
-  // (existing code to create cards...)
-  updateTokenDisplay(); // 👈 add this at the bottom
-}
-
     function sellXBlook(index) {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
