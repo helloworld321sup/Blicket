@@ -97,6 +97,10 @@
       mystical: 5000
     };
 
+    const customNameMap = {
+  "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen"
+};
+
     function displayCollection() {
       const container = document.getElementById('collection');
       container.innerHTML = '';
@@ -109,9 +113,15 @@
         img.src = blook.name;
 
         const name = document.createElement('div');
-        name.className = 'blook-name';
-        const fileName = blook.name.split('/').pop().split('.')[0];
-        name.textContent = decodeURIComponent(fileName);
+name.className = 'blook-name';
+
+const fileName = blook.name.split('/').pop().split('.')[0];
+
+const customNameMap = {
+  "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen"
+};
+
+name.textContent = customNameMap[fileName] || decodeURIComponent(fileName);
 
         const rarity = document.createElement('div');
         rarity.className = 'rarity-tag';
