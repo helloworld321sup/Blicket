@@ -98,46 +98,89 @@
     };
 
     function displayCollection() {
-      const container = document.getElementById('collection');
-      container.innerHTML = '';
+  const container = document.getElementById('collection');
+  container.innerHTML = '';
 
-      collection.forEach((blook, index) => {
-        const card = document.createElement('div');
-        card.className = 'blook-card';
+  const packs = ['Breakfast', 'Fruit', 'Video Game', 'Blizzard', 'Medieval', 'Summer'];
+  const rarityOrder = ['uncommon', 'rare', 'epic', 'legendary', 'chroma', 'mystical'];
 
-        const img = document.createElement('img');
-        img.src = blook.name;
+  // Group collection by pack
+  const groupedByPack = {};
+  for (const pack of packs) {
+    groupedByPack[pack] = [];
+  }
 
-        const name = document.createElement('div');
-        name.className = 'blook-name';
-        const fileName = blook.name.split('/').pop().split('.')[0];
-        name.textContent = decodeURIComponent(fileName);
-
-        const rarity = document.createElement('div');
-        rarity.className = 'rarity-tag';
-        rarity.textContent = blook.rarity;
-        rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
-
-        const quantity = document.createElement('div');
-        quantity.className = 'quantity-badge';
-        quantity.textContent = blook.quantity || 1;
-
-        const sellBtn = document.createElement('button');
-        sellBtn.textContent = 'Sell';
-        sellBtn.style.marginTop = '8px';
-        sellBtn.style.padding = '4px 8px';
-        sellBtn.style.cursor = 'pointer';
-        sellBtn.onclick = () => sellXBlook(index);
-
-        card.appendChild(img);
-        card.appendChild(name);
-        card.appendChild(rarity);
-        card.appendChild(quantity);
-        card.appendChild(sellBtn);
-
-        container.appendChild(card);
-      });
+  // Filter collection to only known packs, add to group
+  collection.forEach(blook => {
+    if (packs.includes(blook.pack)) {
+      groupedByPack[blook.pack].push(blook);
     }
+  });
+
+  // Sort each pack by rarity order
+  for (const pack in groupedByPack) {
+    groupedByPack[pack].sort((a, b) => {
+      return rarityOrder.indexOf(a.rarity.toLowerCase()) - rarityOrder.indexOf(b.rarity.toLowerCase());
+    });
+  }
+
+  // Render packs with blooks
+  for (const pack of packs) {
+    const blooksInPack = groupedByPack[pack];
+    if (blooksInPack.length === 0) continue; // skip empty packs
+
+    // Create and style pack header
+    const packHeader = document.createElement('h2');
+    packHeader.textContent = `${pack} Pack`;
+    packHeader.style.color = 'white';
+    packHeader.style.marginTop = '30px';
+    container.appendChild(packHeader);
+
+    // Create a grid container for blooks in this pack
+    const packGrid = document.createElement('div');
+    packGrid.className = 'collection-grid';
+
+    // Create blook cards
+    blooksInPack.forEach((blook, index) => {
+      const card = document.createElement('div');
+      card.className = 'blook-card';
+
+      const img = document.createElement('img');
+      img.src = blook.name;
+      img.alt = decodeURIComponent(blook.name.split('/').pop().split('.')[0]);
+
+      const name = document.createElement('div');
+      name.className = 'blook-name';
+      name.textContent = decodeURIComponent(blook.name.split('/').pop().split('.')[0]);
+
+      const rarity = document.createElement('div');
+      rarity.className = 'rarity-tag';
+      rarity.textContent = blook.rarity;
+      rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
+
+      const quantity = document.createElement('div');
+      quantity.className = 'quantity-badge';
+      quantity.textContent = blook.quantity || 1;
+
+      const sellBtn = document.createElement('button');
+      sellBtn.textContent = 'Sell';
+      sellBtn.style.marginTop = '8px';
+      sellBtn.style.padding = '4px 8px';
+      sellBtn.style.cursor = 'pointer';
+      sellBtn.onclick = () => sellXBlook(collection.indexOf(blook)); // use global index for sell function
+
+      card.appendChild(img);
+      card.appendChild(name);
+      card.appendChild(rarity);
+      card.appendChild(quantity);
+      card.appendChild(sellBtn);
+
+      packGrid.appendChild(card);
+    });
+
+    container.appendChild(packGrid);
+  }
+}
 
     function sellXBlook(index) {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
