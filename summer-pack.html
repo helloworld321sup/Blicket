@@ -6,7 +6,7 @@
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
     body {
-      background-color: rgb(169, 169, 169);
+      background-color: rgb(0, 255, 190);
       margin: 0;
       display: flex;
       justify-content: center;
@@ -123,11 +123,11 @@ if (userData.tokens < PACK_COST) {
     function getRandomBlook() {
     const rand = Math.random() * 100;
     let total = 0;
-    for (const blook of medievalPack.blooks) {
+    for (const blook of summerPack.blooks) {
       total += blook.chance;
       if (rand <= total) return blook;
     }
-    return medievalPack.blooks[medievalPack.blooks.length - 1];
+    return summerPack.blooks[summerPack.blooks.length - 1];
   }
 
   function spawnConfetti(rarity, originX, originY) {
