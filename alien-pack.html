@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Blicket | Alien Pack</title>
+  <link rel="icon" href="favicon.png" type="image/png">
+  <style>
+    body {
+      background-color: rgb(255, 140, 72);
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      font-family: sans-serif;
+    }
+    .pack-wrapper {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      cursor: pointer;
+      z-index: 10;
+    }
+    .half {
+      position: absolute;
+      width: 100%;
+      height: 50%;
+      background-image: url('https://sdmntprwestus2.oaiusercontent.com/files/00000000-e998-61f8-b618-270d678605c0/raw?se=2025-06-01T15%3A27%3A17Z&sp=r&sv=2024-08-04&sr=b&scid=d5ef2426-c0d3-584a-8fb8-eb9e34768ec0&skoid=e9d2f8b1-028a-4cff-8eb1-d0e66fbefcca&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-06-01T11%3A45%3A17Z&ske=2025-06-02T11%3A45%3A17Z&sks=b&skv=2024-08-04&sig=UgSuJO7MBaxkweq9scWpB9txfGR5ukUw%2BeBZitlKGd4%3D');
+      background-size: cover;
+      background-repeat: no-repeat;
+      transition: transform 0.6s ease, opacity 0.6s ease;
+    }
+    .top-half {
+      background-position: top;
+      top: 0;
+    }
+    .bottom-half {
+      background-position: bottom;
+      bottom: 0;
+    }
+    .torn .top-half {
+      transform: translateY(-150%) rotate(-15deg);
+      opacity: 0;
+    }
+    .torn .bottom-half {
+      transform: translateY(150%) rotate(15deg);
+      opacity: 0;
+    }
+    #result {
+      position: absolute;
+      top: 60%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.1);
+      font-size: 4.5rem;
+      color: white;
+      z-index: 15;
+      transition: transform 0.1s ease;
+      pointer-events: none;
+    }
+    #result img {
+      width: 150px;
+      height: auto;
+      user-select: none;
+      pointer-events: none;
+    }
+    .confetti-piece {
+      position: fixed;
+      width: 12px;
+      height: 12px;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 20;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="pack-wrapper" id="pack">
+    <div id="result"></div>
+    <div class="half top-half"></div>
+    <div class="half bottom-half"></div>
+  </div>
+
+  <script>
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) {
+    window.location.href = 'login.html';
+  }
+
+  const PACK_COST = 20;
+let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+
+if (userData.tokens < PACK_COST) {
+  alert("Not enough tokens to open this pack.");
+  window.location.href = "index.html";
+} else {
+  userData.tokens -= PACK_COST;
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+}
+
+  const alienPack = {
+    blooks: [
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-goldfish.png", chance: 18, rarity: 'uncommon' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-mug.png", chance: 18, rarity: 'uncommon' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-ghost.png", chance: 18, rarity: 'uncommon' },
+      { name: "https://ac.blooket.com/marketassets/blooks/alien.svg", chance: 18, rarity: 'uncommon' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-king.png", chance: 10, rarity: 'rare' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-unicorn.png", chance: 10, rarity: 'rare' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-caterpillar-final.png", chance: 6, rarity: 'epic' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-snowman.png", chance: 1.2, rarity: 'legendary' },
+      { name: "https://preview.redd.it/0g4eflh6ceh91.png?width=1252&format=png&auto=webp&s=ba426c277dbf7a89dbd01e108bb4b397895bd9e2", chance: 0.532, rarity: 'legendary' },
+      { name: "https://tiermaker.com/images/template_images/2022/16133095/iblookets-blooks-16133095/alien-blobfish.png", chance: 0.1, rarity: 'chroma' },
+      { name: "https://preview.redd.it/gq1ol7z5ceh91.png?width=1258&format=png&auto=webp&s=72eb5b3df4c152b0f1405c2fa1c8f6689c96e5ea", chance: 0.06, rarity: 'chroma' },
+      { name: "https://static.wikia.nocookie.net/blacket/images/f/fa/65B0AE8B-3768-4A33-A957-FDD13EDF6090.gif/revision/latest?cb=20230308233248", chance: 0.008, rarity: 'mystical' }
+    ]
+  };
+
+  function getRandomBlook() {
+    const rand = Math.random() * 100;
+    let total = 0;
+    for (const blook of alienPack.blooks) {
+      total += blook.chance;
+      if (rand <= total) return blook;
+    }
+    return alienPack.blooks[alienPack.blooks.length - 1];
+  }
+
+  function spawnConfetti(rarity, originX, originY) {
+    const colors = {
+      uncommon: ['#a0e060', '#88c040'],
+      rare: ['#60b0e0', '#4080c0'],
+      epic: ['#c060e0', '#a040c0'],
+      legendary: ['#f7c338', '#d4a217'],
+      chroma: ['#19c0f1', '#19c0f1']
+    };
+
+    const countMap = {
+      uncommon: 40,
+      rare: 60,
+      epic: 80,
+      legendary: 100,
+      chroma: 120
+    };
+
+    const count = countMap[rarity] || 30;
+    const colorSet = colors[rarity] || ['#ffffff'];
+
+    for (let i = 0; i < count; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+
+      let startX = originX || window.innerWidth / 2;
+      let startY = originY || window.innerHeight / 2;
+      let velocityX = 0, velocityY = 0;
+      let gravity = true;
+
+      if (rarity === 'uncommon') {
+        startX += (Math.random() - 0.5) * 130;
+        startY -= 150;
+        velocityX = (Math.random() - 0.5) * 200;
+        velocityY = -Math.random() * 450 - 400;
+      } else if (rarity === 'rare') {
+        const leftCorner = 60;
+        const rightCorner = window.innerWidth - 60;
+        startX = i % 2 === 0 ? leftCorner : rightCorner;
+        startY = window.innerHeight - 80;
+        velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
+        velocityY = -Math.random() * 600 - 300;
+        gravity = false;
+      } else if (rarity === 'epic') {
+        startX = i % 2 === 0 ? 0 : window.innerWidth;
+        startY = Math.random() * window.innerHeight;
+        velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
+        velocityY = (Math.random() - 0.5) * 100;
+        gravity = false;
+      } else if (rarity === 'legendary') {
+        startX = Math.random() * window.innerWidth;
+        startY = -10;
+        velocityX = (Math.random() - 0.5) * 100;
+        velocityY = Math.random() * 100 + 100;
+      } else if (rarity === 'chroma') {
+        const corners = [
+          [0, 0], [window.innerWidth, 0],
+          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+        ];
+        const [x, y] = corners[i % 4];
+        startX = x;
+        startY = y;
+        velocityX = (Math.random() - 0.5) * 600;
+        velocityY = (Math.random() - 0.5) * 600;
+        gravity = false;
+      }
+
+      confetti.style.left = startX + 'px';
+      confetti.style.top = startY + 'px';
+      document.body.appendChild(confetti);
+
+      const duration = Math.random() * 2 + 2;
+
+      confetti.animate([
+        { transform: `translate(0px, 0px)` },
+        { transform: `translate(${velocityX}px, ${velocityY}px)` }
+      ], {
+        duration: duration * 1000,
+        iterations: 1,
+        easing: 'ease-out'
+      });
+
+      if (gravity) {
+        confetti.animate([
+          { transform: 'translateY(0)' },
+          { transform: `translateY(${window.innerHeight}px)` }
+        ], {
+          duration: duration * 1000,
+          iterations: 1,
+          easing: 'ease-in'
+        });
+      }
+
+      setTimeout(() => confetti.remove(), duration * 1000);
+    }
+  }
+
+  let clicked = false;
+  let clickCount = 0;
+
+  document.getElementById('pack').addEventListener('click', function () {
+    if (clicked) return;
+    clicked = true;
+
+    if (clickCount === 0) {
+      this.classList.add('torn');
+
+      const blook = getRandomBlook();
+      if (blook) {
+        const result = document.getElementById('result');
+        result.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = blook.name;
+        img.alt = 'Blook image';
+        result.appendChild(img);
+
+        const collectionKey = `collection_${currentUser}`;
+        let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+
+        const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
+        if (existingBlookIndex !== -1) {
+          collection[existingBlookIndex].quantity += 1;
+        } else {
+          collection.push({ ...blook, quantity: 1 });
+        }
+
+        localStorage.setItem(collectionKey, JSON.stringify(collection));
+
+        setTimeout(() => {
+          result.style.transform = 'translate(-50%, -50%) scale(1)';
+          const rect = result.getBoundingClientRect();
+          const originX = rect.left + rect.width / 2;
+          const originY = rect.top + rect.height / 2;
+          spawnConfetti(blook.rarity, originX, originY);
+          clicked = false;
+        }, 200);
+      }
+      clickCount++;
+    } else {
+      window.location.href = "index.html";
+    }
+  });
+</script>
+</body>
+</html>
