@@ -6,7 +6,7 @@
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
     body {
-      background-color: rgb(255, 140, 72);
+      background-color: rgb(78, 10, 178);
       margin: 0;
       display: flex;
       justify-content: center;
@@ -89,7 +89,7 @@
     window.location.href = 'login.html';
   }
 
-  const PACK_COST = 20;
+  const PACK_COST = 30;
 let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
 if (userData.tokens < PACK_COST) {
