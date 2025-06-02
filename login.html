@@ -113,6 +113,28 @@
     </div>
   </div>
 
+  <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
+    authDomain: "blicket-3dfc7.firebaseapp.com",
+    projectId: "blicket-3dfc7",
+    storageBucket: "blicket-3dfc7.firebasestorage.app",
+    messagingSenderId: "78883670759",
+    appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+</script>
+
+<!-- Your own JS should come after this -->
+<script src="main.js"></script>
+
+
   <script>
     const loginContainer = document.getElementById('loginContainer');
     const errorMessage = document.getElementById('error-message');
@@ -131,22 +153,35 @@ function handleLogin() {
 
   let users = JSON.parse(localStorage.getItem('users')) || {};
 
-  if (users[username]) {
-    if (users[username].password === password) {
-      // Load saved data
-      localStorage.setItem('currentUser', username);
-      localStorage.setItem('currentUserData', JSON.stringify(users[username]));
+  const usersRef = db.collection('users');
+
+async function handleLogin() {
+  const username = ...;
+  const password = ...;
+
+  // get user doc from Firestore
+  const userDoc = await usersRef.doc(username).get();
+
+  if (userDoc.exists) {
+    const userData = userDoc.data();
+    if (userData.password === password) {
+      // success
+      // save user data locally if you want
       flipAndRedirect();
     } else {
-      errorMessage.textContent = 'Incorrect password';
-      errorMessage.style.display = 'block';
+      // wrong password
+      show error
     }
   } else {
-    // New user - register
-    const newUser = {
+    // user doesn't exist, create new
+    await usersRef.doc(username).set({
       password: password,
-      collection: [] // start empty
-    };
+      collection: [],
+      tokens: 0
+    });
+    flipAndRedirect();
+  }
+}
     users[username] = newUser;
     localStorage.setItem('users', JSON.stringify(users));
     localStorage.setItem('currentUser', username);
