@@ -114,95 +114,76 @@
   </div>
 
   <!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
-    authDomain: "blicket-3dfc7.firebaseapp.com",
-    projectId: "blicket-3dfc7",
-    storageBucket: "blicket-3dfc7.firebasestorage.app",
-    messagingSenderId: "78883670759",
-    appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
-
-<!-- Your own JS should come after this -->
-<script src="main.js"></script>
-
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
 
   <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
+      authDomain: "blicket-3dfc7.firebaseapp.com",
+      projectId: "blicket-3dfc7",
+      storageBucket: "blicket-3dfc7.firebasestorage.app",
+      messagingSenderId: "78883670759",
+      appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const loginContainer = document.getElementById('loginContainer');
     const errorMessage = document.getElementById('error-message');
 
-function handleLogin() {
-  const username = document.getElementById('username').value.trim();
-  const password = document.getElementById('password').value.trim();
+    async function handleLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-  errorMessage.style.display = 'none';
+      errorMessage.style.display = 'none';
 
-  if (!username || !password) {
-    errorMessage.textContent = 'Please fill in all fields';
-    errorMessage.style.display = 'block';
-    return;
-  }
+      if (!username || !password) {
+        errorMessage.textContent = 'Please fill in all fields';
+        errorMessage.style.display = 'block';
+        return;
+      }
 
-  let users = JSON.parse(localStorage.getItem('users')) || {};
+      try {
+        const userDoc = await db.collection('users').doc(username).get();
 
-  const usersRef = db.collection('users');
-
-async function handleLogin() {
-  const username = ...;
-  const password = ...;
-
-  // get user doc from Firestore
-  const userDoc = await usersRef.doc(username).get();
-
-  if (userDoc.exists) {
-    const userData = userDoc.data();
-    if (userData.password === password) {
-      // success
-      // save user data locally if you want
-      flipAndRedirect();
-    } else {
-      // wrong password
-      show error
+        if (userDoc.exists) {
+          const userData = userDoc.data();
+          if (userData.password === password) {
+            // Login success
+            flipAndRedirect();
+          } else {
+            errorMessage.textContent = 'Incorrect password';
+            errorMessage.style.display = 'block';
+          }
+        } else {
+          // New user - register
+          await db.collection('users').doc(username).set({
+            password: password,
+            collection: [],
+            tokens: 0
+          });
+          flipAndRedirect();
+        }
+      } catch (error) {
+        errorMessage.textContent = 'Error connecting to server';
+        errorMessage.style.display = 'block';
+        console.error(error);
+      }
     }
-  } else {
-    // user doesn't exist, create new
-    await usersRef.doc(username).set({
-      password: password,
-      collection: [],
-      tokens: 0
-    });
-    flipAndRedirect();
-  }
-}
-    users[username] = newUser;
-    localStorage.setItem('users', JSON.stringify(users));
-    localStorage.setItem('currentUser', username);
-    localStorage.setItem('currentUserData', JSON.stringify(newUser));
-    flipAndRedirect();
-  }
-}
 
     function flipAndRedirect() {
       loginContainer.classList.add('flipped');
-      // wait for the flip animation, then redirect
       setTimeout(() => {
         window.location.href = 'index.html';
-      }, 800); // matches the CSS transition duration
+      }, 800);
     }
 
-    // handle enter key
-    document.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        handleLogin();
-      }
+    // Enter key login
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleLogin();
     });
   </script>
 </body>
