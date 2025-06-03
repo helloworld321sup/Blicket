@@ -114,8 +114,8 @@
   </div>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -135,51 +135,54 @@
     const errorMessage = document.getElementById('error-message');
 
     async function handleLogin() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value.trim();
+  const errorMessage = document.getElementById('error-message');
 
-      errorMessage.style.display = 'none';
+  errorMessage.style.display = 'none';
 
-      if (!username || !password) {
-        errorMessage.textContent = 'Please fill in all fields';
+  if (!username || !password) {
+    errorMessage.textContent = 'Please fill in all fields';
+    errorMessage.style.display = 'block';
+    return;
+  }
+
+  try {
+    const userDoc = await db.collection('users').doc(username).get();
+
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      if (userData.password === password) {
+        // Login success
+        flipAndRedirect();
+      } else {
+        errorMessage.textContent = 'Incorrect password';
         errorMessage.style.display = 'block';
-        return;
       }
-
-      try {
-        const userDoc = await db.collection('users').doc(username).get();
-
-        if (userDoc.exists) {
-          const userData = userDoc.data();
-          if (userData.password === password) {
-            // Login success
-            flipAndRedirect();
-          } else {
-            errorMessage.textContent = 'Incorrect password';
-            errorMessage.style.display = 'block';
-          }
-        } else {
-          // New user - register
-          await db.collection('users').doc(username).set({
-            password: password,
-            collection: [],
-            tokens: 0
-          });
-          flipAndRedirect();
-        }
-      } catch (error) {
-        errorMessage.textContent = 'Error connecting to server';
-        errorMessage.style.display = 'block';
-        console.error(error);
-      }
+    } else {
+      // Register new user
+      await db.collection('users').doc(username).set({
+        password: password,
+        collection: [],
+        tokens: 0
+      });
+      flipAndRedirect();
     }
+  } catch (error) {
+    console.error(error);
+    errorMessage.textContent = 'Error connecting to server';
+    errorMessage.style.display = 'block';
+  }
+}
 
     function flipAndRedirect() {
-      loginContainer.classList.add('flipped');
-      setTimeout(() => {
-        window.location.href = 'index.html';
-      }, 800);
-    }
+  const username = document.getElementById('username').value.trim();
+  localStorage.setItem('username', username); // 👈 this is new
+  loginContainer.classList.add('flipped');
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 800);
+}
 
     // Enter key login
     document.addEventListener('keypress', (e) => {
