@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Blicket | Packs</title>
-  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="icon" href="favicon.png" type="image/png">
   <style>
-    /* Your existing styles here, unchanged */
     body {
       background-color: #ff4b37;
       margin: 0;
       font-family: sans-serif;
     }
+
     .bottom-left {
       position: fixed;
       bottom: 20px;
@@ -21,6 +21,7 @@
       gap: 10px;
       align-items: flex-start;
     }
+
     #logout-button,
     #collection-button {
       padding: 10px 20px;
@@ -30,11 +31,13 @@
       cursor: pointer;
       font-weight: bold;
     }
+
     #username-display {
       color: white;
       font-size: 16px;
       margin-bottom: 5px;
     }
+
     .pack-container {
       display: flex;
       justify-content: center;
@@ -43,6 +46,7 @@
       gap: 20px;
       flex-wrap: wrap;
     }
+
     .pack-card {
       width: 220px;
       background-color: #f5f5f5;
@@ -53,21 +57,24 @@
       transition: transform 0.2s, box-shadow 0.2s;
       text-decoration: none;
       color: black;
-      cursor: pointer;
     }
+
     .pack-card:hover {
       transform: scale(1.05);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     }
+
     .pack-card img {
       width: 120px;
       height: auto;
       margin-bottom: 15px;
     }
+
     .pack-card h3 {
       margin: 10px 0 5px;
       font-size: 20px;
     }
+
     .breakfast { background-color: #eb7b38; }
     .videogame { background-color: #0d1772; }
     .fruit     { background-color: #c3c3c3; }
@@ -76,14 +83,16 @@
     .summer    { background-color: #00ffbe; }
     .alien     { background-color: #4e0ab2; }
   </style>
-  <!-- Firebase App (the core Firebase SDK) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <!-- Firebase Auth -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-  <!-- Firebase Firestore -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 </head>
 <body>
+
+  <script>
+    // Redirect to login.html if no user is logged in
+    const user = localStorage.getItem("currentUser");
+    if (!user) {
+      window.location.href = "login.html";
+    }
+  </script>
 
   <!-- Top Left: Logout + View Collection + Username -->
   <div class="bottom-left">
@@ -96,123 +105,82 @@
   </div>
 
   <!-- Pack Cards -->
-  <div class="pack-container">
-    <div class="pack-card breakfast" data-cost="20" data-href="breakfast-pack.html">
-      <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack" />
-      <h3>20 🪙</h3>
-    </div>
-    <div class="pack-card fruit" data-cost="20" data-href="fruit-pack.html">
-      <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack" />
-      <h3>20 🪙</h3>
-    </div>
-    <div class="pack-card videogame" data-cost="25" data-href="videogame-pack.html">
-      <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack" />
-      <h3>25 🪙</h3>
-    </div>
-    <div class="pack-card blizzard" data-cost="25" data-href="blizzard-pack.html">
-      <img src="https://blacket.org/content/packs/Blizzard.webp" alt="Blizzard Pack" />
-      <h3>25 🪙</h3>
-    </div>
-    <div class="pack-card medieval" data-cost="25" data-href="medieval-pack.html">
-      <img src="https://blacket.org/content/packs/Medieval.webp" alt="Medieval Pack" />
-      <h3>25 🪙</h3>
-    </div>
-    <div class="pack-card summer" data-cost="25" data-href="summer-pack.html">
-      <img src="https://blacket.org/content/packs/Summer.webp" alt="Summer Pack" />
-      <h3>25 🪙</h3>
-    </div>
-    <div class="pack-card alien" data-cost="30" data-href="alien-pack.html">
-      <img src="alien-pack.png" alt="Alien Pack" />
-      <h3>30 🪙 All new, and completely Blicket made!</h3>
-    </div>
+  <!-- Pack Cards (changed from <a> to <div> with data-cost and data-href) -->
+<div class="pack-container">
+  <div class="pack-card breakfast" data-cost="20" data-href="breakfast-pack.html">
+    <img src="https://ac.blooket.com/dashclassic/assets/Breakfast_Pack-Dbk28uOc.png" alt="Breakfast Pack">
+    <h3>20 🪙</h3>
   </div>
 
+  <div class="pack-card fruit" data-cost="20" data-href="fruit-pack.html">
+    <img src="https://blacket.org/content/packs/Fruit.webp" alt="Fruit Pack">
+    <h3>20 🪙</h3>
+  </div>
+
+  <div class="pack-card videogame" data-cost="25" data-href="videogame-pack.html">
+    <img src="https://blacket.org/content/packs/Video%20Game.webp" alt="Video Game Pack">
+    <h3>25 🪙</h3>
+  </div>
+
+  <div class="pack-card blizzard" data-cost="25" data-href="blizzard-pack.html">
+    <img src="https://blacket.org/content/packs/Blizzard.webp" alt="Blizzard Pack">
+    <h3>25 🪙</h3>
+  </div>
+
+  <div class="pack-card medieval" data-cost="25" data-href="medieval-pack.html">
+    <img src="https://blacket.org/content/packs/Medieval.webp" alt="Medieval Pack">
+    <h3>25 🪙</h3>
+  </div>
+
+  <div class="pack-card summer" data-cost="25" data-href="summer-pack.html">
+    <img src="https://blacket.org/content/packs/Summer.webp" alt="Summer Pack">
+    <h3>25 🪙</h3>
+  </div>
+
+  <div class="pack-card alien" data-cost="25" data-href="alien-pack.html">
+    <img src="alien-pack.png" alt="Alien Pack">
+    <h3>30 🪙 All new, and completely Blicket made!</h3>
+  </div>
+</div>
+
   <script>
-    // Your Firebase config here (replace with your actual config)
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_PROJECT_ID.appspot.com",
-      messagingSenderId: "YOUR_SENDER_ID",
-      appId: "YOUR_APP_ID"
+    document.getElementById("logout-button").onclick = function () {
+      localStorage.removeItem("currentUser");
+      window.location.href = "login.html";
     };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    const displayName = localStorage.getItem("currentUser");
+    if (displayName) {
+      document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
+    }
 
     const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
 
-    let currentUserDoc = null; // will hold Firestore user doc snapshot
-
-    // Redirect to login.html if no user is logged in
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Update username display
-      document.getElementById("username-display").textContent = "Hello, " + (user.displayName || user.email) + "!";
-
-      // Load user data from Firestore
-      try {
-        const docRef = db.collection("users").doc(user.uid);
-        const docSnap = await docRef.get();
-
-        if (!docSnap.exists) {
-          // Create new user doc if missing
-          await docRef.set({ tokens: 0, lastWheelSpin: 0 });
-          currentUserDoc = { tokens: 0, lastWheelSpin: 0 };
-        } else {
-          currentUserDoc = docSnap.data();
-        }
-      } catch (e) {
-        console.error("Error loading user data:", e);
-        alert("Failed to load user data.");
-      }
-
-      updateTokenDisplay();
-      updateWheelUI();
-    });
-
-    document.getElementById("logout-button").onclick = () => {
-      auth.signOut().then(() => {
-        window.location.href = "login.html";
-      });
-    };
-
-    function updateTokenDisplay() {
-      if (!currentUserDoc) return;
-      const tokens = currentUserDoc.tokens || 0;
-      const display = document.getElementById("tokenDisplay");
-      if (display) {
-        display.textContent = `Tokens: ${tokens}`;
-      }
-    }
-
     function canSpinWheel() {
-      if (!currentUserDoc) return false;
-      const lastSpin = currentUserDoc.lastWheelSpin || 0;
-      return Date.now() - lastSpin >= SPIN_INTERVAL;
+      const user = localStorage.getItem("currentUser");
+      if (!user) return false;
+      const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
+      if (!lastSpin) return true;
+      return Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
     }
 
     function updateWheelUI() {
       const btn = document.getElementById("spinWheelBtn");
       const msg = document.getElementById("wheelMessage");
-      if (!currentUserDoc) {
+      const user = localStorage.getItem("currentUser");
+      if (!user) {
         btn.disabled = true;
-        msg.textContent = "Loading...";
+        msg.textContent = "Log in to spin the wheel.";
         return;
       }
+
+      const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
 
       if (canSpinWheel()) {
         btn.disabled = false;
         msg.textContent = "Ready to spin!";
       } else {
-        const nextSpin = new Date(currentUserDoc.lastWheelSpin + SPIN_INTERVAL);
+        const nextSpin = new Date(parseInt(lastSpin) + SPIN_INTERVAL);
         const timeLeft = nextSpin - Date.now();
         const hours = Math.floor(timeLeft / (1000 * 60 * 60));
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
@@ -221,7 +189,7 @@
       }
     }
 
-    async function spinWheel() {
+    function spinWheel() {
       if (!canSpinWheel()) {
         alert("You must wait 12 hours between spins.");
         return;
@@ -251,95 +219,71 @@
         }
       }
 
-      try {
-        const user = auth.currentUser;
-        if (!user) throw new Error("Not authenticated");
+      const user = localStorage.getItem("currentUser");
+      // Load user data object or create default
+      let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
 
-        const userRef = db.collection("users").doc(user.uid);
+      // Add tokens
+      userData.tokens += selected.tokens;
 
-        // Transaction to safely update tokens and lastWheelSpin
-        await db.runTransaction(async (transaction) => {
-          const doc = await transaction.get(userRef);
-          if (!doc.exists) throw "User doc missing";
+      // Save user data back
+      localStorage.setItem(`user_${user}`, JSON.stringify(userData));
 
-          const data = doc.data();
-          const currentTokens = data.tokens || 0;
-          const lastSpin = data.lastWheelSpin || 0;
+      localStorage.setItem(`lastWheelSpin_${user}`, Date.now());
 
-          if (Date.now() - lastSpin < SPIN_INTERVAL) {
-            throw "Spin cooldown active";
-          }
+      document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
+      document.getElementById("spinWheelBtn").disabled = true;
+      updateTokenDisplay();
+    }
 
-          transaction.update(userRef, {
-            tokens: currentTokens + selected.tokens,
-            lastWheelSpin: Date.now()
-          });
+    function updateTokenDisplay() {
+      const user = localStorage.getItem("currentUser");
+      if (!user) return;
 
-          // Update local copy
-          currentUserDoc.tokens = currentTokens + selected.tokens;
-          currentUserDoc.lastWheelSpin = Date.now();
-        });
+      let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+      const tokens = userData.tokens || 0;
 
-        document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens! Come back in 12 hours.`;
-        document.getElementById("spinWheelBtn").disabled = true;
-        updateTokenDisplay();
-        updateWheelUI();
-
-      } catch (error) {
-        console.error("Spin failed:", error);
-        alert(typeof error === "string" ? error : "Failed to spin the wheel.");
+      const display = document.getElementById("tokenDisplay");
+      if (display) {
+        display.textContent = `Tokens: ${tokens}`;
       }
     }
 
-    // Handle pack card clicks: check tokens and redirect if enough tokens
+    window.onload = function() {
+      const user = localStorage.getItem("currentUser");
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById("username-display").textContent = "Hello, " + user + "!";
+
+      // Initialize user object if missing
+      if (!localStorage.getItem(`user_${user}`)) {
+        localStorage.setItem(`user_${user}`, JSON.stringify({ tokens: 0 }));
+      }
+
+      updateTokenDisplay();
+      updateWheelUI();
+    };
+
+    updateWheelUI();
+    updateTokenDisplay();
+    setInterval(updateWheelUI, 60000); // Update every 1 min
+
     document.querySelectorAll('.pack-card').forEach(card => {
-      card.addEventListener('click', async () => {
-        if (!currentUserDoc) {
-          alert("User data not loaded.");
-          return;
-        }
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', () => {
+    const cost = parseInt(card.getAttribute('data-cost'), 10);
+    const href = card.getAttribute('data-href');
+    const user = localStorage.getItem('currentUser');
+    if (!user) return alert('Not logged in.');
 
-        const cost = parseInt(card.getAttribute('data-cost'), 10);
-        const href = card.getAttribute('data-href');
+    let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+window.location.href = href;
+  });
+});
 
-        if ((currentUserDoc.tokens || 0) < cost) {
-          alert("You don't have enough tokens to open this pack.");
-          return;
-        }
-
-        try {
-          const user = auth.currentUser;
-          if (!user) throw new Error("Not authenticated");
-
-          const userRef = db.collection("users").doc(user.uid);
-
-          // Use transaction to deduct tokens safely
-          await db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(userRef);
-            if (!doc.exists) throw "User doc missing";
-
-            const data = doc.data();
-            const currentTokens = data.tokens || 0;
-
-            if (currentTokens < cost) throw "Insufficient tokens";
-
-            transaction.update(userRef, {
-              tokens: currentTokens - cost
-            });
-
-            // Update local copy
-            currentUserDoc.tokens = currentTokens - cost;
-          });
-
-          updateTokenDisplay();
-          window.location.href = href;
-
-        } catch (error) {
-          console.error("Error opening pack:", error);
-          alert(typeof error === "string" ? error : "Failed to open pack.");
-        }
-      });
-    });
   </script>
 </body>
 </html>
