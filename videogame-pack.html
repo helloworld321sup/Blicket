@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Blicket | Video Game Pack</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="favicon.png" type="image/png" />
   <style>
     body {
       background-color: rgb(21, 14, 90);
@@ -15,8 +15,8 @@
       overflow: hidden;
       position: relative;
       font-family: sans-serif;
+      user-select: none;
     }
-
     .pack-wrapper {
       position: relative;
       width: 300px;
@@ -24,7 +24,6 @@
       cursor: pointer;
       z-index: 10;
     }
-
     .half {
       position: absolute;
       width: 100%;
@@ -34,27 +33,22 @@
       background-repeat: no-repeat;
       transition: transform 0.6s ease, opacity 0.6s ease;
     }
-
     .top-half {
       background-position: top;
       top: 0;
     }
-
     .bottom-half {
       background-position: bottom;
       bottom: 0;
     }
-
     .torn .top-half {
       transform: translateY(-150%) rotate(-15deg);
       opacity: 0;
     }
-
     .torn .bottom-half {
       transform: translateY(150%) rotate(15deg);
       opacity: 0;
     }
-
     #result {
       position: absolute;
       top: 60%;
@@ -65,15 +59,14 @@
       z-index: 15;
       transition: transform 0.1s ease;
       pointer-events: none;
+      user-select: none;
     }
-
     #result img {
       width: 150px;
       height: auto;
-      user-select: none;
       pointer-events: none;
+      user-select: none;
     }
-
     .confetti-piece {
       position: fixed;
       width: 12px;
@@ -82,6 +75,7 @@
       pointer-events: none;
       z-index: 20;
       border-radius: 2px;
+      user-select: none;
     }
   </style>
 </head>
@@ -92,24 +86,32 @@
     <div class="half bottom-half"></div>
   </div>
 
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) {
-    window.location.href = 'login.html';
-  }
+    // REPLACE THIS WITH YOUR ACTUAL FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
 
-  const PACK_COST = 25;
-let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
 
-if (userData.tokens < PACK_COST) {
-  alert("Not enough tokens to open this pack.");
-  window.location.href = "index.html";
-} else {
-  userData.tokens -= PACK_COST;
-  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
-}
+    const PACK_COST = 25;
+    const packWrapper = document.getElementById('pack');
+    const result = document.getElementById('result');
 
-
+    // Video Game Pack Blooks & odds
     const videoGamePack = {
       blooks: [
         { name: "https://blacket.org/content/blooks/Pac-Man.webp", chance: 13, rarity: 'uncommon' },
@@ -131,175 +133,156 @@ if (userData.tokens < PACK_COST) {
       ]
     };
 
+    // Pick blook based on weighted chances
     function getRandomBlook() {
-    const rand = Math.random() * 100;
-    let total = 0;
-    for (const blook of videoGamePack.blooks) {
-      total += blook.chance;
-      if (rand <= total) return blook;
-    }
-    return videoGamePack.blooks[videoGamePack.blooks.length - 1];
-  }
-
-  function spawnConfetti(rarity, originX, originY) {
-    const colors = {
-      uncommon: ['#a0e060', '#88c040'],
-      rare: ['#60b0e0', '#4080c0'],
-      epic: ['#c060e0', '#a040c0'],
-      legendary: ['#f7c338', '#d4a217'],
-      chroma: ['#19c0f1', '#19c0f1'],
-      mystical: ['#ffffff', '#ca17e6']
-    };
-
-    const countMap = {
-      uncommon: 40,
-      rare: 60,
-      epic: 80,
-      legendary: 100,
-      chroma: 120,
-      mystical: 150
-    };
-
-    const count = countMap[rarity] || 30;
-    const colorSet = colors[rarity] || ['#ffffff'];
-
-    for (let i = 0; i < count; i++) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-
-      let startX = originX || window.innerWidth / 2;
-      let startY = originY || window.innerHeight / 2;
-      let velocityX = 0, velocityY = 0;
-      let gravity = true;
-
-      if (rarity === 'uncommon') {
-        startX += (Math.random() - 0.5) * 130;
-        startY -= 150;
-        velocityX = (Math.random() - 0.5) * 200;
-        velocityY = -Math.random() * 450 - 400;
-      } else if (rarity === 'rare') {
-        const leftCorner = 60;
-        const rightCorner = window.innerWidth - 60;
-        startX = i % 2 === 0 ? leftCorner : rightCorner;
-        startY = window.innerHeight - 80;
-        velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
-        velocityY = -Math.random() * 600 - 300;
-        gravity = false;
-      } else if (rarity === 'epic') {
-        startX = i % 2 === 0 ? 0 : window.innerWidth;
-        startY = Math.random() * window.innerHeight;
-        velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-        velocityY = (Math.random() - 0.5) * 100;
-        gravity = false;
-      } else if (rarity === 'legendary') {
-        startX = Math.random() * window.innerWidth;
-        startY = -10;
-        velocityX = (Math.random() - 0.5) * 100;
-        velocityY = Math.random() * 100 + 100;
-      } else if (rarity === 'chroma') {
-        const corners = [
-          [0, 0], [window.innerWidth, 0],
-          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-        ];
-        const [x, y] = corners[i % 4];
-        startX = x;
-        startY = y;
-        velocityX = (Math.random() - 0.5) * 600;
-        velocityY = (Math.random() - 0.5) * 600;
-        gravity = false;
-      } else if (rarity === 'mystical') {
-        const corners = [
-          [0, 0], [window.innerWidth, 0],
-          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-        ];
-        const [x, y] = corners[i % 4];
-        startX = x;
-        startY = y;
-        velocityX = (Math.random() - 0.5) * 800;
-        velocityY = (Math.random() - 0.5) * 800;
-        gravity = false;
-        confetti.style.width = '14px';
-        confetti.style.height = '14px';
-        confetti.style.borderRadius = '50%';
-        confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
+      const rand = Math.random() * 100;
+      let total = 0;
+      for (const blook of videoGamePack.blooks) {
+        total += blook.chance;
+        if (rand <= total) return blook;
       }
+      return videoGamePack.blooks[videoGamePack.blooks.length - 1]; // fallback
+    }
 
-      confetti.style.left = startX + 'px';
-      confetti.style.top = startY + 'px';
-      document.body.appendChild(confetti);
+    // Confetti spawning based on rarity and origin point
+    function spawnConfetti(rarity, originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
+      const colors = {
+        uncommon: ['#a0e060', '#88c040'],
+        rare: ['#60b0e0', '#4080c0'],
+        epic: ['#c060e0', '#a040c0'],
+        legendary: ['#f7c338', '#d4a217'],
+        chroma: ['#19c0f1', '#19c0f1'],
+        mystical: ['#ffffff', '#ca17e6']
+      };
 
-      const duration = Math.random() * 2 + 2;
+      const countMap = {
+        uncommon: 40,
+        rare: 60,
+        epic: 80,
+        legendary: 100,
+        chroma: 120,
+        mystical: 150
+      };
 
-      confetti.animate([
-        { transform: `translate(0px, 0px)` },
-        { transform: `translate(${velocityX}px, ${velocityY}px)` }
-      ], {
-        duration: duration * 1000,
-        iterations: 1,
-        easing: 'ease-out'
-      });
+      const count = countMap[rarity] || 30;
+      const colorSet = colors[rarity] || ['#ffffff'];
 
-      if (gravity) {
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+
+        let startX = originX + (Math.random() - 0.5) * 150;
+        let startY = originY + (Math.random() - 0.5) * 150;
+        let velocityX = (Math.random() - 0.5) * 600;
+        let velocityY = -Math.random() * 600 - 300;
+
+        confetti.style.left = startX + 'px';
+        confetti.style.top = startY + 'px';
+        document.body.appendChild(confetti);
+
+        const duration = Math.random() * 2 + 2;
+
         confetti.animate([
-          { transform: 'translateY(0)' },
-          { transform: `translateY(${window.innerHeight}px)` }
+          { transform: 'translate(0, 0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${velocityX}px, ${velocityY}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
         ], {
           duration: duration * 1000,
           iterations: 1,
-          easing: 'ease-in'
+          easing: 'ease-out'
         });
+
+        setTimeout(() => confetti.remove(), duration * 1000);
+      }
+    }
+
+    // Torn pack animation + result showing + saving to Firestore
+    let clicked = false;
+    packWrapper.addEventListener('click', async () => {
+      if (clicked) return;
+      clicked = true;
+
+      const user = auth.currentUser;
+      if (!user) {
+        alert("You must be logged in to open packs.");
+        window.location.href = "login.html";
+        return;
       }
 
-      setTimeout(() => confetti.remove(), duration * 1000);
-    }
-  }
+      const userDocRef = db.collection('users').doc(user.uid);
+      try {
+        const userDoc = await userDocRef.get();
+        if (!userDoc.exists) {
+          alert("User data missing, logging out.");
+          await auth.signOut();
+          window.location.href = "login.html";
+          return;
+        }
+        const userData = userDoc.data();
 
-  let clicked = false;
-  let clickCount = 0;
+        if ((userData.tokens ?? 0) < PACK_COST) {
+          alert("You don't have enough tokens to open this pack.");
+          window.location.href = "index.html";
+          return;
+        }
 
-  document.getElementById('pack').addEventListener('click', function () {
-    if (clicked) return;
-    clicked = true;
+        // Deduct tokens atomically
+        await userDocRef.update({
+          tokens: firebase.firestore.FieldValue.increment(-PACK_COST)
+        });
 
-    if (clickCount === 0) {
-      this.classList.add('torn');
+        // Animate torn pack
+        packWrapper.classList.add('torn');
 
-      const blook = getRandomBlook();
-      if (blook) {
-        const result = document.getElementById('result');
+        // Get random blook
+        const blook = getRandomBlook();
+
+        // Show result blook image
         result.innerHTML = '';
         const img = document.createElement('img');
         img.src = blook.name;
         img.alt = 'Blook image';
         result.appendChild(img);
 
-        const collectionKey = `collection_${currentUser}`;
-        let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
-
-        const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
-        if (existingBlookIndex !== -1) {
-          collection[existingBlookIndex].quantity += 1;
-        } else {
-          collection.push({ ...blook, quantity: 1 });
-        }
-
-        localStorage.setItem(collectionKey, JSON.stringify(collection));
-
+        // Animate blook appearing with a scale-up
         setTimeout(() => {
           result.style.transform = 'translate(-50%, -50%) scale(1)';
           const rect = result.getBoundingClientRect();
-          const originX = rect.left + rect.width / 2;
-          const originY = rect.top + rect.height / 2;
-          spawnConfetti(blook.rarity, originX, originY);
-          clicked = false;
-        }, 200);
+          spawnConfetti(blook.rarity, rect.left + rect.width / 2, rect.top + rect.height / 2);
+        }, 700);
+
+        // Save blook to user's collection in Firestore
+        const collectionRef = userDocRef.collection('collection').doc(blook.name);
+        const collectionDoc = await collectionRef.get();
+
+        if (collectionDoc.exists) {
+          await collectionRef.update({
+            quantity: firebase.firestore.FieldValue.increment(1),
+            rarity: blook.rarity
+          });
+        } else {
+          await collectionRef.set({
+            quantity: 1,
+            rarity: blook.rarity
+          });
+        }
+
+      } catch (error) {
+        console.error("Error opening pack:", error);
+        alert("There was an error. Try refreshing.");
+        clicked = false;
+        packWrapper.classList.remove('torn');
+        result.style.transform = 'translate(-50%, -50%) scale(0.1)';
+        result.innerHTML = '';
       }
-      clickCount++;
-    } else {
-      window.location.href = "index.html";
-    }
-  });
-</script>
+    });
+
+    // Redirect to login if user is not logged in
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+  </script>
 </body>
 </html>
