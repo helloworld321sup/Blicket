@@ -92,22 +92,51 @@
     <div class="half bottom-half"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
   <script>
+    async function main() {
+  await checkAndDeductTokens();
+      
+const firebaseConfig = {
+  apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
+  storageBucket: "blicket-3dfc7.appspot.com",
+  projectId: "blicket-3dfc7",
+  storageBucket: "blicket-3dfc7.firebasestorage.app",
+  messagingSenderId: "78883670759",
+  appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
   const currentUser = localStorage.getItem('currentUser');
   if (!currentUser) {
     window.location.href = 'login.html';
   }
 
   const PACK_COST = 25;
-let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
+async function checkAndDeductTokens() {
+  const userDocRef = db.collection('users').doc(currentUser);
 
-if (userData.tokens < PACK_COST) {
-  alert("Not enough tokens to open this pack.");
-  window.location.href = "index.html";
-} else {
-  userData.tokens -= PACK_COST;
-  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+  try {
+    await db.runTransaction(async (transaction) => {
+      const userDoc = await transaction.get(userDocRef);
+      if (!userDoc.exists) throw "User not found";
+
+      const tokens = userDoc.data().tokens || 0;
+      if (tokens < PACK_COST) throw "Not enough tokens";
+
+      transaction.update(userDocRef, { tokens: tokens - PACK_COST });
+    });
+  } catch (e) {
+    alert(e);
+    window.location.href = "index.html";
+  }
 }
+
+await checkAndDeductTokens();
 
 
     const videoGamePack = {
@@ -274,17 +303,23 @@ if (userData.tokens < PACK_COST) {
         img.alt = 'Blook image';
         result.appendChild(img);
 
-        const collectionKey = `collection_${currentUser}`;
-        let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
+const userDocRef = db.collection('users').doc(currentUser);
+const collectionRef = userDocRef.collection('collection');
+const blookDocRef = collectionRef.doc(blook.name);
 
-        const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
-        if (existingBlookIndex !== -1) {
-          collection[existingBlookIndex].quantity += 1;
-        } else {
-          collection.push({ ...blook, quantity: 1 });
-        }
-
-        localStorage.setItem(collectionKey, JSON.stringify(collection));
+await db.runTransaction(async (transaction) => {
+  const blookDoc = await transaction.get(blookDocRef);
+  if (blookDoc.exists) {
+    const qty = blookDoc.data().quantity || 0;
+    transaction.update(blookDocRef, { quantity: qty + 1 });
+  } else {
+    transaction.set(blookDocRef, {
+      name: blook.name,
+      rarity: blook.rarity,
+      quantity: 1
+    });
+  }
+});
 
         setTimeout(() => {
           result.style.transform = 'translate(-50%, -50%) scale(1)';
