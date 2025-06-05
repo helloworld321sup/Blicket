@@ -278,10 +278,14 @@
     });
 
     // Redirect to login if user is not logged in
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
+    aauth.onAuthStateChanged(user => {
+  if (!user) {
+    // Wait a short delay to ensure Firebase finished checking
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 100); // 100ms is usually enough
+  }
+});
     });
   </script>
 </body>
