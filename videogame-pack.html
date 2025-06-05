@@ -16,6 +16,7 @@
       position: relative;
       font-family: sans-serif;
     }
+
     .pack-wrapper {
       position: relative;
       width: 300px;
@@ -23,6 +24,7 @@
       cursor: pointer;
       z-index: 10;
     }
+
     .half {
       position: absolute;
       width: 100%;
@@ -32,22 +34,27 @@
       background-repeat: no-repeat;
       transition: transform 0.6s ease, opacity 0.6s ease;
     }
+
     .top-half {
       background-position: top;
       top: 0;
     }
+
     .bottom-half {
       background-position: bottom;
       bottom: 0;
     }
+
     .torn .top-half {
       transform: translateY(-150%) rotate(-15deg);
       opacity: 0;
     }
+
     .torn .bottom-half {
       transform: translateY(150%) rotate(15deg);
       opacity: 0;
     }
+
     #result {
       position: absolute;
       top: 60%;
@@ -59,12 +66,14 @@
       transition: transform 0.1s ease;
       pointer-events: none;
     }
+
     #result img {
       width: 150px;
       height: auto;
       user-select: none;
       pointer-events: none;
     }
+
     .confetti-piece {
       position: fixed;
       width: 12px;
@@ -75,11 +84,6 @@
       border-radius: 2px;
     }
   </style>
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
   <div class="pack-wrapper" id="pack">
@@ -89,73 +93,22 @@
   </div>
 
   <script>
-    const PACK_COST = 25;
+  const currentUser = localStorage.getItem('currentUser');
+  if (!currentUser) {
+    window.location.href = 'login.html';
+  }
 
-    const firebaseConfig = {
-  apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
-  authDomain: "blicket-3dfc7.firebaseapp.com",
-  projectId: "blicket-3dfc7",
-  storageBucket: "blicket-3dfc7.firebasestorage.app",
-  messagingSenderId: "78883670759",
-  appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
-};
+  const PACK_COST = 25;
+let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+if (userData.tokens < PACK_COST) {
+  alert("Not enough tokens to open this pack.");
+  window.location.href = "index.html";
+} else {
+  userData.tokens -= PACK_COST;
+  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
+}
 
-    // Still use localStorage for redirecting logic like you wanted
-    const currentUser = localStorage.getItem('currentUser');
-    if (!currentUser) {
-      window.location.href = 'login.html';
-    }
-
-    // Once user exists in localStorage, sign in anonymously or with existing Firebase Auth user
-    // Here, we'll use anonymous sign-in as placeholder; you can replace with your own Auth method
-    auth.signInAnonymously().catch(err => {
-      alert('Firebase auth error: ' + err.message);
-      window.location.href = 'login.html';
-    });
-
-    auth.onAuthStateChanged(async (user) => {
-      if (!user) {
-        // User signed out, redirect to login
-        window.location.href = 'login.html';
-        return;
-      }
-
-      // Use Firebase user uid as unique id to store data (or map your localStorage user to this uid)
-      // For now, use localStorage username as doc id for simplicity:
-      const userId = currentUser;
-
-      try {
-        const userDocRef = db.collection('users').doc(userId);
-        const userDoc = await userDocRef.get();
-
-        if (!userDoc.exists) {
-          alert('User data not found.');
-          window.location.href = 'login.html';
-          return;
-        }
-
-        const userData = userDoc.data();
-
-        if (userData.tokens < PACK_COST) {
-          alert("Not enough tokens to open this pack.");
-          window.location.href = "index.html";
-          return;
-        }
-
-        // Deduct tokens
-        await userDocRef.update({ tokens: userData.tokens - PACK_COST });
-
-        startPackOpening(userId);
-      } catch (error) {
-        alert('Error loading user data: ' + error.message);
-        window.location.href = 'index.html';
-      }
-    });
 
     const videoGamePack = {
       blooks: [
@@ -179,185 +132,174 @@
     };
 
     function getRandomBlook() {
-      const rand = Math.random() * 100;
-      let total = 0;
-      for (const blook of videoGamePack.blooks) {
-        total += blook.chance;
-        if (rand <= total) return blook;
-      }
-      return videoGamePack.blooks[videoGamePack.blooks.length - 1];
+    const rand = Math.random() * 100;
+    let total = 0;
+    for (const blook of videoGamePack.blooks) {
+      total += blook.chance;
+      if (rand <= total) return blook;
     }
+    return videoGamePack.blooks[videoGamePack.blooks.length - 1];
+  }
 
-    // Confetti code unchanged
-    function spawnConfetti(rarity, originX, originY) {
-      const colors = {
-        uncommon: ['#a0e060', '#88c040'],
-        rare: ['#60b0e0', '#4080c0'],
-        epic: ['#c060e0', '#a040c0'],
-        legendary: ['#f7c338', '#d4a217'],
-        chroma: ['#19c0f1', '#19c0f1'],
-        mystical: ['#ffffff', '#ca17e6']
-      };
-      const countMap = {
-        uncommon: 40,
-        rare: 60,
-        epic: 80,
-        legendary: 100,
-        chroma: 120,
-        mystical: 150
-      };
-      const count = countMap[rarity] || 30;
-      const colorSet = colors[rarity] || ['#ffffff'];
+  function spawnConfetti(rarity, originX, originY) {
+    const colors = {
+      uncommon: ['#a0e060', '#88c040'],
+      rare: ['#60b0e0', '#4080c0'],
+      epic: ['#c060e0', '#a040c0'],
+      legendary: ['#f7c338', '#d4a217'],
+      chroma: ['#19c0f1', '#19c0f1'],
+      mystical: ['#ffffff', '#ca17e6']
+    };
 
-      for (let i = 0; i < count; i++) {
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti-piece');
-        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+    const countMap = {
+      uncommon: 40,
+      rare: 60,
+      epic: 80,
+      legendary: 100,
+      chroma: 120,
+      mystical: 150
+    };
 
-        let startX = originX || window.innerWidth / 2;
-        let startY = originY || window.innerHeight / 2;
-        let velocityX = 0, velocityY = 0;
-        let gravity = true;
+    const count = countMap[rarity] || 30;
+    const colorSet = colors[rarity] || ['#ffffff'];
 
-        if (rarity === 'uncommon') {
-          startX += (Math.random() - 0.5) * 130;
-          startY -= 150;
-          velocityX = (Math.random() - 0.5) * 200;
-          velocityY = -Math.random() * 450 - 400;
-        } else if (rarity === 'rare') {
-          const leftCorner = 60;
-          const rightCorner = window.innerWidth - 60;
-          startX = i % 2 === 0 ? leftCorner : rightCorner;
-          startY = window.innerHeight - 80;
-          velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
-          velocityY = -Math.random() * 600 - 300;
-          gravity = false;
-        } else if (rarity === 'epic') {
-          startX = i % 2 === 0 ? 0 : window.innerWidth;
-          startY = Math.random() * window.innerHeight;
-          velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-          velocityY = (Math.random() - 0.5) * 100;
-          gravity = false;
-        } else if (rarity === 'legendary') {
-          startX = Math.random() * window.innerWidth;
-          startY = -10;
-          velocityX = (Math.random() - 0.5) * 100;
-          velocityY = Math.random() * 100 + 100;
-        } else if (rarity === 'chroma') {
-          const corners = [
-            [0, 0], [window.innerWidth, 0],
-            [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-          ];
-          const [x, y] = corners[i % 4];
-          startX = x;
-          startY = y;
-          velocityX = (Math.random() - 0.5) * 600;
-          velocityY = (Math.random() - 0.5) * 600;
-          gravity = false;
-        } else if (rarity === 'mystical') {
-          const corners = [
-            [0, 0], [window.innerWidth, 0],
-            [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-          ];
-          const [x, y] = corners[i % 4];
-          startX = x;
-          startY = y;
-          velocityX = (Math.random() - 0.5) * 800;
-          velocityY = (Math.random() - 0.5) * 800;
-          gravity = false;
-          confetti.style.width = '14px';
-          confetti.style.height = '14px';
-          confetti.style.borderRadius = '50%';
-          confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
-        }
+    for (let i = 0; i < count; i++) {
+      const confetti = document.createElement('div');
+      confetti.classList.add('confetti-piece');
+      confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
 
-        confetti.style.left = startX + 'px';
-        confetti.style.top = startY + 'px';
-        document.body.appendChild(confetti);
+      let startX = originX || window.innerWidth / 2;
+      let startY = originY || window.innerHeight / 2;
+      let velocityX = 0, velocityY = 0;
+      let gravity = true;
 
-        const duration = Math.random() * 2 + 2;
+      if (rarity === 'uncommon') {
+        startX += (Math.random() - 0.5) * 130;
+        startY -= 150;
+        velocityX = (Math.random() - 0.5) * 200;
+        velocityY = -Math.random() * 450 - 400;
+      } else if (rarity === 'rare') {
+        const leftCorner = 60;
+        const rightCorner = window.innerWidth - 60;
+        startX = i % 2 === 0 ? leftCorner : rightCorner;
+        startY = window.innerHeight - 80;
+        velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
+        velocityY = -Math.random() * 600 - 300;
+        gravity = false;
+      } else if (rarity === 'epic') {
+        startX = i % 2 === 0 ? 0 : window.innerWidth;
+        startY = Math.random() * window.innerHeight;
+        velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
+        velocityY = (Math.random() - 0.5) * 100;
+        gravity = false;
+      } else if (rarity === 'legendary') {
+        startX = Math.random() * window.innerWidth;
+        startY = -10;
+        velocityX = (Math.random() - 0.5) * 100;
+        velocityY = Math.random() * 100 + 100;
+      } else if (rarity === 'chroma') {
+        const corners = [
+          [0, 0], [window.innerWidth, 0],
+          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+        ];
+        const [x, y] = corners[i % 4];
+        startX = x;
+        startY = y;
+        velocityX = (Math.random() - 0.5) * 600;
+        velocityY = (Math.random() - 0.5) * 600;
+        gravity = false;
+      } else if (rarity === 'mystical') {
+        const corners = [
+          [0, 0], [window.innerWidth, 0],
+          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+        ];
+        const [x, y] = corners[i % 4];
+        startX = x;
+        startY = y;
+        velocityX = (Math.random() - 0.5) * 800;
+        velocityY = (Math.random() - 0.5) * 800;
+        gravity = false;
+        confetti.style.width = '14px';
+        confetti.style.height = '14px';
+        confetti.style.borderRadius = '50%';
+        confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
+      }
 
+      confetti.style.left = startX + 'px';
+      confetti.style.top = startY + 'px';
+      document.body.appendChild(confetti);
+
+      const duration = Math.random() * 2 + 2;
+
+      confetti.animate([
+        { transform: `translate(0px, 0px)` },
+        { transform: `translate(${velocityX}px, ${velocityY}px)` }
+      ], {
+        duration: duration * 1000,
+        iterations: 1,
+        easing: 'ease-out'
+      });
+
+      if (gravity) {
         confetti.animate([
-          { transform: `translate(0px, 0px)` },
-          { transform: `translate(${velocityX}px, ${velocityY}px)` }
+          { transform: 'translateY(0)' },
+          { transform: `translateY(${window.innerHeight}px)` }
         ], {
           duration: duration * 1000,
           iterations: 1,
-          easing: 'ease-out'
-        });
-
-        if (gravity) {
-          confetti.animate([
-            { transform: 'translateY(0)' },
-            { transform: `translateY(${window.innerHeight}px)` }
-          ], {
-            duration: duration * 1000,
-            iterations: 1,
-            easing: 'ease-in'
-          });
-        }
-
-        setTimeout(() => confetti.remove(), duration * 1000);
-      }
-    }
-
-    async function updateCollection(userId, blook) {
-      const collectionRef = db.collection('users').doc(userId).collection('collection');
-      const blookDoc = await collectionRef.doc(blook.name).get();
-
-      if (blookDoc.exists) {
-        await collectionRef.doc(blook.name).update({
-          quantity: firebase.firestore.FieldValue.increment(1)
-        });
-      } else {
-        await collectionRef.doc(blook.name).set({
-          name: blook.name,
-          chance: blook.chance,
-          rarity: blook.rarity,
-          quantity: 1
+          easing: 'ease-in'
         });
       }
+
+      setTimeout(() => confetti.remove(), duration * 1000);
     }
+  }
 
-    function startPackOpening(userId) {
-      const packElement = document.getElementById('pack');
-      let clicked = false;
-      let clickCount = 0;
+  let clicked = false;
+  let clickCount = 0;
 
-      packElement.addEventListener('click', async function () {
-        if (clicked) return;
-        clicked = true;
+  document.getElementById('pack').addEventListener('click', function () {
+    if (clicked) return;
+    clicked = true;
 
-        if (clickCount === 0) {
-          this.classList.add('torn');
+    if (clickCount === 0) {
+      this.classList.add('torn');
 
-          const blook = getRandomBlook();
-          if (blook) {
-            const result = document.getElementById('result');
-            result.innerHTML = '';
-            const img = document.createElement('img');
-            img.src = blook.name;
-            img.alt = 'Blook image';
-            result.appendChild(img);
+      const blook = getRandomBlook();
+      if (blook) {
+        const result = document.getElementById('result');
+        result.innerHTML = '';
+        const img = document.createElement('img');
+        img.src = blook.name;
+        img.alt = 'Blook image';
+        result.appendChild(img);
 
-            await updateCollection(userId, blook);
+        const collectionKey = `collection_${currentUser}`;
+        let collection = JSON.parse(localStorage.getItem(collectionKey)) || [];
 
-            setTimeout(() => {
-              result.style.transform = 'translate(-50%, -50%) scale(1)';
-              const rect = result.getBoundingClientRect();
-              const originX = rect.left + rect.width / 2;
-              const originY = rect.top + rect.height / 2;
-              spawnConfetti(blook.rarity, originX, originY);
-              clicked = false;
-            }, 200);
-          }
-
-          clickCount++;
+        const existingBlookIndex = collection.findIndex(b => b.name === blook.name);
+        if (existingBlookIndex !== -1) {
+          collection[existingBlookIndex].quantity += 1;
         } else {
-          window.location.href = "index.html";
+          collection.push({ ...blook, quantity: 1 });
         }
-      });
+
+        localStorage.setItem(collectionKey, JSON.stringify(collection));
+
+        setTimeout(() => {
+          result.style.transform = 'translate(-50%, -50%) scale(1)';
+          const rect = result.getBoundingClientRect();
+          const originX = rect.left + rect.width / 2;
+          const originY = rect.top + rect.height / 2;
+          spawnConfetti(blook.rarity, originX, originY);
+          clicked = false;
+        }, 200);
+      }
+      clickCount++;
+    } else {
+      window.location.href = "index.html";
     }
-  </script>
+  });
+</script>
 </body>
 </html>
