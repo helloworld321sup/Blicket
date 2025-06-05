@@ -279,45 +279,6 @@
       return;
     }
 
-    document.querySelectorAll('.pack-card').forEach(card => {
-  card.addEventListener('click', async () => {
-    const cost = parseInt(card.getAttribute('data-cost'));
-    const href = card.getAttribute('data-href');
-    const username = localStorage.getItem("currentUser");
-
-    let tokens = parseInt(localStorage.getItem("tokens")) || 0;
-
-    if (tokens >= cost) {
-      // Deduct tokens locally
-      tokens -= cost;
-      localStorage.setItem("tokens", tokens);
-      updateTokenDisplay(tokens);
-
-      // Deduct tokens in Firestore
-      try {
-        const userDocRef = db.collection("users").doc(username);
-        await db.runTransaction(async (transaction) => {
-          const userDoc = await transaction.get(userDocRef);
-          if (!userDoc.exists) throw "User not found.";
-          const data = userDoc.data();
-          const newTokens = (data.tokens || 0) - cost;
-          transaction.update(userDocRef, { tokens: newTokens });
-        });
-      } catch (e) {
-        alert("Error updating Firebase tokens: " + e);
-        return;
-      }
-
-      // Go to the pack
-      window.location.href = href;
-
-    } else {
-      alert("Not enough tokens to open this pack.");
-    }
-  });
-});
-
-
     document.getElementById("username-display").textContent = "Hello, " + username + "!";
 
     // 💾 ADDED: show local tokens while waiting for Firestore
