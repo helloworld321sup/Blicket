@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head><title>Test Firebase Blook Update</title></head>
+<body>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  async function updateUserCollection() {
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert("No currentUser in localStorage");
+      return;
+    }
+
+    const userRef = doc(db, 'users', currentUser);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      alert("User document does not exist!");
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    // This is your current collection array (or empty)
+    const collection = userData.collection || [];
+
+    // The blook we want to add/update
+    const newBlook = {
+      name: "https://blacket.org/content/blooks/Pac-Man.webp",
+      rarity: "uncommon",
+      quantity: 1,
+      imageUrl: "https://blacket.org/content/blooks/Pac-Man.webp"
+    };
+
+    // Check if blook already exists in collection
+    const index = collection.findIndex(b => b.name === newBlook.name);
+    if (index !== -1) {
+      // increment quantity
+      collection[index].quantity += 1;
+    } else {
+      collection.push(newBlook);
+    }
+
+    // Update Firestore document
+    await updateDoc(userRef, { collection: collection });
+
+    alert("Blook collection updated in Firebase!");
+  }
+
+  updateUserCollection();
+</script>
+</body>
+</html>
