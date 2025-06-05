@@ -71,188 +71,192 @@
   <div class="collection-grid" id="collection"></div>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<script>
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) {
-    alert('You are not logged in.');
-    window.location.href = 'login.html';
-  }
+  <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
+  authDomain: "blicket-3dfc7.firebaseapp.com",
+  projectId: "blicket-3dfc7",
+  storageBucket: "blicket-3dfc7.firebasestorage.app",
+  messagingSenderId: "78883670759",
+  appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
+};
 
-  const db = firebase.firestore();
-  let collection = [];
-  let userData = { tokens: 0 };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  const rarityColors = {
-    'uncommon': '#a0e060',
-    'rare': '#60b0e0',
-    'epic': '#c060e0',
-    'legendary': '#f7c338',
-    'chroma': '#19c0f1',
-    'mystical': '#ca17e6'
-  };
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      alert('You are not logged in.');
+      window.location.href = 'login.html';
+    }
 
-  const rarityValues = {
-    uncommon: 5,
-    rare: 20,
-    epic: 75,
-    legendary: 200,
-    chroma: 700,
-    mystical: 5000
-  };
+    let collection = [];
+    let userData = { tokens: 0 };
 
-  // Fetch user data from Firestore
-  async function loadUserData() {
-    try {
-      const userDoc = await db.collection('users').doc(currentUser).get();
-      if (!userDoc.exists) {
-        alert('User data not found. Please login again.');
-        window.location.href = 'login.html';
+    const rarityColors = {
+      'uncommon': '#a0e060',
+      'rare': '#60b0e0',
+      'epic': '#c060e0',
+      'legendary': '#f7c338',
+      'chroma': '#19c0f1',
+      'mystical': '#ca17e6'
+    };
+
+    const rarityValues = {
+      uncommon: 5,
+      rare: 20,
+      epic: 75,
+      legendary: 200,
+      chroma: 700,
+      mystical: 5000
+    };
+
+    async function loadUserData() {
+      try {
+        const userDoc = await db.collection('users').doc(currentUser).get();
+        if (!userDoc.exists) {
+          alert('User data not found. Please login again.');
+          window.location.href = 'login.html';
+          return;
+        }
+        const data = userDoc.data();
+        collection = data.collection || [];
+        userData.tokens = data.tokens || 0;
+        displayCollection();
+      } catch (err) {
+        console.error('Error loading user data:', err);
+        alert('Failed to load user data.');
+      }
+    }
+
+    function displayCollection() {
+      const container = document.getElementById('collection');
+      container.innerHTML = '';
+      collection.forEach((blook, index) => {
+        const card = document.createElement('div');
+        card.className = 'blook-card';
+
+        const img = document.createElement('img');
+        img.src = blook.imageUrl || blook.name;
+
+        const name = document.createElement('div');
+        name.className = 'blook-name';
+        name.textContent = customNameMap[blook.name] || blook.name || "Unknown Blook";
+
+        const rarity = document.createElement('div');
+        rarity.className = 'rarity-tag';
+        rarity.textContent = blook.rarity;
+        rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
+
+        const quantity = document.createElement('div');
+        quantity.className = 'quantity-badge';
+        quantity.textContent = blook.quantity || 1;
+
+        const sellBtn = document.createElement('button');
+        sellBtn.textContent = 'Sell';
+        sellBtn.style.marginTop = '8px';
+        sellBtn.style.padding = '4px 8px';
+        sellBtn.style.cursor = 'pointer';
+        sellBtn.onclick = () => sellXBlook(index);
+
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(rarity);
+        card.appendChild(quantity);
+        card.appendChild(sellBtn);
+
+        container.appendChild(card);
+      });
+    }
+
+    async function saveUserData() {
+      try {
+        await db.collection('users').doc(currentUser).update({
+          collection: collection,
+          tokens: userData.tokens
+        });
+      } catch (err) {
+        console.error('Error saving user data:', err);
+        alert('Failed to save user data.');
+      }
+    }
+
+    async function sellXBlook(index) {
+      const blook = collection[index];
+      const maxQuantity = blook.quantity || 1;
+      const sellValue = rarityValues[blook.rarity] || 0;
+
+      let amount = prompt(`How many ${blook.name} do you want to sell? (1-${maxQuantity})`);
+      if (amount === null) return;
+
+      amount = parseInt(amount);
+      if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
+        alert(`Enter a valid number between 1 and ${maxQuantity}.`);
         return;
       }
-      const data = userDoc.data();
-      collection = data.collection || [];
-      userData.tokens = data.tokens || 0;
-      displayCollection();
-    } catch (err) {
-      console.error('Error loading user data:', err);
-      alert('Failed to load user data.');
-    }
-  }
 
-  function displayCollection() {
-    const container = document.getElementById('collection');
-    container.innerHTML = '';
-    collection.forEach((blook, index) => {
-      const card = document.createElement('div');
-      card.className = 'blook-card';
+      userData.tokens += sellValue * amount;
 
-      const img = document.createElement('img');
-      img.src = blook.name;
-
-      const name = document.createElement('div');
-      name.className = 'blook-name';
-      const fileName = blook.name.split('/').pop().split('.')[0];
-      name.textContent = customNameMap[fileName] || decodeURIComponent(fileName);
-
-      const rarity = document.createElement('div');
-      rarity.className = 'rarity-tag';
-      rarity.textContent = blook.rarity;
-      rarity.style.backgroundColor = rarityColors[blook.rarity.toLowerCase()] || '#888';
-
-      const quantity = document.createElement('div');
-      quantity.className = 'quantity-badge';
-      quantity.textContent = blook.quantity || 1;
-
-      const sellBtn = document.createElement('button');
-      sellBtn.textContent = 'Sell';
-      sellBtn.style.marginTop = '8px';
-      sellBtn.style.padding = '4px 8px';
-      sellBtn.style.cursor = 'pointer';
-      sellBtn.onclick = () => sellXBlook(index);
-
-      card.appendChild(img);
-      card.appendChild(name);
-      card.appendChild(rarity);
-      card.appendChild(quantity);
-      card.appendChild(sellBtn);
-
-      container.appendChild(card);
-    });
-  }
-
-  // Save updated collection and tokens to Firestore
-  async function saveUserData() {
-    try {
-      await db.collection('users').doc(currentUser).update({
-        collection: collection,
-        tokens: userData.tokens
-      });
-    } catch (err) {
-      console.error('Error saving user data:', err);
-      alert('Failed to save user data.');
-    }
-  }
-
-  async function sellXBlook(index) {
-    const blook = collection[index];
-    const maxQuantity = blook.quantity || 1;
-    const rarity = blook.rarity;
-    const sellValue = rarityValues[rarity] || 0;
-
-    let amount = prompt(`How many ${decodeURIComponent(blook.name.split('/').pop().split('.')[0])} do you want to sell? (1-${maxQuantity})`);
-    if (amount === null) return;
-
-    amount = parseInt(amount);
-    if (isNaN(amount) || amount < 1 || amount > maxQuantity) {
-      alert(`Enter a valid number between 1 and ${maxQuantity}.`);
-      return;
-    }
-
-    userData.tokens += sellValue * amount;
-
-    if (amount === maxQuantity) {
-      collection.splice(index, 1);
-    } else {
-      collection[index].quantity -= amount;
-    }
-
-    await saveUserData();
-    alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
-    displayCollection();
-  }
-
-  async function sellAllBlooks() {
-    let totalTokens = 0;
-
-    collection.forEach(blook => {
-      const quantity = blook.quantity || 1;
-      const value = rarityValues[blook.rarity] || 0;
-      totalTokens += value * quantity;
-    });
-
-    collection = [];
-    userData.tokens += totalTokens;
-
-    await saveUserData();
-    alert(`Sold all blooks for ${totalTokens} tokens!`);
-    displayCollection();
-  }
-
-  async function sellAllDuplicates() {
-    let totalTokens = 0;
-
-    collection = collection.map(blook => {
-      const quantity = blook.quantity || 1;
-      if (quantity > 1) {
-        const duplicates = quantity - 1;
-        const value = rarityValues[blook.rarity] || 0;
-        totalTokens += duplicates * value;
-        blook.quantity = 1;
+      if (amount === maxQuantity) {
+        collection.splice(index, 1);
+      } else {
+        collection[index].quantity -= amount;
       }
-      return blook;
-    });
 
-    userData.tokens += totalTokens;
+      await saveUserData();
+      alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
+      displayCollection();
+    }
 
-    await saveUserData();
-    alert(`Sold all duplicates for ${totalTokens} tokens!`);
-    displayCollection();
-  }
+    async function sellAllBlooks() {
+      let totalTokens = 0;
+      collection.forEach(blook => {
+        const quantity = blook.quantity || 1;
+        const value = rarityValues[blook.rarity] || 0;
+        totalTokens += value * quantity;
+      });
 
-  const customNameMap = {
-    "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen",
-    "755": "Blueberry Yougurt",
-    "d1a659d7-4caf-4184-9a10-91e9a40f25fc": "Strawberry Milk",
-    "custom-blooks-i-have-made-v0-gfdrycozh9gc1": "Blood Orange Juice",
-    "6de84203-ba3b-4edc-b778-76e10f1f3207": "Cherry Milk",
-    "0g4eflh6ceh91": "Alien Chick",
-    "gq1ol7z5ceh91": "Alien Cyborg"
-  };
+      collection = [];
+      userData.tokens += totalTokens;
 
-  // Load on page start
-  loadUserData();
-</script>
+      await saveUserData();
+      alert(`Sold all blooks for ${totalTokens} tokens!`);
+      displayCollection();
+    }
+
+    async function sellAllDuplicates() {
+      let totalTokens = 0;
+      collection = collection.map(blook => {
+        const quantity = blook.quantity || 1;
+        if (quantity > 1) {
+          const duplicates = quantity - 1;
+          const value = rarityValues[blook.rarity] || 0;
+          totalTokens += duplicates * value;
+          blook.quantity = 1;
+        }
+        return blook;
+      });
+
+      userData.tokens += totalTokens;
+
+      await saveUserData();
+      alert(`Sold all duplicates for ${totalTokens} tokens!`);
+      displayCollection();
+    }
+
+    const customNameMap = {
+      "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen",
+      "755": "Blueberry Yougurt",
+      "d1a659d7-4caf-4184-9a10-91e9a40f25fc": "Strawberry Milk",
+      "custom-blooks-i-have-made-v0-gfdrycozh9gc1": "Blood Orange Juice",
+      "6de84203-ba3b-4edc-b778-76e10f1f3207": "Cherry Milk",
+      "0g4eflh6ceh91": "Alien Chick",
+      "gq1ol7z5ceh91": "Alien Cyborg"
+    };
+
+    loadUserData();
+  </script>
 </body>
 </html>
