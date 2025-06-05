@@ -146,25 +146,26 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
+<!-- Inside <script> at the bottom -->
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
     authDomain: "blicket-3dfc7.firebaseapp.com",
     projectId: "blicket-3dfc7",
-    storageBucket: "blicket-3dfc7.firebasestorage.app",
+    storageBucket: "blicket-3dfc7",
     messagingSenderId: "78883670759",
     appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
   };
 
-  // Initialize Firebase (compat)
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
-  let currentUserData = null; // store loaded user data
+  const SPIN_INTERVAL = 12 * 60 * 60 * 1000;
+  let currentUserData = null;
 
   document.getElementById("logout-button").onclick = function () {
     localStorage.removeItem("currentUser");
+    // 💾 ADDED: Keep tokens stored so they persist after re-login
     window.location.href = "login.html";
   };
 
@@ -181,6 +182,8 @@
   function updateTokenDisplay(tokens) {
     const display = document.getElementById("tokenDisplay");
     if (display) display.textContent = `Tokens: ${tokens}`;
+    // 💾 ADDED: Save to localStorage
+    localStorage.setItem("tokens", tokens);
   }
 
   function updateWheelUI(lastWheelSpin) {
@@ -203,8 +206,7 @@
 
   function canSpinWheel(lastWheelSpin) {
     const now = Date.now();
-    if (!lastWheelSpin) return true;
-    return now - lastWheelSpin >= SPIN_INTERVAL;
+    return !lastWheelSpin || now - lastWheelSpin >= SPIN_INTERVAL;
   }
 
   async function spinWheel() {
@@ -263,7 +265,7 @@
 
       document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
       document.getElementById("spinWheelBtn").disabled = true;
-      updateTokenDisplay(currentUserData.tokens);
+      updateTokenDisplay(currentUserData.tokens); // 💾 Updates display + saves to localStorage
 
     } catch (e) {
       alert("Error spinning wheel: " + e);
@@ -279,29 +281,16 @@
 
     document.getElementById("username-display").textContent = "Hello, " + username + "!";
 
-    currentUserData = await fetchUserData(username);
+    // 💾 ADDED: show local tokens while waiting for Firestore
+    const localTokens = localStorage.getItem("tokens");
+    if (localTokens !== null) updateTokenDisplay(localTokens);
 
-    updateTokenDisplay(currentUserData.tokens);
+    currentUserData = await fetchUserData(username);
+    updateTokenDisplay(currentUserData.tokens); // Also resyncs localStorage
     updateWheelUI(currentUserData.lastWheelSpin);
   }
 
-  window.onload = () => {
-    init();
-  };
-
-  // Add click behavior to all pack cards
-document.querySelectorAll(".pack-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const cost = parseInt(card.getAttribute("data-cost"));
-    const href = card.getAttribute("data-href");
-
-    if (currentUserData.tokens >= cost) {
-      window.location.href = href;
-    } else {
-      alert("Not enough tokens!");
-    }
-  });
-});
+  window.onload = init;
 
   document.getElementById("spinWheelBtn").onclick = spinWheel;
 
@@ -310,9 +299,6 @@ document.querySelectorAll(".pack-card").forEach(card => {
       updateWheelUI(currentUserData.lastWheelSpin);
     }
   }, 60000);
-
-  // Pack card clicks remain same on index.html,
-  // but pack.html must handle Firestore tokens deduction properly.
 </script>
 </body>
 </html>
