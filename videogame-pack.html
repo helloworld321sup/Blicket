@@ -92,12 +92,12 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // REPLACE THIS WITH YOUR ACTUAL FIREBASE CONFIG
+let currentUser;
     const firebaseConfig = {
     apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
     authDomain: "blicket-3dfc7.firebaseapp.com",
     projectId: "blicket-3dfc7",
-    storageBucket: "blicket-3dfc7.firebasestorage.app",
+    storageBucket: "blicket-3dfc7.appspot.com",
     messagingSenderId: "78883670759",
     appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
   };
@@ -199,17 +199,14 @@
     // Torn pack animation + result showing + saving to Firestore
     let clicked = false;
     packWrapper.addEventListener('click', async () => {
-      if (clicked) return;
-      clicked = true;
+  if (clicked) return;
+  if (!currentUser) {
+    alert("Login not confirmed yet. Try again in a second.");
+    return;
+  }
 
-      const user = auth.currentUser;
-      if (!user) {
-        alert("You must be logged in to open packs.");
-        window.location.href = "login.html";
-        return;
-      }
-
-      const userDocRef = db.collection('users').doc(user.uid);
+  clicked = true;
+  const userDocRef = db.collection('users').doc(currentUser.uid);
       try {
         const userDoc = await userDocRef.get();
         if (!userDoc.exists) {
@@ -278,15 +275,15 @@
     });
 
     // Redirect to login if user is not logged in
-    aauth.onAuthStateChanged(user => {
+    auth.onAuthStateChanged(user => {
   if (!user) {
-    // Wait a short delay to ensure Firebase finished checking
     setTimeout(() => {
       window.location.href = "login.html";
-    }, 100); // 100ms is usually enough
+    }, 100);
+  } else {
+    currentUser = user;
   }
 });
-    });
   </script>
 </body>
 </html>
