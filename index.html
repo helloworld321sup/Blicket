@@ -289,6 +289,20 @@
     init();
   };
 
+  // Add click behavior to all pack cards
+document.querySelectorAll(".pack-card").forEach(card => {
+  card.addEventListener("click", () => {
+    const cost = parseInt(card.getAttribute("data-cost"));
+    const href = card.getAttribute("data-href");
+
+    if (currentUserData.tokens >= cost) {
+      window.location.href = href;
+    } else {
+      alert("Not enough tokens!");
+    }
+  });
+});
+
   document.getElementById("spinWheelBtn").onclick = spinWheel;
 
   setInterval(() => {
