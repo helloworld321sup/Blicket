@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Blicket | Video Game Pack</title>
-  <link rel="icon" href="favicon.png" type="image/png">
+  <link rel="icon" href="favicon.png" type="image/png" />
   <style>
     body {
       background-color: rgb(21, 14, 90);
@@ -96,48 +96,44 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    async function main() {
-  await checkAndDeductTokens();
-      
-const firebaseConfig = {
-  apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
-  storageBucket: "blicket-3dfc7.appspot.com",
-  projectId: "blicket-3dfc7",
-  storageBucket: "blicket-3dfc7.firebasestorage.app",
-  messagingSenderId: "78883670759",
-  appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
+      projectId: "blicket-3dfc7",
+      storageBucket: "blicket-3dfc7.appspot.com",
+      messagingSenderId: "78883670759",
+      appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
+    };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) {
-    window.location.href = 'login.html';
-  }
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      window.location.href = 'login.html';
+    }
 
-  const PACK_COST = 25;
-async function checkAndDeductTokens() {
-  const userDocRef = db.collection('users').doc(currentUser);
+    const PACK_COST = 25;
+    let clicked = false;
+    let clickCount = 0;
 
-  try {
-    await db.runTransaction(async (transaction) => {
-      const userDoc = await transaction.get(userDocRef);
-      if (!userDoc.exists) throw "User not found";
+    async function checkAndDeductTokens() {
+      const userDocRef = db.collection('users').doc(currentUser);
 
-      const tokens = userDoc.data().tokens || 0;
-      if (tokens < PACK_COST) throw "Not enough tokens";
+      try {
+        await db.runTransaction(async (transaction) => {
+          const userDoc = await transaction.get(userDocRef);
+          if (!userDoc.exists) throw "User not found";
 
-      transaction.update(userDocRef, { tokens: tokens - PACK_COST });
-    });
-  } catch (e) {
-    alert(e);
-    window.location.href = "index.html";
-  }
-}
+          const tokens = userDoc.data().tokens || 0;
+          if (tokens < PACK_COST) throw "Not enough tokens";
 
-await checkAndDeductTokens();
-
+          transaction.update(userDocRef, { tokens: tokens - PACK_COST });
+        });
+      } catch (e) {
+        alert(e);
+        window.location.href = "index.html";
+      }
+    }
 
     const videoGamePack = {
       blooks: [
@@ -161,180 +157,184 @@ await checkAndDeductTokens();
     };
 
     function getRandomBlook() {
-    const rand = Math.random() * 100;
-    let total = 0;
-    for (const blook of videoGamePack.blooks) {
-      total += blook.chance;
-      if (rand <= total) return blook;
-    }
-    return videoGamePack.blooks[videoGamePack.blooks.length - 1];
-  }
-
-  function spawnConfetti(rarity, originX, originY) {
-    const colors = {
-      uncommon: ['#a0e060', '#88c040'],
-      rare: ['#60b0e0', '#4080c0'],
-      epic: ['#c060e0', '#a040c0'],
-      legendary: ['#f7c338', '#d4a217'],
-      chroma: ['#19c0f1', '#19c0f1'],
-      mystical: ['#ffffff', '#ca17e6']
-    };
-
-    const countMap = {
-      uncommon: 40,
-      rare: 60,
-      epic: 80,
-      legendary: 100,
-      chroma: 120,
-      mystical: 150
-    };
-
-    const count = countMap[rarity] || 30;
-    const colorSet = colors[rarity] || ['#ffffff'];
-
-    for (let i = 0; i < count; i++) {
-      const confetti = document.createElement('div');
-      confetti.classList.add('confetti-piece');
-      confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
-
-      let startX = originX || window.innerWidth / 2;
-      let startY = originY || window.innerHeight / 2;
-      let velocityX = 0, velocityY = 0;
-      let gravity = true;
-
-      if (rarity === 'uncommon') {
-        startX += (Math.random() - 0.5) * 130;
-        startY -= 150;
-        velocityX = (Math.random() - 0.5) * 200;
-        velocityY = -Math.random() * 450 - 400;
-      } else if (rarity === 'rare') {
-        const leftCorner = 60;
-        const rightCorner = window.innerWidth - 60;
-        startX = i % 2 === 0 ? leftCorner : rightCorner;
-        startY = window.innerHeight - 80;
-        velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
-        velocityY = -Math.random() * 600 - 300;
-        gravity = false;
-      } else if (rarity === 'epic') {
-        startX = i % 2 === 0 ? 0 : window.innerWidth;
-        startY = Math.random() * window.innerHeight;
-        velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
-        velocityY = (Math.random() - 0.5) * 100;
-        gravity = false;
-      } else if (rarity === 'legendary') {
-        startX = Math.random() * window.innerWidth;
-        startY = -10;
-        velocityX = (Math.random() - 0.5) * 100;
-        velocityY = Math.random() * 100 + 100;
-      } else if (rarity === 'chroma') {
-        const corners = [
-          [0, 0], [window.innerWidth, 0],
-          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-        ];
-        const [x, y] = corners[i % 4];
-        startX = x;
-        startY = y;
-        velocityX = (Math.random() - 0.5) * 600;
-        velocityY = (Math.random() - 0.5) * 600;
-        gravity = false;
-      } else if (rarity === 'mystical') {
-        const corners = [
-          [0, 0], [window.innerWidth, 0],
-          [0, window.innerHeight], [window.innerWidth, window.innerHeight]
-        ];
-        const [x, y] = corners[i % 4];
-        startX = x;
-        startY = y;
-        velocityX = (Math.random() - 0.5) * 800;
-        velocityY = (Math.random() - 0.5) * 800;
-        gravity = false;
-        confetti.style.width = '14px';
-        confetti.style.height = '14px';
-        confetti.style.borderRadius = '50%';
-        confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
+      const rand = Math.random() * 100;
+      let total = 0;
+      for (const blook of videoGamePack.blooks) {
+        total += blook.chance;
+        if (rand <= total) return blook;
       }
+      return videoGamePack.blooks[videoGamePack.blooks.length - 1];
+    }
 
-      confetti.style.left = startX + 'px';
-      confetti.style.top = startY + 'px';
-      document.body.appendChild(confetti);
+    function spawnConfetti(rarity, originX, originY) {
+      const colors = {
+        uncommon: ['#a0e060', '#88c040'],
+        rare: ['#60b0e0', '#4080c0'],
+        epic: ['#c060e0', '#a040c0'],
+        legendary: ['#f7c338', '#d4a217'],
+        chroma: ['#19c0f1', '#19c0f1'],
+        mystical: ['#ffffff', '#ca17e6']
+      };
 
-      const duration = Math.random() * 2 + 2;
+      const countMap = {
+        uncommon: 40,
+        rare: 60,
+        epic: 80,
+        legendary: 100,
+        chroma: 120,
+        mystical: 150
+      };
 
-      confetti.animate([
-        { transform: `translate(0px, 0px)` },
-        { transform: `translate(${velocityX}px, ${velocityY}px)` }
-      ], {
-        duration: duration * 1000,
-        iterations: 1,
-        easing: 'ease-out'
-      });
+      const count = countMap[rarity] || 30;
+      const colorSet = colors[rarity] || ['#ffffff'];
 
-      if (gravity) {
+      for (let i = 0; i < count; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        confetti.style.backgroundColor = colorSet[Math.floor(Math.random() * colorSet.length)];
+
+        let startX = originX || window.innerWidth / 2;
+        let startY = originY || window.innerHeight / 2;
+        let velocityX = 0, velocityY = 0;
+        let gravity = true;
+
+        if (rarity === 'uncommon') {
+          startX += (Math.random() - 0.5) * 130;
+          startY -= 150;
+          velocityX = (Math.random() - 0.5) * 200;
+          velocityY = -Math.random() * 450 - 400;
+        } else if (rarity === 'rare') {
+          const leftCorner = 60;
+          const rightCorner = window.innerWidth - 60;
+          startX = i % 2 === 0 ? leftCorner : rightCorner;
+          startY = window.innerHeight - 80;
+          velocityX = i % 2 === 0 ? Math.random() * 600 + 100 : -Math.random() * 600 - 100;
+          velocityY = -Math.random() * 600 - 300;
+          gravity = false;
+        } else if (rarity === 'epic') {
+          startX = i % 2 === 0 ? 0 : window.innerWidth;
+          startY = Math.random() * window.innerHeight;
+          velocityX = i % 2 === 0 ? Math.random() * 1000 + 400 : -Math.random() * 1000 - 400;
+          velocityY = (Math.random() - 0.5) * 100;
+          gravity = false;
+        } else if (rarity === 'legendary') {
+          startX = Math.random() * window.innerWidth;
+          startY = -10;
+          velocityX = (Math.random() - 0.5) * 100;
+          velocityY = Math.random() * 100 + 100;
+        } else if (rarity === 'chroma') {
+          const corners = [
+            [0, 0], [window.innerWidth, 0],
+            [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+          ];
+          const [x, y] = corners[i % 4];
+          startX = x;
+          startY = y;
+          velocityX = (Math.random() - 0.5) * 600;
+          velocityY = (Math.random() - 0.5) * 600;
+          gravity = false;
+        } else if (rarity === 'mystical') {
+          const corners = [
+            [0, 0], [window.innerWidth, 0],
+            [0, window.innerHeight], [window.innerWidth, window.innerHeight]
+          ];
+          const [x, y] = corners[i % 4];
+          startX = x;
+          startY = y;
+          velocityX = (Math.random() - 0.5) * 800;
+          velocityY = (Math.random() - 0.5) * 800;
+          gravity = false;
+          confetti.style.width = '14px';
+          confetti.style.height = '14px';
+          confetti.style.borderRadius = '50%';
+          confetti.style.boxShadow = `0 0 10px 3px ${confetti.style.backgroundColor}`;
+        }
+
+        confetti.style.left = startX + 'px';
+        confetti.style.top = startY + 'px';
+        document.body.appendChild(confetti);
+
+        const duration = Math.random() * 2 + 2;
+
         confetti.animate([
-          { transform: 'translateY(0)' },
-          { transform: `translateY(${window.innerHeight}px)` }
+          { transform: `translate(0px, 0px)` },
+          { transform: `translate(${velocityX}px, ${velocityY}px)` }
         ], {
           duration: duration * 1000,
           iterations: 1,
-          easing: 'ease-in'
+          easing: 'ease-out'
         });
+
+        if (gravity) {
+          confetti.animate([
+            { transform: 'translateY(0)' },
+            { transform: `translateY(${window.innerHeight}px)` }
+          ], {
+            duration: duration * 1000,
+            iterations: 1,
+            easing: 'ease-in'
+          });
+        }
+
+        setTimeout(() => confetti.remove(), duration * 1000);
       }
-
-      setTimeout(() => confetti.remove(), duration * 1000);
     }
-  }
 
-  let clicked = false;
-  let clickCount = 0;
+    document.getElementById('pack').addEventListener('click', async function () {
+      if (clicked) return;
+      clicked = true;
 
-  document.getElementById('pack').addEventListener('click', function () {
-    if (clicked) return;
-    clicked = true;
+      if (clickCount === 0) {
+        // Deduct tokens first, if fails, redirect inside checkAndDeductTokens
+        await checkAndDeductTokens();
 
-    if (clickCount === 0) {
-      this.classList.add('torn');
+        this.classList.add('torn');
 
-      const blook = getRandomBlook();
-      if (blook) {
-        const result = document.getElementById('result');
-        result.innerHTML = '';
-        const img = document.createElement('img');
-        img.src = blook.name;
-        img.alt = 'Blook image';
-        result.appendChild(img);
+        const blook = getRandomBlook();
+        if (blook) {
+          const result = document.getElementById('result');
+          result.innerHTML = '';
+          const img = document.createElement('img');
+          img.src = blook.name;
+          img.alt = 'Blook image';
+          result.appendChild(img);
 
-const userDocRef = db.collection('users').doc(currentUser);
-const collectionRef = userDocRef.collection('collection');
-const blookDocRef = collectionRef.doc(blook.name);
+          const userDocRef = db.collection('users').doc(currentUser);
+          const collectionRef = userDocRef.collection('collection');
+          const blookDocRef = collectionRef.doc(blook.name);
 
-await db.runTransaction(async (transaction) => {
-  const blookDoc = await transaction.get(blookDocRef);
-  if (blookDoc.exists) {
-    const qty = blookDoc.data().quantity || 0;
-    transaction.update(blookDocRef, { quantity: qty + 1 });
-  } else {
-    transaction.set(blookDocRef, {
-      name: blook.name,
-      rarity: blook.rarity,
-      quantity: 1
+          try {
+            await db.runTransaction(async (transaction) => {
+              const blookDoc = await transaction.get(blookDocRef);
+              if (blookDoc.exists) {
+                const qty = blookDoc.data().quantity || 0;
+                transaction.update(blookDocRef, { quantity: qty + 1 });
+              } else {
+                transaction.set(blookDocRef, {
+                  name: blook.name,
+                  rarity: blook.rarity,
+                  quantity: 1
+                });
+              }
+            });
+          } catch (e) {
+            console.error('Failed to update blook collection:', e);
+          }
+
+          setTimeout(() => {
+            result.style.transform = 'translate(-50%, -50%) scale(1)';
+            const rect = result.getBoundingClientRect();
+            const originX = rect.left + rect.width / 2;
+            const originY = rect.top + rect.height / 2;
+            spawnConfetti(blook.rarity, originX, originY);
+            clicked = false;
+          }, 200);
+        }
+        clickCount++;
+      } else {
+        window.location.href = "index.html";
+      }
     });
-  }
-});
-
-        setTimeout(() => {
-          result.style.transform = 'translate(-50%, -50%) scale(1)';
-          const rect = result.getBoundingClientRect();
-          const originX = rect.left + rect.width / 2;
-          const originY = rect.top + rect.height / 2;
-          spawnConfetti(blook.rarity, originX, originY);
-          clicked = false;
-        }, 200);
-      }
-      clickCount++;
-    } else {
-      window.location.href = "index.html";
-    }
-  });
-</script>
+  </script>
 </body>
 </html>
