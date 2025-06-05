@@ -7,7 +7,7 @@
   <link rel="icon" href="favicon.png" type="image/png">
   <style>
     body {
-      background-color: #ff4b37;
+      background-color: #818181;
       margin: 0;
       font-family: sans-serif;
     }
@@ -80,8 +80,6 @@
     .fruit     { background-color: #c3c3c3; }
     .blizzard  { background-color: #00b9e4; }
     .medieval  { background-color: #a9a9a9; }
-    .summer    { background-color: #00ffbe; }
-    .alien     { background-color: #4e0ab2; }
   </style>
 </head>
 <body>
@@ -131,213 +129,149 @@
     <img src="https://blacket.org/content/packs/Medieval.webp" alt="Medieval Pack">
     <h3>25 🪙</h3>
   </div>
-
-  <div class="pack-card summer" data-cost="25" data-href="summer-pack.html">
-    <img src="https://blacket.org/content/packs/Summer.webp" alt="Summer Pack">
-    <h3>25 🪙</h3>
-  </div>
-
-  <div class="pack-card alien" data-cost="25" data-href="alien-pack.html">
-    <img src="alien-pack.png" alt="Alien Pack">
-    <h3>30 🪙 All new, and completely Blicket made!</h3>
-  </div>
 </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
-<!-- Inside <script> at the bottom -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
-    authDomain: "blicket-3dfc7.firebaseapp.com",
-    projectId: "blicket-3dfc7",
-    storageBucket: "blicket-3dfc7",
-    messagingSenderId: "78883670759",
-    appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-
-  const SPIN_INTERVAL = 12 * 60 * 60 * 1000;
-  let currentUserData = null;
-
-  document.getElementById("logout-button").onclick = function () {
-    localStorage.removeItem("currentUser");
-    // 💾 ADDED: Keep tokens stored so they persist after re-login
-    window.location.href = "login.html";
-  };
-
-  async function fetchUserData(username) {
-    const userDocRef = db.collection("users").doc(username);
-    const userDoc = await userDocRef.get();
-    if (!userDoc.exists) {
-      await userDocRef.set({ tokens: 0, lastWheelSpin: 0 });
-      return { tokens: 0, lastWheelSpin: 0 };
-    }
-    return userDoc.data();
-  }
-
-  function updateTokenDisplay(tokens) {
-    const display = document.getElementById("tokenDisplay");
-    if (display) display.textContent = `Tokens: ${tokens}`;
-    // 💾 ADDED: Save to localStorage
-    localStorage.setItem("tokens", tokens);
-  }
-
-  function updateWheelUI(lastWheelSpin) {
-    const btn = document.getElementById("spinWheelBtn");
-    const msg = document.getElementById("wheelMessage");
-
-    const now = Date.now();
-    if (!lastWheelSpin || now - lastWheelSpin >= SPIN_INTERVAL) {
-      btn.disabled = false;
-      msg.textContent = "Ready to spin!";
-    } else {
-      const nextSpin = new Date(lastWheelSpin + SPIN_INTERVAL);
-      const timeLeft = nextSpin - now;
-      const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      msg.textContent = `Come back in ${hours}h ${minutes}m.`;
-      btn.disabled = true;
-    }
-  }
-
-  function canSpinWheel(lastWheelSpin) {
-    const now = Date.now();
-    return !lastWheelSpin || now - lastWheelSpin >= SPIN_INTERVAL;
-  }
-
-  async function spinWheel() {
-    if (!currentUserData) return alert("User data not loaded yet.");
-    if (!canSpinWheel(currentUserData.lastWheelSpin)) {
-      alert("You must wait 12 hours between spins.");
-      return;
-    }
-
-    const rewards = [
-      { tokens: 3000, weight: 0.8 },
-      { tokens: 500, weight: 24.8 },
-      { tokens: 550, weight: 24.8 },
-      { tokens: 700, weight: 24.8 },
-      { tokens: 800, weight: 12.4 },
-      { tokens: 1000, weight: 12.4 }
-    ];
-
-    const totalWeight = rewards.reduce((acc, r) => acc + r.weight, 0);
-    const rand = Math.random() * totalWeight;
-    let sum = 0;
-    let selected = rewards[0];
-    for (const reward of rewards) {
-      sum += reward.weight;
-      if (rand <= sum) {
-        selected = reward;
-        break;
-      }
-    }
-
-    const userDocRef = db.collection("users").doc(localStorage.getItem("currentUser"));
-
-    try {
-      await db.runTransaction(async (transaction) => {
-        const userDoc = await transaction.get(userDocRef);
-        if (!userDoc.exists) {
-          throw "User document missing!";
-        }
-
-        const data = userDoc.data();
-        const now = Date.now();
-
-        if (now - data.lastWheelSpin < SPIN_INTERVAL) {
-          throw "Spin cooldown active!";
-        }
-
-        const newTokens = (data.tokens || 0) + selected.tokens;
-        transaction.update(userDocRef, {
-          tokens: newTokens,
-          lastWheelSpin: now
-        });
-
-        currentUserData.tokens = newTokens;
-        currentUserData.lastWheelSpin = now;
-      });
-
-      document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
-      document.getElementById("spinWheelBtn").disabled = true;
-      updateTokenDisplay(currentUserData.tokens); // 💾 Updates display + saves to localStorage
-
-    } catch (e) {
-      alert("Error spinning wheel: " + e);
-    }
-  }
-
-  async function init() {
-    const username = localStorage.getItem("currentUser");
-    if (!username) {
+  <script>
+    document.getElementById("logout-button").onclick = function () {
+      localStorage.removeItem("currentUser");
       window.location.href = "login.html";
-      return;
+    };
+
+    const displayName = localStorage.getItem("currentUser");
+    if (displayName) {
+      document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
     }
 
-    document.querySelectorAll('.pack-card').forEach(card => {
-  card.addEventListener('click', async () => {
-    const cost = parseInt(card.getAttribute('data-cost'));
-    const href = card.getAttribute('data-href');
-    const username = localStorage.getItem("currentUser");
+    const SPIN_INTERVAL = 12 * 60 * 60 * 1000; // 12 hours
 
-    let tokens = parseInt(localStorage.getItem("tokens")) || 0;
+    function canSpinWheel() {
+      const user = localStorage.getItem("currentUser");
+      if (!user) return false;
+      const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
+      if (!lastSpin) return true;
+      return Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
+    }
 
-    if (tokens >= cost) {
-      // Deduct tokens locally
-      tokens -= cost;
-      localStorage.setItem("tokens", tokens);
-      updateTokenDisplay(tokens);
-
-      // Deduct tokens in Firestore
-      try {
-        const userDocRef = db.collection("users").doc(username);
-        await db.runTransaction(async (transaction) => {
-          const userDoc = await transaction.get(userDocRef);
-          if (!userDoc.exists) throw "User not found.";
-          const data = userDoc.data();
-          const newTokens = (data.tokens || 0) - cost;
-          transaction.update(userDocRef, { tokens: newTokens });
-        });
-      } catch (e) {
-        alert("Error updating Firebase tokens: " + e);
+    function updateWheelUI() {
+      const btn = document.getElementById("spinWheelBtn");
+      const msg = document.getElementById("wheelMessage");
+      const user = localStorage.getItem("currentUser");
+      if (!user) {
+        btn.disabled = true;
+        msg.textContent = "Log in to spin the wheel.";
         return;
       }
 
-      // Go to the pack
-      window.location.href = href;
+      const lastSpin = localStorage.getItem(`lastWheelSpin_${user}`);
 
-    } else {
-      alert("Not enough tokens to open this pack.");
+      if (canSpinWheel()) {
+        btn.disabled = false;
+        msg.textContent = "Ready to spin!";
+      } else {
+        const nextSpin = new Date(parseInt(lastSpin) + SPIN_INTERVAL);
+        const timeLeft = nextSpin - Date.now();
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        msg.textContent = `Come back in ${hours}h ${minutes}m.`;
+        btn.disabled = true;
+      }
     }
+
+    function spinWheel() {
+      if (!canSpinWheel()) {
+        alert("You must wait 12 hours between spins.");
+        return;
+      }
+
+      // Weighted rewards
+      const rewards = [
+        { tokens: 3000, weight: 0.8 },
+        { tokens: 500, weight: 24.8 },
+        { tokens: 550, weight: 24.8 },
+        { tokens: 700, weight: 24.8 },
+        { tokens: 800, weight: 12.4 },
+        { tokens: 1000, weight: 12.4 }
+      ];
+
+      // Pick a reward based on weights
+      const totalWeight = rewards.reduce((acc, r) => acc + r.weight, 0);
+      const rand = Math.random() * totalWeight;
+      let sum = 0;
+      let selected = rewards[0];
+
+      for (const reward of rewards) {
+        sum += reward.weight;
+        if (rand <= sum) {
+          selected = reward;
+          break;
+        }
+      }
+
+      const user = localStorage.getItem("currentUser");
+      // Load user data object or create default
+      let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+
+      // Add tokens
+      userData.tokens += selected.tokens;
+
+      // Save user data back
+      localStorage.setItem(`user_${user}`, JSON.stringify(userData));
+
+      localStorage.setItem(`lastWheelSpin_${user}`, Date.now());
+
+      document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens, Come back in 12 hours.`;
+      document.getElementById("spinWheelBtn").disabled = true;
+      updateTokenDisplay();
+    }
+
+    function updateTokenDisplay() {
+      const user = localStorage.getItem("currentUser");
+      if (!user) return;
+
+      let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+      const tokens = userData.tokens || 0;
+
+      const display = document.getElementById("tokenDisplay");
+      if (display) {
+        display.textContent = `Tokens: ${tokens}`;
+      }
+    }
+
+    window.onload = function() {
+      const user = localStorage.getItem("currentUser");
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      document.getElementById("username-display").textContent = "Hello, " + user + "!";
+
+      // Initialize user object if missing
+      if (!localStorage.getItem(`user_${user}`)) {
+        localStorage.setItem(`user_${user}`, JSON.stringify({ tokens: 0 }));
+      }
+
+      updateTokenDisplay();
+      updateWheelUI();
+    };
+
+    updateWheelUI();
+    updateTokenDisplay();
+    setInterval(updateWheelUI, 60000); // Update every 1 min
+
+    document.querySelectorAll('.pack-card').forEach(card => {
+  card.style.cursor = 'pointer';
+  card.addEventListener('click', () => {
+    const cost = parseInt(card.getAttribute('data-cost'), 10);
+    const href = card.getAttribute('data-href');
+    const user = localStorage.getItem('currentUser');
+    if (!user) return alert('Not logged in.');
+
+    let userData = JSON.parse(localStorage.getItem(`user_${user}`)) || { tokens: 0 };
+window.location.href = href;
   });
 });
 
-
-    document.getElementById("username-display").textContent = "Hello, " + username + "!";
-
-    // 💾 ADDED: show local tokens while waiting for Firestore
-    const localTokens = localStorage.getItem("tokens");
-    if (localTokens !== null) updateTokenDisplay(localTokens);
-
-    currentUserData = await fetchUserData(username);
-    updateTokenDisplay(currentUserData.tokens); // Also resyncs localStorage
-    updateWheelUI(currentUserData.lastWheelSpin);
-  }
-
-  window.onload = init;
-
-  document.getElementById("spinWheelBtn").onclick = spinWheel;
-
-  setInterval(() => {
-    if (currentUserData) {
-      updateWheelUI(currentUserData.lastWheelSpin);
-    }
-  }, 60000);
-</script>
+  </script>
 </body>
 </html>
