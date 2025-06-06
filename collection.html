@@ -57,24 +57,6 @@
       font-size: 10px;
     }
   </style>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js"></script>
-  <script>
-    // Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyA-wi0PMo1VUj8ES623IxUgb_AZGGQz4Bs",
-  authDomain: "blicket-3dfc7.firebaseapp.com",
-  projectId: "blicket-3dfc7",
-  storageBucket: "blicket-3dfc7.firebasestorage.app",
-  messagingSenderId: "78883670759",
-  appId: "1:78883670759:web:929f1ecd3bc95d0782f042"
-};
-    
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
 </head>
 <body>
   <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 20px;">
@@ -116,15 +98,15 @@ const firebaseConfig = {
     };
 
     const customNameMap = {
-      "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen",
-      "755": "Blueberry Yougurt",
-      "d1a659d7-4caf-4184-9a10-91e9a40f25fc": "Strawberry Milk",
-      "custom-blooks-i-have-made-v0-gfdrycozh9gc1": "Blood Orange Juice",
-      "6de84203-ba3b-4edc-b778-76e10f1f3207": "Cherry Milk",
-      "0g4eflh6ceh91": "Alien Chick",
-      "gq1ol7z5ceh91": "Alien Cyborg"
-    };
-
+  "6daea961-7e74-4aa7-9249-284fffef8209": "Phantom Queen",
+  "755": "Blueberry Yougurt",
+  "d1a659d7-4caf-4184-9a10-91e9a40f25fc": "Strawberry Milk",
+  "custom-blooks-i-have-made-v0-gfdrycozh9gc1": "Blood Orange Juice",
+  "6de84203-ba3b-4edc-b778-76e10f1f3207": "Cherry Milk",
+  "0g4eflh6ceh91": "Alien Chick",
+  "gq1ol7z5ceh91": "Alien Cyborg"
+};
+    
     function displayCollection() {
       const container = document.getElementById('collection');
       container.innerHTML = '';
@@ -137,11 +119,11 @@ const firebaseConfig = {
         img.src = blook.name;
 
         const name = document.createElement('div');
-        name.className = 'blook-name';
+name.className = 'blook-name';
 
-        const fileName = blook.name.split('/').pop().split('.')[0];
+const fileName = blook.name.split('/').pop().split('.')[0];
 
-        name.textContent = customNameMap[fileName] || decodeURIComponent(fileName);
+name.textContent = customNameMap[fileName] || decodeURIComponent(fileName);
 
         const rarity = document.createElement('div');
         rarity.className = 'rarity-tag';
@@ -157,7 +139,7 @@ const firebaseConfig = {
         sellBtn.style.marginTop = '8px';
         sellBtn.style.padding = '4px 8px';
         sellBtn.style.cursor = 'pointer';
-        sellBtn.onclick = async () => await sellXBlook(index);
+        sellBtn.onclick = () => sellXBlook(index);
 
         card.appendChild(img);
         card.appendChild(name);
@@ -169,33 +151,7 @@ const firebaseConfig = {
       });
     }
 
-    async function syncCollectionToFirebase() {
-      if (!currentUser) return;
-
-      const userCollectionRef = db.collection('users').doc(currentUser).collection('collection');
-      const batch = db.batch();
-
-      collection.forEach(blook => {
-        const fileName = blook.name.split('/').pop().split('.')[0];
-        const docId = decodeURIComponent(fileName);
-
-        const docRef = userCollectionRef.doc(docId);
-        batch.set(docRef, {
-          name: blook.name,
-          rarity: blook.rarity,
-          quantity: blook.quantity || 1
-        });
-      });
-
-      try {
-        await batch.commit();
-        console.log('Collection synced to Firebase.');
-      } catch (err) {
-        console.error('Failed to sync collection to Firebase:', err);
-      }
-    }
-
-    async function sellXBlook(index) {
+    function sellXBlook(index) {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
       const blook = collection[index];
       const maxQuantity = blook.quantity || 1;
@@ -224,10 +180,9 @@ const firebaseConfig = {
 
       alert(`Sold ${amount} blook(s) for ${sellValue * amount} tokens.`);
       displayCollection();
-      await syncCollectionToFirebase();
     }
 
-    async function sellAllBlooks() {
+    function sellAllBlooks() {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
       let totalTokens = 0;
 
@@ -245,10 +200,9 @@ const firebaseConfig = {
 
       alert(`Sold all blooks for ${totalTokens} tokens!`);
       displayCollection();
-      await syncCollectionToFirebase();
     }
 
-    async function sellAllDuplicates() {
+    function sellAllDuplicates() {
       let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
       let totalTokens = 0;
 
@@ -270,13 +224,9 @@ const firebaseConfig = {
 
       alert(`Sold all duplicates for ${totalTokens} tokens!`);
       displayCollection();
-      await syncCollectionToFirebase();
     }
 
-    // Initial display and sync on page load
     displayCollection();
-    syncCollectionToFirebase();
-
   </script>
 </body>
 </html>
