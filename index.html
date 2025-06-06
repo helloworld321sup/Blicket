@@ -256,6 +256,21 @@ const firebaseConfig = {
       tokens = userData.tokens;
     }
 
+    function updateTokens(newAmount) {
+  const username = localStorage.getItem('currentUser');
+  if (!username) return;
+
+  localStorage.setItem(`tokens_${username}`, newAmount);
+
+  // Update Firestore too
+  const db = firebase.firestore();
+  db.collection('users').doc(username).update({
+    tokens: newAmount
+  }).catch((error) => {
+    console.error("Error updating tokens in Firestore:", error);
+  });
+}
+
     document.getElementById("tokenDisplay").textContent = `Tokens: ${tokens}`;
   }
 
