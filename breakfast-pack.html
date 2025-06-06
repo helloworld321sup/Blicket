@@ -4,6 +4,59 @@
   <meta charset="UTF-8" />
   <title>Blicket | Breakfast Pack</title>
   <link rel="icon" href="favicon.png" type="image/png">
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    function updateTokens(newAmount) {
+      const username = localStorage.getItem('currentUser');
+      if (!username) return;
+
+      const userKey = `user_${username}`;
+      const localData = JSON.parse(localStorage.getItem(userKey)) || {};
+      localData.tokens = newAmount;
+      localStorage.setItem(userKey, JSON.stringify(localData));
+
+      const userRef = doc(db, "users", username);
+      updateDoc(userRef, { tokens: newAmount }).catch((err) => console.error("Failed to update Firestore tokens:", err));
+    }
+
+    const currentUser = localStorage.getItem('currentUser');
+    if (!currentUser) {
+      window.location.href = 'login.html';
+    }
+
+    const PACK_COST = 20;
+    const userRef = doc(db, "users", currentUser);
+    getDoc(userRef).then(docSnap => {
+      let tokens = 0;
+      if (docSnap.exists()) {
+        tokens = docSnap.data().tokens;
+      }
+
+      if (tokens < PACK_COST) {
+        alert("Not enough tokens to open this pack.");
+        window.location.href = "index.html";
+        return;
+      } else {
+        updateTokens(tokens - PACK_COST);
+      }
+    });
+
+    window.updateTokens = updateTokens;
+  </script>
   <style>
     body {
       background-color: rgb(255, 140, 72);
@@ -82,25 +135,9 @@
     <div class="half top-half"></div>
     <div class="half bottom-half"></div>
   </div>
-
+  
   <script>
-  const currentUser = localStorage.getItem('currentUser');
-  if (!currentUser) {
-    window.location.href = 'login.html';
-  }
-
-  const PACK_COST = 20;
-let userData = JSON.parse(localStorage.getItem(`user_${currentUser}`)) || { tokens: 0 };
-
-if (userData.tokens < PACK_COST) {
-  alert("Not enough tokens to open this pack.");
-  window.location.href = "index.html";
-} else {
-  userData.tokens -= PACK_COST;
-  localStorage.setItem(`user_${currentUser}`, JSON.stringify(userData));
-}
-
-  const breakfastPack = {
+      const breakfastPack = {
     blooks: [
       { name: "https://ac.blooket.com/marketassets/blooks/toast.svg", chance: 11.8268, rarity: 'uncommon' },
       { name: "https://ac.blooket.com/marketassets/blooks/cereal.svg", chance: 12.2768, rarity: 'uncommon' },
