@@ -157,38 +157,39 @@ const firebaseConfig = {
 </div>
 
 <script>
-  const username = localStorage.getItem("currentUser");
-  const tokenDisplay = document.getElementById("tokenDisplay");
+  document.getElementById("logout-button").onclick = () => {
+    localStorage.removeItem("currentUser");
+    window.location.href = "login.html";
+  };
 
-  async function updateTokens(newAmount) {
-    localStorage.setItem(`tokens_${username}`, newAmount);
-    try {
-      const { db, doc, updateDoc } = window.BlicketFirebase;
-      const userRef = doc(db, "users", username);
-      await updateDoc(userRef, { tokens: newAmount });
-    } catch (err) {
-      console.error("Error updating Firestore tokens:", err);
-    }
+  const displayName = localStorage.getItem("currentUser");
+  if (displayName) {
+    document.getElementById("username-display").textContent = "Hello, " + displayName + "!";
   }
 
-  async function updateTokenDisplay() {
-    let tokens = 0;
-    try {
-      const { db, doc, getDoc, setDoc } = window.blicketFirebase;
-      const userRef = doc(db, "users", username);
-      const snap = await getDoc(userRef);
-      if (snap.exists()) {
-        tokens = snap.data().tokens;
-        localStorage.setItem(`tokens_${username}`, tokens);
-      } else {
-        await setDoc(userRef, { tokens: 0 });
-        tokens = 0;
-      }
-    } catch (e) {
-      tokens = parseInt(localStorage.getItem(`tokens_${username}`)) || 0;
-    }
+  const SPIN_INTERVAL = 12 * 60 * 60 * 1000;
 
-    tokenDisplay.textContent = `Tokens: ${tokens}`;
+  function canSpinWheel() {
+    const lastSpin = localStorage.getItem(`lastWheelSpin_${displayName}`);
+    return !lastSpin || Date.now() - parseInt(lastSpin) >= SPIN_INTERVAL;
+  }
+
+  function updateWheelUI() {
+    const btn = document.getElementById("spinWheelBtn");
+    const msg = document.getElementById("wheelMessage");
+    const lastSpin = localStorage.getItem(`lastWheelSpin_${displayName}`);
+
+    if (canSpinWheel()) {
+      btn.disabled = false;
+      msg.textContent = "Ready to spin!";
+    } else {
+      const nextSpin = new Date(parseInt(lastSpin) + SPIN_INTERVAL);
+      const timeLeft = nextSpin - Date.now();
+      const hours = Math.floor(timeLeft / 3600000);
+      const minutes = Math.floor((timeLeft % 3600000) / 60000);
+      msg.textContent = `Come back in ${hours}h ${minutes}m.`;
+      btn.disabled = true;
+    }
   }
 
   async function spinWheel() {
@@ -219,78 +220,56 @@ const firebaseConfig = {
     }
 
     try {
-      const { db, doc, updateDoc, getDoc } = window.blicketFirebase;
-      const userRef = doc(db, "users", username);
+      const { db, doc, updateDoc, increment, getDoc } = window.BlicketFirebase;
+      const userRef = doc(db, "users", displayName);
       await updateDoc(userRef, { tokens: increment(selected.tokens) });
-      const snap = await getDoc(userRef);
-      const newTokens = snap.data().tokens;
-      localStorage.setItem(`tokens_${username}`, newTokens);
+      const newSnap = await getDoc(userRef);
+      const newTokens = newSnap.data().tokens;
+      localStorage.setItem(`user_${displayName}`, JSON.stringify({ tokens: newTokens }));
     } catch (err) {
       console.warn("Firebase failed, fallback to localStorage:", err);
-      let fallback = parseInt(localStorage.getItem(`tokens_${username}`)) || 0;
-      fallback += selected.tokens;
-      localStorage.setItem(`tokens_${username}`, fallback);
+      const fallback = JSON.parse(localStorage.getItem(`user_${displayName}`)) || { tokens: 0 };
+      fallback.tokens += selected.tokens;
+      localStorage.setItem(`user_${displayName}`, JSON.stringify(fallback));
     }
 
-    localStorage.setItem(`lastWheelSpin_${username}`, Date.now());
+    localStorage.setItem(`lastWheelSpin_${displayName}`, Date.now());
     document.getElementById("wheelMessage").textContent = `You won ${selected.tokens} tokens! Come back in 12 hours.`;
     document.getElementById("spinWheelBtn").disabled = true;
     updateTokenDisplay();
   }
 
-  function canSpinWheel() {
-    const lastSpin = localStorage.getItem(`lastWheelSpin_${username}`);
-    return !lastSpin || Date.now() - parseInt(lastSpin) >= 12 * 60 * 60 * 1000;
-  }
-
-  function updateWheelUI() {
-    const btn = document.getElementById("spinWheelBtn");
-    const msg = document.getElementById("wheelMessage");
-    const lastSpin = localStorage.getItem(`lastWheelSpin_${username}`);
-
-    if (canSpinWheel()) {
-      btn.disabled = false;
-      msg.textContent = "Ready to spin!";
-    } else {
-      const nextSpin = new Date(parseInt(lastSpin) + 12 * 60 * 60 * 1000);
-      const timeLeft = nextSpin - Date.now();
-      const hours = Math.floor(timeLeft / 3600000);
-      const minutes = Math.floor((timeLeft % 3600000) / 60000);
-      msg.textContent = `Come back in ${hours}h ${minutes}m.`;
-      btn.disabled = true;
-    }
-  }
-
-  window.addEventListener('DOMContentLoaded', async () => {
-    // Firestore sync
+  async function updateTokenDisplay() {
+    let tokens = 0;
     try {
-      const { db, doc, getDoc } = window.blicketFirebase;
-      const userRef = doc(db, "users", username);
+      const { db, doc, getDoc, setDoc } = window.BlicketFirebase;
+      const userRef = doc(db, "users", displayName);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
-        const tokens = snap.data().tokens;
-        localStorage.setItem(`tokens_${username}`, tokens);
-        tokenDisplay.textContent = `Tokens: ${tokens}`;
+        tokens = snap.data().tokens;
+        localStorage.setItem(`user_${displayName}`, JSON.stringify({ tokens }));
       } else {
-        tokenDisplay.textContent = `Tokens: 0`;
+        await setDoc(userRef, { tokens: 0 });
       }
     } catch (e) {
-      const localTokens = localStorage.getItem(`tokens_${username}`) || 0;
-      tokenDisplay.textContent = `Tokens: ${localTokens}`;
+      const userData = JSON.parse(localStorage.getItem(`user_${displayName}`)) || { tokens: 0 };
+      tokens = userData.tokens;
     }
 
-    document.querySelectorAll(".pack-card").forEach(card => {
-      card.style.cursor = "pointer";
-      card.addEventListener("click", () => {
-        const href = card.getAttribute("data-href");
-        window.location.href = href;
-      });
-    });
+    document.getElementById("tokenDisplay").textContent = `Tokens: ${tokens}`;
+  }
 
-    updateWheelUI();
-    updateTokenDisplay();
-    setInterval(updateWheelUI, 60000);
+  document.querySelectorAll(".pack-card").forEach(card => {
+    card.style.cursor = "pointer";
+    card.addEventListener("click", () => {
+      const href = card.getAttribute("data-href");
+      window.location.href = href;
+    });
   });
+
+  updateWheelUI();
+  updateTokenDisplay();
+  setInterval(updateWheelUI, 60000);
 </script>
 
 </body>
