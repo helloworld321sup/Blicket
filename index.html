@@ -219,7 +219,7 @@ const firebaseConfig = {
     }
 
     try {
-      const { db, doc, updateDoc, getDoc } = window.BlicketFirebase;
+      const { db, doc, updateDoc, getDoc } = window.blicketFirebase;
       const userRef = doc(db, "users", username);
       await updateDoc(userRef, { tokens: increment(selected.tokens) });
       const snap = await getDoc(userRef);
@@ -264,7 +264,7 @@ const firebaseConfig = {
   window.addEventListener('DOMContentLoaded', async () => {
     // Firestore sync
     try {
-      const { db, doc, getDoc } = window.BlicketFirebase;
+      const { db, doc, getDoc } = window.blicketFirebase;
       const userRef = doc(db, "users", username);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
